@@ -1,0 +1,33 @@
+/**
+ * Accessibility Checker Styles
+ *
+ * Styles for highlighting accessibility issues in the editor content.
+ */
+
+/* Issue decorations in editor content */
+.scryb-accessibility-issue {
+    position: relative;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    cursor: help;
+}
+
+.scryb-accessibility-issue--error {
+    text-decoration-color: var(--scryb-color-red-500, #ef4444);
+    background-color: var(--scryb-color-red-50, #fef2f2);
+}
+
+.scryb-accessibility-issue--warning {
+    text-decoration-color: var(--scryb-color-yellow-500, #eab308);
+    background-color: var(--scryb-color-yellow-50, #fffbeb);
+}
+
+.scryb-accessibility-issue--info {
+    text-decoration-color: var(--scryb-color-blue-500, #3b82f6);
+    background-color: var(--scryb-color-blue-50, #eff6ff);
+}
+
+/* Hover effect */
+.scryb-accessibility-issue:hover {
+    opacity: 0.8;
+}

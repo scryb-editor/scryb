@@ -1,0 +1,328 @@
+/* =============================================================================
+   Scryb Editor Design Tokens
+
+   This file defines the core design tokens (CSS Custom Properties) for the editor.
+   These tokens provide a semantic abstraction layer that allows easy customization.
+
+   HOW TO CUSTOMIZE:
+   ─────────────────
+   To create a custom theme, override these variables in your application's CSS:
+
+   ```css
+   .scryb-editor {
+     --scryb-primary: #your-primary-color;
+     --scryb-primary-hover: #your-primary-hover;
+     --scryb-bg: #your-background;
+     --scryb-text: #your-text-color;
+   }
+   ```
+
+   Or scope to a specific theme class:
+
+   ```css
+   .my-custom-theme {
+     --scryb-primary: #8b5cf6;
+     --scryb-bg: #faf5ff;
+   }
+   ```
+   ============================================================================= */
+
+/* =============================================================================
+   Primitive Tokens
+
+   These are the raw color values. They are NOT meant to be used directly
+   in components. Instead, use the semantic tokens below.
+   Users can override these to change the entire color palette.
+   ============================================================================= */
+
+/* Token scope: the editor itself + companion components that may render
+   OUTSIDE the editor host element (e.g. the TOC sidebar mounted as a
+   sibling, or floating popups portaled to <body>). All of these surfaces
+   need access to the same design tokens.
+
+   The theme classes are listed too: themes.css binds its semantic tokens to
+   these primitives (e.g. --scryb-blockquote-bg: var(--scryb-color-dark-200)),
+   so any element carrying a theme class — a bare `.scryb-content` viewer
+   wrapped in `.scryb-theme-dark`, outside any editor — must find the
+   primitives on itself, or every semantic token silently falls back to the
+   light literals baked into content.css. */
+.scryb-editor,
+.scryb-toc,
+.scryb-emoji-popup,
+.scryb-mention-popup,
+.scryb-editor-portal,
+.scryb-theme-light,
+.scryb-theme-dark,
+.scryb-theme-auto {
+    /* ─────────────────────────────────────────────────────────────────────────
+     Neutral Palette (Light)
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-color-white: #ffffff;
+    --scryb-color-gray-50: #f8f9fa;
+    --scryb-color-gray-100: #f1f5f9;
+    --scryb-color-gray-200: #e2e8f0;
+    --scryb-color-gray-300: #d1d5db;
+    --scryb-color-gray-400: #a0aec0;
+    --scryb-color-gray-500: #718096;
+    --scryb-color-gray-600: #4a5568;
+    --scryb-color-gray-700: #374151;
+    --scryb-color-gray-800: #2d3748;
+    --scryb-color-gray-900: #1a202c;
+    --scryb-color-black: #111827;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Primary Palette (Blue)
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-color-primary-100: rgba(49, 130, 206, 0.1);
+    --scryb-color-primary-200: rgba(49, 130, 206, 0.2);
+    --scryb-color-primary-400: #60a5fa;
+    --scryb-color-primary-500: #3b82f6;
+    --scryb-color-primary-600: #3182ce;
+    --scryb-color-primary-700: #1d4ed8;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Accent Palette (dark-theme interactive accents)
+
+     The primary blue lightened for dark surfaces — same hue as the light
+     theme, not a second brand color. Retinted from the original indigo
+     (#6366f1 family): an editor sold white-label cannot ship an opinionated
+     hue on its surfaces, and two blues across the two themes read as two
+     products. Blue appears only on interaction — links, selection, focus —
+     never on a surface.
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-color-accent-100: rgba(59, 130, 246, 0.1);
+    --scryb-color-accent-200: rgba(59, 130, 246, 0.2);
+    --scryb-color-accent-300: rgba(59, 130, 246, 0.3);
+    --scryb-color-accent-400: #93c5fd;
+    --scryb-color-accent-500: #60a5fa;
+    --scryb-color-accent-600: #3b82f6;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Semantic Colors
+     ───────────────────────────────────────────────────────────────────────── */
+    /* #c53030, not the old #e53e3e: error text renders on white and gray-50
+       surfaces throughout the components, and #e53e3e measured 4.1:1 on white
+       — under the 4.5:1 AA floor. One step darker clears every light surface
+       (5.0:1 on white, 4.5:1 on gray-100) without changing the hue. The
+       -light value is for dark surfaces, where #f87171 passes comfortably. */
+    --scryb-color-error: #c53030;
+    --scryb-color-error-light: #f87171;
+    --scryb-color-warning: #fef08a;
+    --scryb-color-warning-dark: #854d0e;
+
+    /* Inline code is not an error, so it gets its own pair rather than
+       borrowing the error tokens: retinting error text would otherwise
+       recolour every code span. The light value is a step darker than
+       --scryb-color-error because #e53e3e measured 3.8:1 on the gray-100
+       chip, under the 4.5:1 AA floor for body-size text; this clears it at
+       5.3:1. The dark value sits on --scryb-color-dark-border. */
+    --scryb-color-code: #bf2b2b;
+    --scryb-color-code-light: #f87171;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Dark Palette
+
+     Near-neutral grays (saturation ≤5%), not the original navy (#1a1a2e
+     family, ~27% saturated blue): dark chrome must stay hue-free so it sits
+     under any consumer brand. The faint cool cast that remains is below the
+     threshold where it reads as a color.
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-color-dark-50: #26262b;
+    --scryb-color-dark-100: #1e1e22;
+    --scryb-color-dark-200: #19191d;
+    --scryb-color-dark-300: #121215;
+    --scryb-color-dark-border: #303036;
+    --scryb-color-dark-border-hover: #3f3f46;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Shadows
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --scryb-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    --scryb-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --scryb-shadow-xl: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    --scryb-shadow-dark-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --scryb-shadow-dark-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --scryb-shadow-dark-xl: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Transitions
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --scryb-transition-normal: 0.2s ease;
+    --scryb-transition-slow: 0.3s ease;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Border Radius
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-radius-sm: 2px;
+    --scryb-radius-md: 6px;
+    --scryb-radius-lg: 12px;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Spacing
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-spacing-xs: 2px;
+    --scryb-spacing-sm: 4px;
+    --scryb-spacing-md: 8px;
+    --scryb-spacing-lg: 16px;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Scrollbars
+
+     Every scrollable surface in the editor draws the same bar. Quietness is
+     bought with GEOMETRY, not with contrast: a 4px thumb at 4:1 reads calmer
+     than a 15px thumb at 2:1, and only one of the two is legible.
+
+     The thumb is a control that says "this region continues", so WCAG 2.1
+     SC 1.4.11 asks 3:1 of it. Measured against white: gray-300 is 1.4:1 and
+     gray-400 is 2.26:1 — both fail. gray-500 is 4.01:1 on white and 4.25:1 on
+     the dark surface, which is why one value serves both themes at rest and
+     only the hover state is re-bound per theme.
+
+     `-size` is the track, `-inset` is a transparent border the thumb paints
+     inside of. That is what keeps the visible thumb 4px while the pointer
+     target stays the full 10px — see the recipe in components.css.
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-scrollbar-size: 10px;
+    --scryb-scrollbar-inset: 3px;
+    --scryb-scrollbar-thumb: var(--scryb-color-gray-500);
+    --scryb-scrollbar-thumb-hover: var(--scryb-color-gray-600);
+    --scryb-scrollbar-track: transparent;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Bubble Menu geometry (theme-independent)
+
+     Shared by the React `.scryb-bubble-menu` and Angular `.bubble-menu` so both
+     adapters render an identical bubble menu. Colors/shadow live in themes.css
+     (--scryb-bubble-bg / -border / -shadow); geometry lives here.
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-bubble-radius: 10px;
+    --scryb-bubble-padding: 8px 10px;
+    --scryb-bubble-gap: var(--scryb-spacing-xs);
+    --scryb-bubble-button-size: 36px;
+    --scryb-bubble-button-radius: var(--scryb-radius-md);
+
+    /* Details / Toggle Block (Phase 68) */
+    --scryb-details-summary-hover-bg: rgba(0, 0, 0, 0.04);
+    --scryb-details-border: var(--scryb-color-gray-200);
+    --scryb-details-content-border: var(--scryb-color-gray-300);
+    --scryb-details-chevron-color: var(--scryb-color-gray-500);
+    --scryb-details-chevron-active-color: var(--scryb-color-primary-600);
+    /* The toggle's arrow, as a mask rather than an icon-font ligature: the
+       editor chrome draws inline SVG now, and this was the last rule that made
+       the Material Symbols font a requirement rather than a fallback. Same
+       artwork as `chevron_right` in core's icon registry (Lucide, ISC).
+       Override it to change the marker; it is painted with `currentColor`, so
+       the colour tokens above still apply. */
+    --scryb-details-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E");
+
+    /* Table of Contents (Phase 68)
+       Editorial-minimalism design: borderless container, rail-based.
+       Default item text is muted (gray-500); brightens to active-color on
+       hover/active. The rail is hairline gray-200, replaced by active-color
+       on the heading currently in viewport. No background fills anywhere.
+       Hover/active "bg" tokens preserved as `transparent` for back-compat. */
+    --scryb-toc-bg: transparent;
+    --scryb-toc-border: var(--scryb-color-gray-200);
+    --scryb-toc-item-color: var(--scryb-color-gray-500);
+    --scryb-toc-item-hover-bg: transparent;
+    --scryb-toc-item-active-bg: transparent;
+    --scryb-toc-item-active-color: var(--scryb-color-primary-600);
+    --scryb-toc-title-color: var(--scryb-color-gray-500);
+
+    /* Emoji Popup (Phase 68) */
+    --scryb-emoji-popup-bg: var(--scryb-surface-elevated, #ffffff);
+    --scryb-emoji-popup-border: rgba(0, 0, 0, 0.06);
+    --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --scryb-emoji-item-hover-bg: rgba(0, 0, 0, 0.04);
+    --scryb-emoji-item-selected-bg: rgba(0, 0, 0, 0.06);
+    --scryb-emoji-group-header-color: var(--scryb-color-gray-400);
+    --scryb-emoji-empty-color: var(--scryb-text-muted);
+
+    /* Mention Popup & Pill */
+    --scryb-mention-popup-bg: var(--scryb-surface-elevated, #ffffff);
+    --scryb-mention-popup-border: rgba(0, 0, 0, 0.06);
+    --scryb-mention-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --scryb-mention-item-hover-bg: rgba(0, 0, 0, 0.04);
+    --scryb-mention-item-selected-bg: rgba(0, 0, 0, 0.06);
+    --scryb-mention-empty-color: var(--scryb-text-muted);
+    --scryb-mention-avatar-bg: var(--scryb-color-primary-100);
+    --scryb-mention-avatar-color: var(--scryb-color-primary-600);
+    --scryb-mention-pill-bg: var(--scryb-color-primary-100);
+    --scryb-mention-pill-color: var(--scryb-color-primary-600);
+}
+
+/* =============================================================================
+   Tooltip Theme Tokens
+
+   These are used specifically for tooltip styling.
+   Override these to customize tooltip appearance.
+   ============================================================================= */
+
+.scryb-editor {
+    --scryb-tooltip-bg: var(--scryb-color-gray-800);
+    --scryb-tooltip-text: var(--scryb-color-gray-50);
+    --scryb-tooltip-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --scryb-tooltip-radius: var(--scryb-radius-md);
+    --scryb-tooltip-font-size: 12px;
+    --scryb-tooltip-padding: 4px 8px;
+}
+
+/* =============================================================================
+   Side Menu Theme Tokens
+
+   These are used specifically for the side menu (+ button and drag handle).
+   Override these to customize side menu appearance.
+   ============================================================================= */
+
+.scryb-editor {
+    --scryb-sidemenu-bg: transparent;
+    --scryb-sidemenu-hover-bg: var(--scryb-color-gray-100);
+    --scryb-sidemenu-icon-color: var(--scryb-color-gray-400);
+    --scryb-sidemenu-border: transparent;
+    --scryb-sidemenu-shadow: none;
+}
+
+/* =============================================================================
+   Block Menu Theme Tokens
+
+   These are used specifically for the block context menu styling.
+   Override these to customize block menu appearance.
+   ============================================================================= */
+
+.scryb-editor {
+    --scryb-block-menu-bg: var(--scryb-color-white);
+    --scryb-block-menu-border: var(--scryb-color-gray-200);
+    /* The emoji/mention popup recipe, not --scryb-shadow-lg: a 32px-blur
+       shadow under a ~120px dropdown reads as a floating smudge. Tight
+       layered shadows match the element's actual size. */
+    --scryb-block-menu-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --scryb-block-menu-item-hover-bg: var(--scryb-color-gray-100);
+    --scryb-block-menu-separator-color: var(--scryb-color-gray-200);
+}
+
+/* =============================================================================
+   Overflow Panel Tokens
+
+   The "more" panel behind the toolbar and bubble menu overflow buttons.
+
+   The divider defaults to zero thickness: sections are grouped by spacing,
+   because a stack of hairlines at several times the panel's base spacing unit
+   becomes the loudest thing in it. Consumers who want visible rules set
+   --scryb-overflow-divider-size to 1px rather than having to out-specify the
+   layout rules in components.css.
+   ============================================================================= */
+
+/* The portal container is listed too: React portals its overflow popover into
+   `.scryb-editor-portal`, outside the editor root, so tokens declared only on
+   `.scryb-editor` would silently fall back there and a consumer override would
+   reach the Angular panel but not the React one. */
+.scryb-editor,
+.scryb-editor-portal {
+    --scryb-overflow-width: 240px;
+    --scryb-overflow-divider-size: 0;
+    --scryb-overflow-divider-gap: 6px;
+    --scryb-overflow-divider-color: var(--scryb-toolbar-separator);
+}

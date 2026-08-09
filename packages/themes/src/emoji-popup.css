@@ -1,0 +1,124 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Emoji Popup (Phase 68)
+
+   Styles for the emoji suggestion popup triggered by typing ":" in the editor.
+   All colors use var(--scryb-emoji-*) tokens defined in tokens.css (light values)
+   and overridden in themes.css (.scryb-theme-dark block).
+
+   Rules:
+   - NO hardcoded hex or rgba() values — all colors via var(--scryb-*) tokens
+   - NO .scryb-theme-dark selectors — dark values live in themes.css
+   - Padding/gap values are multiples of 4 (UI-SPEC Dimension 5)
+   - Two font weights only: 400 (regular) and 600 (semibold) (UI-SPEC Dimension 4)
+   - Container border-radius: var(--scryb-radius-lg) (12px)
+   - Item border-radius: var(--scryb-radius-md) (6px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Container ─────────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup {
+  position: absolute;
+  background: var(--scryb-emoji-popup-bg);
+  border: 1px solid var(--scryb-emoji-popup-border);
+  border-radius: var(--scryb-radius-lg);
+  box-shadow: var(--scryb-emoji-popup-shadow);
+  padding: var(--scryb-spacing-md);
+  min-width: 220px;
+  z-index: 1000;
+  display: none;
+}
+
+.scryb-emoji-popup.is-visible {
+  display: block;
+}
+
+/* ─── Scroll area ───────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* ─── Group header ──────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-group-header {
+  padding: var(--scryb-spacing-sm) var(--scryb-spacing-md);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--scryb-emoji-group-header-color);
+  user-select: none;
+}
+
+/* ─── Item row ──────────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-item {
+  display: flex;
+  align-items: center;
+  gap: var(--scryb-spacing-md);
+  padding: var(--scryb-spacing-md);
+  border-radius: var(--scryb-radius-md);
+  min-height: 32px;
+  cursor: pointer;
+  color: var(--scryb-text-color);
+  transition: background-color var(--scryb-transition-fast);
+  user-select: none;
+}
+
+.scryb-emoji-popup-item:hover {
+  background: var(--scryb-emoji-item-hover-bg);
+}
+
+.scryb-emoji-popup-item.is-selected {
+  background: var(--scryb-emoji-item-selected-bg);
+}
+
+.scryb-emoji-popup-item:focus-visible {
+  outline: 2px solid var(--scryb-color-primary-600);
+  outline-offset: 2px;
+}
+
+/* ─── Emoji glyph ───────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-item-glyph {
+  font-size: 20px;
+  line-height: 1;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ─── Item label ────────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-item-label {
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────────── */
+
+.scryb-emoji-popup-empty {
+  padding: var(--scryb-spacing-lg);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--scryb-emoji-empty-color, var(--scryb-text-muted));
+}
+
+/* ─── Screen-reader live region (visually hidden) ───────────────────────── */
+
+.scryb-emoji-popup-aria-hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,33 @@
+/* =============================================================================
+   Material Symbols Font Configuration
+
+   Configures the Material Symbols Outlined icon font.
+   This font must be loaded separately in your application.
+
+   LOADING THE FONT:
+   ─────────────────
+   Add this to your index.html or import via CSS:
+
+   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+   Or via npm:
+   npm install material-symbols
+   ============================================================================= */
+
+.material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: "liga";
+    -webkit-font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}

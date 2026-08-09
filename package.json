@@ -1,0 +1,18 @@
+{
+  "name": "scryb",
+  "private": true,
+  "description": "The MIT packages behind the Scryb rich text editor: headless core, Tiptap extensions, themes and an SSR-safe viewer",
+  "license": "MIT",
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "packages/*"
+  ],
+  "overrides": {
+    "prosemirror-model": "1.25.11",
+    "prosemirror-view": "1.42.2"
+  },
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "test": "bun run --filter '*' test"
+  }
+}

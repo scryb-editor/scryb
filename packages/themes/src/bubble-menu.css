@@ -1,0 +1,42 @@
+/* =============================================================================
+   Bubble Menu Styles
+
+   These styles apply to the Floating UI-positioned bubble menus used in the
+   editor. All colors reference CSS custom properties for theme compatibility.
+
+   The BubbleMenuPlugin from @tiptap/extension-bubble-menu manages visibility
+   and positioning via inline styles (visibility, position, top, left).
+   ============================================================================= */
+
+/* =============================================================================
+   Bubble menu container, layout and overflow styles live in components.css
+   under the shared .scryb-bubble-menu* classes — both adapters render the
+   same class names. The parallel .bubble-menu rule set that used to live here
+   styled the Angular adapter separately and drifted; do not reintroduce it.
+   ============================================================================= */
+
+/* =============================================================================
+   Tooltip Theme
+
+   Used for small informational tooltips (e.g., button labels).
+   Colors are themeable via CSS custom properties.
+   ============================================================================= */
+
+.tippy-box[data-theme~="scryb-tooltip"] {
+    background: var(--scryb-tooltip-bg, #1f2937);
+    color: var(--scryb-tooltip-text, #f9fafb);
+    font-size: var(--scryb-tooltip-font-size, 12px);
+    font-weight: 500;
+    padding: var(--scryb-tooltip-padding, 4px 8px);
+    border-radius: var(--scryb-tooltip-radius, 6px);
+    box-shadow: var(--scryb-tooltip-shadow, 0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.tippy-box[data-theme~="scryb-tooltip"] > .tippy-content {
+    padding: 0;
+}
+
+.tippy-box[data-theme~="scryb-tooltip"] > .tippy-arrow::before {
+    border-top-color: var(--scryb-tooltip-bg, #1f2937);
+    border-bottom-color: var(--scryb-tooltip-bg, #1f2937);
+}

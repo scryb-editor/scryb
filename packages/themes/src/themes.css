@@ -1,0 +1,492 @@
+/* =============================================================================
+   Scryb Editor Theme System
+
+   Themeable design system using CSS Custom Properties.
+   Supports: Light (default), Dark, Auto (system preference), Custom themes.
+
+   CUSTOMIZATION: Override --scryb-* variables in your CSS, create custom
+   theme classes (.scryb-theme-*), or extend existing themes.
+   See docs at https://scryb.dev/reference/themes for examples.
+   ============================================================================= */
+
+/* =============================================================================
+   Light Theme (Default)
+
+   Defined on .scryb-editor so all themes inherit these values.
+   Other themes only need to override what's different.
+   ============================================================================= */
+
+/* Light theme tokens. Extended scope so companion components rendered
+   OUTSIDE the editor host (TOC sidebar, floating popups) inherit the same
+   palette without needing to be wrapped in `.scryb-editor`.
+
+   NOTE: `--scryb-text-color` is intentionally NOT declared on the
+   unconditional `.scryb-editor:not(.scryb-theme-dark)` selector — it is only
+   set below on explicit theme classes (`.scryb-theme-light`,
+   `.scryb-theme-dark`, `.scryb-theme-auto`). Combined with the theme-scoped
+   `color` rule in components.css, this lets consumers that opt out of theme
+   classes inherit `color` from their ancestor. Mirrors the pattern used for
+   `--scryb-editor-bg` in commit 00ced39. See
+   .planning/debug/editor-color-no-inherit.md. */
+.scryb-editor:not(.scryb-theme-dark),
+.scryb-theme-light,
+.scryb-toc:not(.scryb-theme-dark),
+.scryb-emoji-popup:not(.scryb-theme-dark),
+.scryb-mention-popup:not(.scryb-theme-dark),
+.scryb-editor-portal:not(.scryb-theme-dark) {
+    color-scheme: light;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Editor Container
+     ─────────────────────────────────────────────────────────────────────────
+     The editor is a self-contained card: solid surface, hairline border,
+     12px radius, whisper of a shadow. Consumers embedding it inside their
+     own card can flatten it back with
+     `.scryb-editor { --scryb-editor-bg: transparent; border: none; box-shadow: none; }`.
+     Floating UI (popups, menus, modals) uses `--scryb-surface-elevated`
+     (see the non-popup-scope rule below). */
+    --scryb-editor-bg: var(--scryb-color-white);
+    --scryb-editor-border: var(--scryb-color-gray-200);
+    /* One neutral step darker, not the primary blue: editors keep focus for
+       the whole writing session, so a saturated focus border would be a
+       permanent frame around the content. Focus rings on controls stay blue. */
+    --scryb-editor-border-focus: var(--scryb-color-gray-300);
+    --scryb-editor-shadow: 0 1px 2px rgba(22, 24, 31, 0.04);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Text Colors
+     ─────────────────────────────────────────────────────────────────────────
+     `--scryb-text-color` is declared only on explicit theme classes below.
+     Muted is #5a6472, not gray-500 (#718096): muted text renders at 11-13px
+     across the chrome (toolbar icons, dropdown labels, footer) and gray-500
+     measured 3.8:1 on gray-50 — under the 4.5:1 AA floor. #5a6472 measures
+     6.0:1 on white and 5.7:1 on gray-50. */
+    --scryb-text-muted: #5a6472;
+    --scryb-text-placeholder: var(--scryb-color-gray-400);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Toolbar
+     ─────────────────────────────────────────────────────────────────────────
+     Transparent on the card surface with a 6%-alpha hairline: the toolbar is
+     part of the card, not a separate gray band above it. */
+    --scryb-toolbar-bg: transparent;
+    --scryb-toolbar-border: rgba(15, 22, 36, 0.06);
+    --scryb-toolbar-button-hover: var(--scryb-color-gray-200);
+    --scryb-toolbar-button-active: var(--scryb-color-gray-300);
+    --scryb-toolbar-separator: rgba(15, 22, 36, 0.08);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Buttons
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-button-bg: transparent;
+    --scryb-button-hover-bg: var(--scryb-color-gray-100);
+    --scryb-button-hover-text: var(--scryb-color-black);
+    /* Neutral active fill, one step past hover, with near-black icon: the
+       saturated primary tint was the loudest element in an otherwise neutral
+       chrome. State separation comes from depth (hover #f1f5f9 → active
+       ~#e6e7e9) plus icon color (muted → black), not from hue. */
+    --scryb-button-active-bg: rgba(22, 24, 31, 0.1);
+    --scryb-button-active-bg-hover: rgba(22, 24, 31, 0.14);
+    --scryb-button-active-text: var(--scryb-color-black);
+    --scryb-button-disabled-opacity: 0.4;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Bubble Menu
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-bubble-bg: rgba(255, 255, 255, 0.95);
+    --scryb-bubble-border: #e5e7eb;
+    --scryb-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --scryb-bubble-max-width: 540px;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Content Elements
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-heading-color: inherit;
+    --scryb-link-color: var(--scryb-color-primary-500);
+    --scryb-link-hover-color: var(--scryb-color-primary-700);
+    --scryb-code-bg: var(--scryb-color-gray-100);
+    --scryb-code-color: var(--scryb-color-code);
+    --scryb-pre-bg: var(--scryb-color-gray-900);
+    --scryb-pre-color: var(--scryb-color-gray-200);
+    --scryb-blockquote-bg: var(--scryb-color-gray-50);
+    --scryb-blockquote-border: var(--scryb-color-gray-200);
+    --scryb-hr-color: var(--scryb-color-gray-200);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Table
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-table-border: var(--scryb-color-gray-200);
+    --scryb-table-header-bg: var(--scryb-color-gray-50);
+    --scryb-table-header-color: var(--scryb-color-gray-700);
+    --scryb-table-row-even-bg: #fafbfc;
+    --scryb-table-row-hover-bg: var(--scryb-color-gray-100);
+    --scryb-table-selected-bg: var(--scryb-color-accent-100);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Images
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-image-border: transparent;
+    --scryb-image-border-hover: var(--scryb-color-gray-200);
+    --scryb-image-selected-border: var(--scryb-color-primary-600);
+    --scryb-image-shadow: var(--scryb-shadow-xl);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Character Count
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-char-count-bg: transparent;
+    --scryb-char-count-border: rgba(15, 22, 36, 0.06);
+    --scryb-char-count-color: var(--scryb-text-muted);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Selection & Highlight
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-selection-bg: var(--scryb-color-primary-200);
+    /* Block-menu target wash. A step lighter than --scryb-selection-bg: it
+       covers a whole block rather than a phrase, and it sits under body text
+       that has to stay readable while the menu is open. */
+    --scryb-block-selected-bg: var(--scryb-color-primary-100);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Side Menu
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-sidemenu-bg: transparent;
+    --scryb-sidemenu-hover-bg: var(--scryb-color-gray-100);
+    --scryb-sidemenu-icon-color: var(--scryb-color-gray-400);
+    --scryb-sidemenu-border: transparent;
+    --scryb-sidemenu-shadow: none;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Block Menu
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-block-menu-bg: var(--scryb-color-white);
+    --scryb-block-menu-border: var(--scryb-color-gray-200);
+    --scryb-block-menu-shadow: var(--scryb-shadow-lg);
+    --scryb-block-menu-item-hover-bg: var(--scryb-color-gray-100);
+    --scryb-block-menu-separator-color: var(--scryb-color-gray-200);
+}
+
+/* =============================================================================
+   Surface Elevated
+
+   Defined at the container level only (NOT the popup-scope selectors) so that
+   popups inherit from their nearest theme ancestor via cascade. If we declared
+   this on `.scryb-mention-popup:not(.scryb-theme-dark)` too, the direct
+   declaration on the popup element would beat inherited dark values.
+   ============================================================================= */
+.scryb-editor:not(.scryb-theme-dark),
+.scryb-theme-light {
+    --scryb-surface-elevated: var(--scryb-color-white);
+}
+
+/* =============================================================================
+   Light-theme text color
+
+   Scoped to the explicit `.scryb-theme-light` class only (NOT the unconditional
+   `.scryb-editor:not(.scryb-theme-dark)` selector) so that consumers rendering
+   the editor without a theme class can inherit `color` from their ancestor.
+   Mirrors the pattern from commit 00ced39 for `--scryb-editor-bg`.
+   See .planning/debug/editor-color-no-inherit.md. */
+.scryb-theme-light {
+    --scryb-text-color: var(--scryb-color-gray-800);
+}
+
+/* =============================================================================
+   Dark Theme
+
+   Only overrides values that differ from light theme.
+   Uses CSS cascade - all other values are inherited from .scryb-editor.
+   ============================================================================= */
+
+.scryb-theme-dark {
+    color-scheme: dark;
+
+    /* Editor Container — a solid dark card, mirroring the light theme.
+     * Flatten with `--scryb-editor-bg: transparent; border: none;` if the
+     * editor sits inside your own dark card. */
+    --scryb-editor-bg: var(--scryb-color-dark-100);
+    --scryb-surface-elevated: var(--scryb-color-dark-100);
+    --scryb-editor-border: var(--scryb-color-dark-border);
+    --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+    --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    /* Text Colors */
+    --scryb-text-color: var(--scryb-color-gray-200);
+    --scryb-text-muted: var(--scryb-color-gray-400);
+    --scryb-text-placeholder: var(--scryb-color-gray-600);
+
+    /* Toolbar — transparent on the dark card, hairline boundary. */
+    --scryb-toolbar-bg: transparent;
+    --scryb-toolbar-border: var(--scryb-color-dark-border);
+    --scryb-toolbar-button-hover: var(--scryb-color-dark-border);
+    --scryb-toolbar-button-active: var(--scryb-color-dark-border-hover);
+    --scryb-toolbar-separator: rgba(255, 255, 255, 0.08);
+
+    /* Buttons — neutral active fill one step past hover, bright icon;
+       mirrors the light theme's depth-not-hue state separation. */
+    --scryb-button-hover-bg: var(--scryb-color-dark-border);
+    --scryb-button-hover-text: var(--scryb-color-gray-100);
+    --scryb-button-active-bg: rgba(255, 255, 255, 0.12);
+    --scryb-button-active-bg-hover: rgba(255, 255, 255, 0.17);
+    --scryb-button-active-text: var(--scryb-color-gray-100);
+    --scryb-button-disabled-opacity: 0.3;
+
+    /* Bubble Menu */
+    --scryb-bubble-bg: rgba(30, 30, 34, 0.95);
+    --scryb-bubble-border: rgba(48, 48, 54, 0.5);
+    --scryb-bubble-shadow: var(--scryb-shadow-dark-lg);
+
+    /* Content Elements */
+    --scryb-heading-color: inherit;
+    --scryb-link-color: var(--scryb-color-accent-500);
+    --scryb-link-hover-color: var(--scryb-color-accent-400);
+    --scryb-code-bg: var(--scryb-color-dark-border);
+    --scryb-code-color: var(--scryb-color-code-light);
+    --scryb-pre-bg: var(--scryb-color-dark-300);
+    --scryb-pre-color: var(--scryb-color-gray-200);
+    --scryb-blockquote-bg: var(--scryb-color-dark-200);
+    --scryb-blockquote-border: var(--scryb-color-dark-border-hover);
+    --scryb-hr-color: var(--scryb-color-dark-border);
+
+    /* Scrollbars
+       The resting thumb keeps gray-500 — 4.25:1 on var(--scryb-color-dark-100), so it clears the
+       same bar it clears on white. Only the hover brightens, and it brightens
+       upward here where the light theme darkens. */
+    --scryb-scrollbar-thumb-hover: var(--scryb-color-gray-400);
+    --scryb-menu-scroll-shadow: rgba(0, 0, 0, 0.55);
+
+    /* Table */
+    --scryb-table-scroll-shadow: rgba(0, 0, 0, 0.55);
+    --scryb-table-border: var(--scryb-color-dark-border);
+    --scryb-table-header-bg: var(--scryb-color-dark-200);
+    --scryb-table-header-color: var(--scryb-color-gray-200);
+    --scryb-table-row-even-bg: var(--scryb-color-dark-50);
+    --scryb-table-row-hover-bg: var(--scryb-color-dark-border);
+    --scryb-table-selected-bg: var(--scryb-color-accent-200);
+
+    /* Images */
+    --scryb-image-border-hover: var(--scryb-color-dark-border-hover);
+    --scryb-image-selected-border: var(--scryb-color-accent-600);
+    --scryb-image-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+    /* Character Count */
+    --scryb-char-count-bg: transparent;
+    --scryb-char-count-border: var(--scryb-color-dark-border);
+    --scryb-char-count-color: var(--scryb-color-gray-400);
+
+    /* Selection & Highlight */
+    --scryb-selection-bg: var(--scryb-color-accent-300);
+    --scryb-block-selected-bg: rgba(59, 130, 246, 0.18);
+
+    /* Side Menu */
+    --scryb-sidemenu-bg: transparent;
+    --scryb-sidemenu-hover-bg: var(--scryb-color-dark-border);
+    --scryb-sidemenu-icon-color: var(--scryb-color-gray-500);
+    --scryb-sidemenu-border: transparent;
+    --scryb-sidemenu-shadow: none;
+
+    /* Block Menu */
+    --scryb-block-menu-bg: var(--scryb-color-dark-100);
+    --scryb-block-menu-border: var(--scryb-color-dark-border);
+    --scryb-block-menu-shadow: var(--scryb-shadow-dark-lg);
+    --scryb-block-menu-item-hover-bg: var(--scryb-color-dark-border);
+    --scryb-block-menu-separator-color: var(--scryb-color-dark-border);
+
+    /* Details / Toggle Block (Phase 68) */
+    --scryb-details-summary-hover-bg: rgba(255, 255, 255, 0.05);
+    --scryb-details-border: var(--scryb-color-dark-border);
+    --scryb-details-content-border: var(--scryb-color-dark-border-hover);
+    --scryb-details-chevron-color: var(--scryb-color-gray-400);
+    --scryb-details-chevron-active-color: var(--scryb-color-accent-500);
+
+    /* Table of Contents (Phase 68)
+       Editorial-minimalism design (matches light theme structure):
+       borderless container, hairline rail, accent rail on active item. */
+    --scryb-toc-bg: transparent;
+    --scryb-toc-border: var(--scryb-color-dark-border);
+    --scryb-toc-item-color: var(--scryb-color-gray-500);
+    --scryb-toc-item-hover-bg: transparent;
+    --scryb-toc-item-active-bg: transparent;
+    --scryb-toc-item-active-color: var(--scryb-color-accent-400);
+    --scryb-toc-title-color: var(--scryb-color-gray-500);
+
+    /* Emoji Popup (Phase 68) */
+    --scryb-emoji-popup-border: rgba(255, 255, 255, 0.06);
+    --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+    --scryb-emoji-item-hover-bg: rgba(255, 255, 255, 0.04);
+    --scryb-emoji-item-selected-bg: rgba(255, 255, 255, 0.06);
+    --scryb-emoji-group-header-color: var(--scryb-color-gray-500);
+
+    /* Mention Popup & Pill */
+    --scryb-mention-popup-border: rgba(255, 255, 255, 0.06);
+    --scryb-mention-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+    --scryb-mention-item-hover-bg: rgba(255, 255, 255, 0.04);
+    --scryb-mention-item-selected-bg: rgba(255, 255, 255, 0.06);
+    --scryb-mention-avatar-bg: var(--scryb-color-accent-200);
+    --scryb-mention-avatar-color: var(--scryb-color-accent-400);
+    --scryb-mention-pill-bg: var(--scryb-color-accent-200);
+    --scryb-mention-pill-color: var(--scryb-color-accent-400);
+}
+
+/* =============================================================================
+   Auto Theme (System Preference)
+
+   Follows the user's system color scheme preference.
+   Uses light theme by default, switches to dark when system prefers dark.
+
+   Note: This uses @media query, so it cannot be overridden by JavaScript
+   without adding/removing the class. Use .scryb-theme-light or
+   .scryb-theme-dark for programmatic theme control.
+   ============================================================================= */
+
+.scryb-theme-auto {
+    /* Default: Light theme values inherited from .scryb-editor */
+    color-scheme: light dark;
+
+    /* Explicit text color (light-mode default). `--scryb-text-color` is no
+     * longer declared on the unconditional `.scryb-editor:not(.scryb-theme-dark)`
+     * selector, so auto-theme in light mode needs its own declaration.
+     * Overridden inside the `@media (prefers-color-scheme: dark)` block below. */
+    --scryb-text-color: var(--scryb-color-gray-800);
+}
+
+/* Dark mode when system prefers dark.
+
+   The compound selectors below are required, not redundant. The light
+   fallbacks at the top of this file are scoped as
+   `.scryb-editor:not(.scryb-theme-dark)` — specificity (0,2,0) — and an
+   auto-themed host matches them, since it is not `.scryb-theme-dark`. A media
+   query adds no specificity of its own, so a bare `.scryb-theme-auto` (0,1,0)
+   loses the cascade and the host keeps its light values while only the few
+   variables absent from the light block flip to dark: a light editor surface
+   carrying dark-theme text.
+
+   Each host listed in the light fallback therefore needs a matching compound
+   selector here to reach (0,2,0) and win on source order. The bare
+   `.scryb-theme-auto` is kept for elements that carry only the theme class.
+   Keep this list in sync with the light fallback block above. */
+@media (prefers-color-scheme: dark) {
+    .scryb-theme-auto,
+    .scryb-editor.scryb-theme-auto,
+    .scryb-toc.scryb-theme-auto,
+    .scryb-emoji-popup.scryb-theme-auto,
+    .scryb-mention-popup.scryb-theme-auto,
+    .scryb-editor-portal.scryb-theme-auto {
+        /* Editor Container */
+        --scryb-editor-bg: var(--scryb-color-dark-100);
+        --scryb-surface-elevated: var(--scryb-color-dark-100);
+        --scryb-editor-border: var(--scryb-color-dark-border);
+        --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+        --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+        /* Text Colors */
+        --scryb-text-color: var(--scryb-color-gray-200);
+        --scryb-text-muted: var(--scryb-color-gray-400);
+        --scryb-text-placeholder: var(--scryb-color-gray-600);
+
+        /* Toolbar */
+        --scryb-toolbar-bg: transparent;
+        --scryb-toolbar-border: var(--scryb-color-dark-border);
+        --scryb-toolbar-button-hover: var(--scryb-color-dark-border);
+        --scryb-toolbar-button-active: var(--scryb-color-dark-border-hover);
+        --scryb-toolbar-separator: rgba(255, 255, 255, 0.08);
+
+        /* Buttons — neutral active fill, mirrors the explicit dark theme. */
+        --scryb-button-hover-bg: var(--scryb-color-dark-border);
+        --scryb-button-hover-text: var(--scryb-color-gray-100);
+        --scryb-button-active-bg: rgba(255, 255, 255, 0.12);
+        --scryb-button-active-bg-hover: rgba(255, 255, 255, 0.17);
+        --scryb-button-active-text: var(--scryb-color-gray-100);
+        --scryb-button-disabled-opacity: 0.3;
+
+        /* Bubble Menu */
+        --scryb-bubble-bg: rgba(30, 30, 34, 0.95);
+        --scryb-bubble-border: rgba(48, 48, 54, 0.5);
+        --scryb-bubble-shadow: var(--scryb-shadow-dark-lg);
+
+        /* Content Elements */
+        --scryb-heading-color: inherit;
+        --scryb-link-color: var(--scryb-color-accent-500);
+        --scryb-link-hover-color: var(--scryb-color-accent-400);
+        --scryb-code-bg: var(--scryb-color-dark-border);
+        --scryb-code-color: var(--scryb-color-code-light);
+        --scryb-pre-bg: var(--scryb-color-dark-300);
+        --scryb-pre-color: var(--scryb-color-gray-200);
+        --scryb-blockquote-bg: var(--scryb-color-dark-200);
+        --scryb-blockquote-border: var(--scryb-color-dark-border-hover);
+        --scryb-hr-color: var(--scryb-color-dark-border);
+
+        /* Scrollbars — see the .scryb-theme-dark block above for the reasoning. */
+        --scryb-scrollbar-thumb-hover: var(--scryb-color-gray-400);
+        --scryb-menu-scroll-shadow: rgba(0, 0, 0, 0.55);
+
+        /* Table */
+        --scryb-table-scroll-shadow: rgba(0, 0, 0, 0.55);
+        --scryb-table-border: var(--scryb-color-dark-border);
+        --scryb-table-header-bg: var(--scryb-color-dark-200);
+        --scryb-table-header-color: var(--scryb-color-gray-200);
+        --scryb-table-row-even-bg: var(--scryb-color-dark-50);
+        --scryb-table-row-hover-bg: var(--scryb-color-dark-border);
+        --scryb-table-selected-bg: var(--scryb-color-accent-200);
+
+        /* Images */
+        --scryb-image-border-hover: var(--scryb-color-dark-border-hover);
+        --scryb-image-selected-border: var(--scryb-color-accent-600);
+        --scryb-image-shadow: var(--scryb-shadow-dark-xl);
+
+        /* Character Count */
+        --scryb-char-count-bg: transparent;
+        --scryb-char-count-border: var(--scryb-color-dark-border);
+        --scryb-char-count-color: var(--scryb-color-gray-400);
+
+        /* Selection & Highlight */
+        --scryb-selection-bg: var(--scryb-color-accent-300);
+        --scryb-block-selected-bg: rgba(59, 130, 246, 0.18);
+
+        /* Side Menu */
+        --scryb-sidemenu-bg: transparent;
+        --scryb-sidemenu-hover-bg: var(--scryb-color-dark-border);
+        --scryb-sidemenu-icon-color: var(--scryb-color-gray-500);
+        --scryb-sidemenu-border: transparent;
+        --scryb-sidemenu-shadow: none;
+
+        /* Block Menu */
+        --scryb-block-menu-bg: var(--scryb-color-dark-100);
+        --scryb-block-menu-border: var(--scryb-color-dark-border);
+        --scryb-block-menu-shadow: var(--scryb-shadow-dark-lg);
+        --scryb-block-menu-item-hover-bg: var(--scryb-color-dark-border);
+        --scryb-block-menu-separator-color: var(--scryb-color-dark-border);
+
+        /* Details / Toggle Block (Phase 68) */
+        --scryb-details-summary-hover-bg: rgba(255, 255, 255, 0.05);
+        --scryb-details-border: var(--scryb-color-dark-border);
+        --scryb-details-content-border: var(--scryb-color-dark-border-hover);
+        --scryb-details-chevron-color: var(--scryb-color-gray-400);
+        --scryb-details-chevron-active-color: var(--scryb-color-accent-500);
+
+        /* Table of Contents (Phase 68) */
+        --scryb-toc-bg: var(--scryb-color-dark-200);
+        --scryb-toc-border: var(--scryb-color-dark-border);
+        --scryb-toc-item-color: var(--scryb-color-gray-300);
+        --scryb-toc-item-hover-bg: var(--scryb-color-dark-border);
+        --scryb-toc-item-active-bg: var(--scryb-color-accent-200);
+        --scryb-toc-item-active-color: var(--scryb-color-accent-400);
+        --scryb-toc-title-color: var(--scryb-color-gray-500);
+
+        /* Emoji Popup (Phase 68) */
+        --scryb-emoji-popup-border: rgba(255, 255, 255, 0.06);
+        --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+        --scryb-emoji-item-hover-bg: rgba(255, 255, 255, 0.04);
+        --scryb-emoji-item-selected-bg: rgba(255, 255, 255, 0.06);
+        --scryb-emoji-group-header-color: var(--scryb-color-gray-500);
+
+        /* Mention Popup & Pill */
+        --scryb-mention-popup-border: rgba(255, 255, 255, 0.06);
+        --scryb-mention-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+        --scryb-mention-item-hover-bg: rgba(255, 255, 255, 0.04);
+        --scryb-mention-item-selected-bg: rgba(255, 255, 255, 0.06);
+        --scryb-mention-avatar-bg: var(--scryb-color-accent-200);
+        --scryb-mention-avatar-color: var(--scryb-color-accent-400);
+        --scryb-mention-pill-bg: var(--scryb-color-accent-200);
+        --scryb-mention-pill-color: var(--scryb-color-accent-400);
+    }
+}

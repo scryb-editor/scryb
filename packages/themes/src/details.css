@@ -1,0 +1,207 @@
+/* ═══════════════ Details / Toggle Block ═══════════════ */
+
+/*
+  Targets BOTH the interactive editing NodeView (div[data-type="details"])
+  AND the SSR / viewer renderHTML output (<details> / <summary>).
+
+  Rules:
+  1. Light theme only — no .scryb-theme-dark blocks in this file.
+  2. All color values route through var(--scryb-*) tokens defined in tokens.css.
+  3. Dark overrides are applied centrally in themes.css via the .scryb-theme-dark
+     rule block (cascade override of the same tokens).
+*/
+
+/* =============================================================================
+   Editing NodeView: div[data-type="details"]
+   ============================================================================= */
+
+.scryb-content div[data-type="details"] {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--scryb-details-border);
+  border-radius: var(--scryb-radius-md);
+  overflow: hidden;
+  margin: var(--scryb-spacing-md) 0;
+}
+
+/* Outer row wrapping chevron button + summary text */
+.scryb-content div[data-type="details"] > div {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--scryb-spacing-md);
+  padding: var(--scryb-spacing-md);
+  min-height: 36px;
+}
+
+/* Summary hover state */
+.scryb-content div[data-type="details"] > div:hover {
+  background-color: var(--scryb-details-summary-hover-bg);
+  transition: background-color 0.15s ease;
+}
+
+/* Chevron toggle button */
+.scryb-content div[data-type="details"] > button {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--scryb-details-chevron-color);
+  border-radius: var(--scryb-radius-sm);
+  cursor: pointer;
+  transition:
+    transform var(--scryb-transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--scryb-transition-fast, 0.15s ease);
+  flex-shrink: 0;
+}
+
+/* Chevron glyph as a masked SVG.
+   -----------------------------------------------------------------------------
+   Was a Material Symbols ligature, which made the icon font a hard requirement
+   for anyone using details blocks — the editor chrome stopped needing it when
+   the icons became inline SVG, and this was the last rule holding it. The mask
+   is painted with `currentColor`, so the colour and rotation rules below reach
+   it exactly as they reached the glyph. */
+.scryb-content div[data-type="details"] > button::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask: var(--scryb-details-chevron-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E"))
+    center / contain no-repeat;
+  mask: var(--scryb-details-chevron-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E"))
+    center / contain no-repeat;
+}
+
+/* Chevron rotated + colored when open */
+.scryb-content div[data-type="details"].is-open > button {
+  transform: rotate(90deg);
+  color: var(--scryb-details-chevron-active-color);
+}
+
+/* Keyboard focus ring on chevron */
+.scryb-content div[data-type="details"] > button:focus-visible {
+  outline: 2px solid var(--scryb-color-primary-600);
+  outline-offset: 2px;
+}
+
+/* Summary text node */
+.scryb-content div[data-type="details"] summary {
+  list-style: none;
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Empty summary placeholder */
+.scryb-content div[data-type="details"] summary:empty::before {
+  content: attr(data-placeholder);
+  color: var(--scryb-text-placeholder);
+}
+
+/* Content area — hidden when collapsed */
+.scryb-content div[data-type="detailsContent"] {
+  display: none;
+  padding: var(--scryb-spacing-md) var(--scryb-spacing-md) var(--scryb-spacing-md) 32px;
+  border-top: 1px solid var(--scryb-details-border);
+  border-left: 4px solid var(--scryb-details-content-border);
+}
+
+/* Content area — visible when open */
+.scryb-content div[data-type="details"].is-open div[data-type="detailsContent"] {
+  display: block;
+}
+
+/* Empty content placeholder */
+.scryb-content div[data-type="detailsContent"] p:empty::before {
+  content: attr(data-placeholder);
+  color: var(--scryb-text-placeholder);
+}
+
+/* =============================================================================
+   SSR / Viewer renderHTML output: <details> / <summary>
+
+   Every selector is scoped under .scryb-content. These rules used to target
+   bare <details>/<summary>, which meant importing all.css restyled every
+   disclosure element on the host page — the pricing site's FAQ rendered the
+   theme's chevron_right glyph next to its own "+" marker the moment the
+   editor bundle loaded. The viewer wraps its output in .scryb-content (and
+   the editing view carries the same class), so nothing inside the editor
+   loses styling by tightening this.
+   ============================================================================= */
+
+.scryb-content details {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--scryb-details-border);
+  border-radius: var(--scryb-radius-md);
+  overflow: hidden;
+  margin: var(--scryb-spacing-md) 0;
+}
+
+.scryb-content details > summary {
+  list-style: none;
+  padding: var(--scryb-spacing-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--scryb-spacing-md);
+  font-size: 14px;
+  line-height: 1.3;
+  min-height: 36px;
+}
+
+/* Remove browser default disclosure marker */
+.scryb-content details > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Chevron glyph as a masked SVG, for the same reason as the editor's copy
+   above: read-only output should not need an icon font to draw one arrow. */
+.scryb-content details > summary::before {
+  content: "";
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask: var(--scryb-details-chevron-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E"))
+    center / contain no-repeat;
+  mask: var(--scryb-details-chevron-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E"))
+    center / contain no-repeat;
+  color: var(--scryb-details-chevron-color);
+  transition:
+    transform var(--scryb-transition-fast, 0.15s cubic-bezier(0.4, 0, 0.2, 1)),
+    color 0.15s ease;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Chevron rotated + colored when open */
+.scryb-content details[open] > summary::before {
+  transform: rotate(90deg);
+  color: var(--scryb-details-chevron-active-color);
+}
+
+/* Keyboard focus ring on summary */
+.scryb-content details > summary:focus-visible {
+  outline: 2px solid var(--scryb-color-primary-600);
+  outline-offset: 2px;
+}
+
+/* Summary hover state */
+.scryb-content details > summary:hover {
+  background-color: var(--scryb-details-summary-hover-bg);
+}
+
+/* Content area padding + left accent border */
+.scryb-content details > div[data-type="detailsContent"] {
+  padding: var(--scryb-spacing-md) var(--scryb-spacing-md) var(--scryb-spacing-md) 32px;
+  border-top: 1px solid var(--scryb-details-border);
+  border-left: 4px solid var(--scryb-details-content-border);
+}
+
+/* Hide content when closed (SSR output may not use display toggle) */
+.scryb-content details:not([open]) > div[data-type="detailsContent"] {
+  display: none;
+}

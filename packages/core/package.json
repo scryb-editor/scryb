@@ -1,0 +1,254 @@
+{
+  "name": "@scryb-editor/core",
+  "version": "3.4.0",
+  "description": "Headless core for the Scryb rich text editor: a configured Tiptap factory, formatting commands, i18n and an accessibility checker",
+  "keywords": [
+    "rich-text-editor",
+    "wysiwyg",
+    "tiptap",
+    "prosemirror",
+    "editor",
+    "headless",
+    "typescript",
+    "contenteditable",
+    "accessibility",
+    "i18n"
+  ],
+  "homepage": "https://scryb.dev",
+  "bugs": {
+    "email": "support@scryb.dev"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./commands": {
+      "import": {
+        "types": "./dist/commands.d.mts",
+        "default": "./dist/commands.mjs"
+      },
+      "require": {
+        "types": "./dist/commands.d.cts",
+        "default": "./dist/commands.cjs"
+      }
+    },
+    "./editor-factory": {
+      "import": {
+        "types": "./dist/editor-factory.d.mts",
+        "default": "./dist/editor-factory.mjs"
+      },
+      "require": {
+        "types": "./dist/editor-factory.d.cts",
+        "default": "./dist/editor-factory.cjs"
+      }
+    },
+    "./i18n/i18n-manager": {
+      "import": {
+        "types": "./dist/i18n/i18n-manager.d.mts",
+        "default": "./dist/i18n/i18n-manager.mjs"
+      },
+      "require": {
+        "types": "./dist/i18n/i18n-manager.d.cts",
+        "default": "./dist/i18n/i18n-manager.cjs"
+      }
+    },
+    "./accessibility/checker": {
+      "import": {
+        "types": "./dist/accessibility/checker.d.mts",
+        "default": "./dist/accessibility/checker.mjs"
+      },
+      "require": {
+        "types": "./dist/accessibility/checker.d.cts",
+        "default": "./dist/accessibility/checker.cjs"
+      }
+    },
+    "./image/image-manager": {
+      "import": {
+        "types": "./dist/image/image-manager.d.mts",
+        "default": "./dist/image/image-manager.mjs"
+      },
+      "require": {
+        "types": "./dist/image/image-manager.d.cts",
+        "default": "./dist/image/image-manager.cjs"
+      }
+    },
+    "./slash-commands/plugin": {
+      "import": {
+        "types": "./dist/slash-commands/plugin.d.mts",
+        "default": "./dist/slash-commands/plugin.mjs"
+      },
+      "require": {
+        "types": "./dist/slash-commands/plugin.d.cts",
+        "default": "./dist/slash-commands/plugin.cjs"
+      }
+    },
+    "./bubble-menu/coordinator": {
+      "import": {
+        "types": "./dist/bubble-menu/coordinator.d.mts",
+        "default": "./dist/bubble-menu/coordinator.mjs"
+      },
+      "require": {
+        "types": "./dist/bubble-menu/coordinator.d.cts",
+        "default": "./dist/bubble-menu/coordinator.cjs"
+      }
+    },
+    "./block-menu": {
+      "import": {
+        "types": "./dist/block-menu/index.d.mts",
+        "default": "./dist/block-menu/index.mjs"
+      },
+      "require": {
+        "types": "./dist/block-menu/index.d.cts",
+        "default": "./dist/block-menu/index.cjs"
+      }
+    },
+    "./locales/*": {
+      "import": {
+        "types": "./dist/locales/*.d.mts",
+        "default": "./dist/locales/*.mjs"
+      },
+      "require": {
+        "types": "./dist/locales/*.d.cts",
+        "default": "./dist/locales/*.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "size": "size-limit"
+  },
+  "size-limit": [
+    {
+      "name": "typical import — createScrybEditor",
+      "path": "dist/index.mjs",
+      "import": "{ createScrybEditor }",
+      "limit": "8 kB",
+      "gzip": true,
+      "ignore": [
+        "@intevation/tiptap-extension-office-paste",
+        "@scryb-editor/extensions",
+        "@tiptap/core",
+        "@tiptap/extension-character-count",
+        "@tiptap/extension-details",
+        "@tiptap/extension-emoji",
+        "@tiptap/extension-invisible-characters",
+        "@tiptap/extension-link",
+        "@tiptap/extension-mention",
+        "@tiptap/extension-placeholder",
+        "@tiptap/extension-subscript",
+        "@tiptap/extension-superscript",
+        "@tiptap/extension-table-of-contents",
+        "@tiptap/extension-task-item",
+        "@tiptap/extension-task-list",
+        "@tiptap/extension-text-align",
+        "@tiptap/extension-text-style",
+        "@tiptap/extension-typography",
+        "@tiptap/extension-underline",
+        "@tiptap/extension-unique-id",
+        "@tiptap/extension-youtube",
+        "@tiptap/pm",
+        "@tiptap/starter-kit",
+        "@tiptap/suggestion"
+      ]
+    },
+    {
+      "name": "the whole barrel",
+      "path": "dist/index.mjs",
+      "import": "*",
+      "limit": "44 kB",
+      "gzip": true,
+      "ignore": [
+        "@intevation/tiptap-extension-office-paste",
+        "@scryb-editor/extensions",
+        "@tiptap/core",
+        "@tiptap/extension-character-count",
+        "@tiptap/extension-details",
+        "@tiptap/extension-emoji",
+        "@tiptap/extension-invisible-characters",
+        "@tiptap/extension-link",
+        "@tiptap/extension-mention",
+        "@tiptap/extension-placeholder",
+        "@tiptap/extension-subscript",
+        "@tiptap/extension-superscript",
+        "@tiptap/extension-table-of-contents",
+        "@tiptap/extension-task-item",
+        "@tiptap/extension-task-list",
+        "@tiptap/extension-text-align",
+        "@tiptap/extension-text-style",
+        "@tiptap/extension-typography",
+        "@tiptap/extension-underline",
+        "@tiptap/extension-unique-id",
+        "@tiptap/extension-youtube",
+        "@tiptap/pm",
+        "@tiptap/starter-kit",
+        "@tiptap/suggestion"
+      ]
+    }
+  ],
+  "dependencies": {
+    "@intevation/tiptap-extension-office-paste": "^0.1.2",
+    "@scryb-editor/extensions": "*",
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/extension-character-count": "^3.0.0",
+    "@tiptap/extension-details": "3.29.0",
+    "@tiptap/extension-emoji": "3.29.0",
+    "@tiptap/extension-invisible-characters": "^3.0.0",
+    "@tiptap/extension-link": "^3.0.0",
+    "@tiptap/extension-mention": "3.29.0",
+    "@tiptap/extension-placeholder": "^3.0.0",
+    "@tiptap/extension-subscript": "^3.0.0",
+    "@tiptap/extension-superscript": "^3.0.0",
+    "@tiptap/extension-table-of-contents": "3.29.0",
+    "@tiptap/extension-task-item": "^3.0.0",
+    "@tiptap/extension-task-list": "^3.0.0",
+    "@tiptap/extension-text-align": "^3.0.0",
+    "@tiptap/extension-text-style": "^3.0.0",
+    "@tiptap/extension-typography": "^3.0.0",
+    "@tiptap/extension-underline": "^3.0.0",
+    "@tiptap/extension-unique-id": "^3.0.0",
+    "@tiptap/extension-youtube": "^3.0.0",
+    "@tiptap/pm": "^3.0.0",
+    "@tiptap/starter-kit": "^3.0.0",
+    "@tiptap/suggestion": "^3.0.0"
+  },
+  "devDependencies": {
+    "@size-limit/esbuild": "^13.0.1",
+    "@size-limit/file": "^13.0.1",
+    "happy-dom": "^20.11.1",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "size-limit": "^13.0.1",
+    "tsdown": "^0.22.14",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scryb-editor/scryb.git",
+    "directory": "packages/core"
+  }
+}

@@ -1,0 +1,41 @@
+name: Close pull requests
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              "Thanks for this, and sorry to close it.",
+              "",
+              "This repository is a read-only mirror. Its contents are generated from a",
+              "private monorepo on every release, so a merge here would be overwritten by",
+              "the next sync and your commit would not survive.",
+              "",
+              "If this is a bug, please open an issue — those are read and answered.",
+              "If it is a patch you would like applied, send it to support@scryb.dev and",
+              "it will go in with attribution.",
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body,
+            });
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              state: "closed",
+            });

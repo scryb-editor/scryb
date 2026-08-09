@@ -1,0 +1,135 @@
+/* ═══════════════ Table of Contents ═══════════════
+   Component styles for <scryb-toc> / <Toc>.
+
+   Design language: refined editorial minimalism, modeled on the modern
+   documentation TOCs that have become the de facto standard — Tailwind
+   CSS, Linear, Vercel, GitBook, Mintlify. The component is intentionally
+   borderless and bg-less so it disappears into the page chrome; structure
+   comes from a single hairline "rail" running down the left edge of the
+   item list. The active heading replaces its segment of the rail with an
+   accent color, creating an unobtrusive but unmistakable indicator.
+
+   Rules:
+   - All values via var(--scryb-toc-*) and existing var(--scryb-*) tokens.
+   - NO .scryb-theme-dark override blocks — dark values live in themes.css.
+   - NO hardcoded hex or raw rgba — all translucent values are token-defined.
+   - NO background fill on hover or active — text color + accent rail only.
+   - All padding/margin values are multiples of 4 (UI-SPEC Dimension 5).
+   - Two font weights only (400 / 600) — active state signals via color
+     and the rail accent, never via weight (UI-SPEC Dimension 4).
+   - TOC is editor-only; this file is imported by all.css only, NOT viewer.css.
+   ══════════════════════════════════════════════════ */
+
+/* ─── Panel container ──────────────────────────────────────────────────────── */
+/* Borderless, bg-less. The component blends into whatever surface mounts it.
+   The visual structure is provided by the list rail + header, not by a card. */
+.scryb-toc {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 200px;
+    max-width: 280px;
+    font-family: inherit;
+}
+
+/* ─── Header ("On this page" / "Contents") ─────────────────────────────────── */
+/* Sits ABOVE the rail. Aligned to the left edge so its first letter lines up
+   visually with the indented item text below. */
+.scryb-toc-header {
+    margin: 0 0 var(--scryb-spacing-md) 0;
+    padding: 0 0 0 var(--scryb-spacing-lg);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--scryb-toc-title-color);
+}
+
+/* ─── Item list ─────────────────────────────────────────────────────────────── */
+/* The rail. A 1px hairline running the full height of the list. Item buttons
+   overlap this rail with their own (transparent-by-default) left border so
+   the active item can "ignite" its segment with the accent color. */
+.scryb-toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--scryb-toc-border);
+}
+
+.scryb-toc-item {
+    margin: 0;
+}
+
+/* ─── Item button (shared) ──────────────────────────────────────────────────── */
+.scryb-toc-item > button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    /* Item border-left overlays the parent rail by 1px so the accent border
+       (when active) sits exactly on top of the rail without doubling its width. */
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--scryb-toc-item-color);
+    transition: color 0.18s ease, border-color 0.18s ease;
+    /* Hint to assistive tech: the button is part of a navigation list. */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Indentation by heading level ─────────────────────────────────────────── */
+/* All padding-left values are multiples of 4. Indentation grows by 8px per
+   level, keeping the visual hierarchy clear without pushing deep headings
+   off the right edge of a 200px sidebar. */
+.scryb-toc-item-level-1 > button {
+    padding: var(--scryb-spacing-sm) 0 var(--scryb-spacing-sm) var(--scryb-spacing-lg);
+}
+
+.scryb-toc-item-level-2 > button {
+    padding: var(--scryb-spacing-sm) 0 var(--scryb-spacing-sm) 24px;
+}
+
+.scryb-toc-item-level-3 > button {
+    padding: var(--scryb-spacing-sm) 0 var(--scryb-spacing-sm) 32px;
+}
+
+/* ─── Hover state — text color only, no bg fill ──────────────────────────── */
+.scryb-toc-item > button:hover {
+    color: var(--scryb-toc-item-active-color);
+}
+
+/* ─── Active state (heading currently in viewport) ─────────────────────────── */
+/* The accent rail replaces the hairline rail at this position; text color
+   shifts to the accent color. Font weight stays at 400 (UI-SPEC Dimension 4
+   forbids using weight for active signaling). */
+.scryb-toc-item.is-active > button {
+    color: var(--scryb-toc-item-active-color);
+    border-left-color: var(--scryb-toc-item-active-color);
+}
+
+/* ─── Focus-visible (keyboard navigation) ──────────────────────────────────── */
+/* Positive outline-offset so the ring is OUTSIDE the button — survives any
+   future overflow:hidden on the container (fixes IN-06 from REVIEW.md). */
+.scryb-toc-item > button:focus-visible {
+    outline: 2px solid var(--scryb-toc-item-active-color);
+    outline-offset: 2px;
+    border-radius: var(--scryb-radius-sm);
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────────────── */
+/* Lives outside the rail (no border-left on .scryb-toc-empty). Italic to
+   distinguish from a real heading, muted color to recede. */
+.scryb-toc-empty {
+    margin: 0;
+    padding: var(--scryb-spacing-sm) 0 var(--scryb-spacing-sm) var(--scryb-spacing-lg);
+    font-size: 13px;
+    line-height: 1.4;
+    font-style: italic;
+    color: var(--scryb-text-muted);
+}

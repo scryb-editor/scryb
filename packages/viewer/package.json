@@ -1,0 +1,76 @@
+{
+  "name": "@scryb-editor/viewer",
+  "version": "3.4.0",
+  "description": "SSR-safe renderer that turns Tiptap JSON into an HTML string with no DOM and no client-side editor, for read-only pages",
+  "keywords": [
+    "rich-text-editor",
+    "tiptap",
+    "prosemirror",
+    "ssr",
+    "server-side-rendering",
+    "html",
+    "renderer",
+    "read-only",
+    "wysiwyg",
+    "typescript"
+  ],
+  "homepage": "https://scryb.dev",
+  "bugs": {
+    "email": "support@scryb.dev"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@tiptap/html": "^3.0.0",
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/pm": "^3.0.0",
+    "@scryb-editor/core": "*",
+    "@scryb-editor/extensions": "*"
+  },
+  "devDependencies": {
+    "@tiptap/html": "^3.29.0",
+    "@tiptap/core": "^3.29.0",
+    "@tiptap/pm": "^3.29.0",
+    "@scryb-editor/core": "*",
+    "@scryb-editor/extensions": "*",
+    "tsdown": "^0.22.14",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scryb-editor/scryb.git",
+    "directory": "packages/viewer"
+  }
+}

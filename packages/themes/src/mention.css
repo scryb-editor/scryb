@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mention Popup & Pill
+
+   Styles for the mention suggestion popup triggered by typing "@" in the
+   editor, plus the inline pill rendered for persisted mention nodes. All
+   colors use var(--scryb-mention-*) tokens defined in tokens.css (light
+   values) and overridden in themes.css (.scryb-theme-dark block).
+
+   Rules:
+   - NO hardcoded hex or rgba() values — all colors via var(--scryb-*) tokens
+   - NO .scryb-theme-dark selectors — dark values live in themes.css
+   - Padding/gap values are multiples of 4
+   - Two font weights only: 400 (regular) and 600 (semibold)
+   - Container border-radius: var(--scryb-radius-lg) (12px)
+   - Item border-radius: var(--scryb-radius-md) (6px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Inline mention pill (persisted in document) ───────────────────────── */
+
+.scryb-editor .scryb-mention {
+  display: inline-block;
+  padding: 0 var(--scryb-spacing-sm);
+  border-radius: var(--scryb-radius-sm);
+  background: var(--scryb-mention-pill-bg);
+  color: var(--scryb-mention-pill-color);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ─── Popup container ───────────────────────────────────────────────────── */
+
+.scryb-mention-popup {
+  position: absolute;
+  background: var(--scryb-mention-popup-bg);
+  border: 1px solid var(--scryb-mention-popup-border);
+  border-radius: var(--scryb-radius-lg);
+  box-shadow: var(--scryb-mention-popup-shadow);
+  padding: var(--scryb-spacing-md);
+  min-width: 240px;
+  z-index: 1000;
+  display: none;
+}
+
+.scryb-mention-popup.is-visible {
+  display: block;
+}
+
+/* ─── Scroll area ───────────────────────────────────────────────────────── */
+
+.scryb-mention-popup-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* ─── Item row ──────────────────────────────────────────────────────────── */
+
+.scryb-mention-popup-item {
+  display: flex;
+  align-items: center;
+  gap: var(--scryb-spacing-md);
+  padding: var(--scryb-spacing-md);
+  border-radius: var(--scryb-radius-md);
+  min-height: 36px;
+  cursor: pointer;
+  color: var(--scryb-text-color);
+  transition: background-color var(--scryb-transition-fast);
+  user-select: none;
+}
+
+.scryb-mention-popup-item:hover {
+  background: var(--scryb-mention-item-hover-bg);
+}
+
+.scryb-mention-popup-item.is-selected {
+  background: var(--scryb-mention-item-selected-bg);
+}
+
+.scryb-mention-popup-item:focus-visible {
+  outline: 2px solid var(--scryb-color-primary-600);
+  outline-offset: 2px;
+}
+
+/* ─── Avatar ────────────────────────────────────────────────────────────── */
+
+.scryb-mention-popup-item-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scryb-mention-popup-item-avatar-fallback {
+  background: var(--scryb-mention-avatar-bg);
+  color: var(--scryb-mention-avatar-color);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ─── Item label ────────────────────────────────────────────────────────── */
+
+.scryb-mention-popup-item-label {
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────────── */
+
+.scryb-mention-popup-empty {
+  padding: var(--scryb-spacing-lg);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--scryb-mention-empty-color, var(--scryb-text-muted));
+}
+
+/* ─── Screen-reader live region (visually hidden) ───────────────────────── */
+
+.scryb-mention-popup-aria-hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

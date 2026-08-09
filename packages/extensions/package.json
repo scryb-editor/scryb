@@ -1,0 +1,223 @@
+{
+  "name": "@scryb-editor/extensions",
+  "version": "3.4.0",
+  "description": "Tiptap extensions for rich text editing: font size and family, line height, indentation, resizable images, tables, drag handle, paste cleanup and an accessibility checker",
+  "keywords": [
+    "tiptap",
+    "tiptap-extension",
+    "prosemirror",
+    "rich-text-editor",
+    "wysiwyg",
+    "editor",
+    "typescript",
+    "table",
+    "image-resize",
+    "markdown"
+  ],
+  "homepage": "https://scryb.dev",
+  "bugs": {
+    "email": "support@scryb.dev"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./font-size": {
+      "import": {
+        "types": "./dist/font-size.d.mts",
+        "default": "./dist/font-size.mjs"
+      },
+      "require": {
+        "types": "./dist/font-size.d.cts",
+        "default": "./dist/font-size.cjs"
+      }
+    },
+    "./font-family": {
+      "import": {
+        "types": "./dist/font-family.d.mts",
+        "default": "./dist/font-family.mjs"
+      },
+      "require": {
+        "types": "./dist/font-family.d.cts",
+        "default": "./dist/font-family.cjs"
+      }
+    },
+    "./line-height": {
+      "import": {
+        "types": "./dist/line-height.d.mts",
+        "default": "./dist/line-height.mjs"
+      },
+      "require": {
+        "types": "./dist/line-height.d.cts",
+        "default": "./dist/line-height.cjs"
+      }
+    },
+    "./letter-spacing": {
+      "import": {
+        "types": "./dist/letter-spacing.d.mts",
+        "default": "./dist/letter-spacing.mjs"
+      },
+      "require": {
+        "types": "./dist/letter-spacing.d.cts",
+        "default": "./dist/letter-spacing.cjs"
+      }
+    },
+    "./indent": {
+      "import": {
+        "types": "./dist/indent.d.mts",
+        "default": "./dist/indent.mjs"
+      },
+      "require": {
+        "types": "./dist/indent.d.cts",
+        "default": "./dist/indent.cjs"
+      }
+    },
+    "./block-background": {
+      "import": {
+        "types": "./dist/block-background.d.mts",
+        "default": "./dist/block-background.mjs"
+      },
+      "require": {
+        "types": "./dist/block-background.d.cts",
+        "default": "./dist/block-background.cjs"
+      }
+    },
+    "./resizable-image": {
+      "import": {
+        "types": "./dist/resizable-image.d.mts",
+        "default": "./dist/resizable-image.mjs"
+      },
+      "require": {
+        "types": "./dist/resizable-image.d.cts",
+        "default": "./dist/resizable-image.cjs"
+      }
+    },
+    "./table-bundle": {
+      "import": {
+        "types": "./dist/table-bundle.d.mts",
+        "default": "./dist/table-bundle.mjs"
+      },
+      "require": {
+        "types": "./dist/table-bundle.d.cts",
+        "default": "./dist/table-bundle.cjs"
+      }
+    },
+    "./accessibility-checker": {
+      "import": {
+        "types": "./dist/accessibility-checker.d.mts",
+        "default": "./dist/accessibility-checker.mjs"
+      },
+      "require": {
+        "types": "./dist/accessibility-checker.d.cts",
+        "default": "./dist/accessibility-checker.cjs"
+      }
+    },
+    "./upload-progress": {
+      "import": {
+        "types": "./dist/upload-progress.d.mts",
+        "default": "./dist/upload-progress.mjs"
+      },
+      "require": {
+        "types": "./dist/upload-progress.d.cts",
+        "default": "./dist/upload-progress.cjs"
+      }
+    },
+    "./text-bubble-menu": {
+      "import": {
+        "types": "./dist/text-bubble-menu.d.mts",
+        "default": "./dist/text-bubble-menu.mjs"
+      },
+      "require": {
+        "types": "./dist/text-bubble-menu.d.cts",
+        "default": "./dist/text-bubble-menu.cjs"
+      }
+    },
+    "./markdown-autoformat": {
+      "import": {
+        "types": "./dist/markdown-autoformat.d.mts",
+        "default": "./dist/markdown-autoformat.mjs"
+      },
+      "require": {
+        "types": "./dist/markdown-autoformat.d.cts",
+        "default": "./dist/markdown-autoformat.cjs"
+      }
+    },
+    "./paste-cleanup": {
+      "import": {
+        "types": "./dist/paste-cleanup.d.mts",
+        "default": "./dist/paste-cleanup.mjs"
+      },
+      "require": {
+        "types": "./dist/paste-cleanup.d.cts",
+        "default": "./dist/paste-cleanup.cjs"
+      }
+    },
+    "./drag-handle": {
+      "import": {
+        "types": "./dist/drag-handle.d.mts",
+        "default": "./dist/drag-handle.mjs"
+      },
+      "require": {
+        "types": "./dist/drag-handle.d.cts",
+        "default": "./dist/drag-handle.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@intevation/tiptap-extension-office-paste": "^0.1.2",
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/extension-bubble-menu": "^3.0.0",
+    "@tiptap/extension-drag-handle": "^3.0.0",
+    "@tiptap/extension-image": "^3.0.0",
+    "@tiptap/extension-table": "^3.0.0",
+    "@tiptap/extension-table-cell": "^3.0.0",
+    "@tiptap/extension-table-header": "^3.0.0",
+    "@tiptap/extension-table-row": "^3.0.0",
+    "@tiptap/extension-text-style": "^3.0.0",
+    "@tiptap/pm": "^3.0.0",
+    "dompurify": "^3.4.12"
+  },
+  "devDependencies": {
+    "@tiptap/starter-kit": "^3.0.0",
+    "happy-dom": "^20.11.1",
+    "jsdom": "^29.1.1",
+    "prosemirror-model": "^1.25.11",
+    "prosemirror-state": "^1.4.4",
+    "tsdown": "^0.22.14",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scryb-editor/scryb.git",
+    "directory": "packages/extensions"
+  }
+}

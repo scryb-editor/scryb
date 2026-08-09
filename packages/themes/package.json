@@ -1,0 +1,57 @@
+{
+  "name": "@scryb-editor/themes",
+  "version": "3.4.0",
+  "description": "CSS design tokens, light and dark themes, and content styles for the Scryb rich text editor, with a viewer-only stylesheet for read-only pages",
+  "keywords": [
+    "css",
+    "design-tokens",
+    "theme",
+    "dark-mode",
+    "rich-text-editor",
+    "wysiwyg",
+    "tiptap",
+    "prosemirror",
+    "editor",
+    "stylesheet"
+  ],
+  "homepage": "https://scryb.dev",
+  "bugs": {
+    "email": "support@scryb.dev"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/all.css",
+    "./all": "./src/all.css",
+    "./tokens": "./src/tokens.css",
+    "./themes": "./src/themes.css",
+    "./content": "./src/content.css",
+    "./viewer": "./src/viewer.css",
+    "./components": "./src/components.css",
+    "./bubble-menu": "./src/bubble-menu.css",
+    "./icons": "./src/material-symbols.css",
+    "./accessibility": "./src/accessibility.css"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "echo 'CSS-only package -- no build step'",
+    "clean": "echo 'Nothing to clean'",
+    "test": "bun test tests/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scryb-editor/scryb.git",
+    "directory": "packages/themes"
+  }
+}

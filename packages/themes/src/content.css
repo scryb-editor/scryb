@@ -1,0 +1,613 @@
+/* =============================================================================
+   Scryb Editor Content Styles
+
+   .scryb-content content styling: typography, lists, headings,
+   code blocks, tables, images, and other editor content elements.
+   All colors reference CSS custom properties for theme compatibility.
+   ============================================================================= */
+
+/* =============================================================================
+   Link Styles
+   ============================================================================= */
+
+/* Both class names on purpose. The editor factory renders links as
+   `class="tiptap-link"`, so `.scryb-link` alone matched nothing the editor has
+   ever produced and links came out as plain black body text. `.tiptap-link` is
+   also baked into every document already saved by a consumer, which is why the
+   class the factory emits is left alone rather than renamed. */
+.scryb-link,
+.tiptap-link {
+    color: var(--scryb-link-color, #3b82f6);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color var(--scryb-transition-normal, 0.2s ease);
+}
+
+.scryb-link:hover,
+.tiptap-link:hover {
+    color: var(--scryb-link-hover-color, #1d4ed8);
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   Text Alignment
+   ============================================================================= */
+
+.scryb-content .has-text-align-left {
+    text-align: left;
+}
+
+.scryb-content .has-text-align-center {
+    text-align: center;
+}
+
+.scryb-content .has-text-align-right {
+    text-align: right;
+}
+
+.scryb-content .has-text-align-justify {
+    text-align: justify;
+}
+
+/* =============================================================================
+   List Styles
+   ============================================================================= */
+
+.scryb-content ul,
+.scryb-content ol,
+.scryb-content .scryb-bullet-list,
+.scryb-content .scryb-ordered-list {
+    padding-left: 2em !important;
+    margin: 0.5em 0 !important;
+    list-style-position: outside !important;
+}
+
+.scryb-content ul,
+.scryb-content .scryb-bullet-list {
+    list-style-type: disc !important;
+}
+
+.scryb-content ol,
+.scryb-content .scryb-ordered-list {
+    list-style-type: decimal !important;
+}
+
+.scryb-content li,
+.scryb-content .scryb-list-item {
+    margin: 0.25em 0;
+    display: list-item !important;
+    list-style-position: outside !important;
+}
+
+/* Nested list styles */
+.scryb-content ul ul,
+.scryb-content .scryb-bullet-list ul {
+    list-style-type: circle !important;
+}
+
+.scryb-content ul ul ul,
+.scryb-content .scryb-bullet-list ul ul {
+    list-style-type: square !important;
+}
+
+/* =============================================================================
+   Content Root Base Styles
+
+   (A "hide residual drag handles" block used to sit here. The classes it
+   targeted — .drag-handle-container, [class*="drag_indicator"] and friends —
+   appear nowhere in any Scryb package anymore, so on a real page its only
+   effect was hiding HOST elements that happened to share those names, with
+   !important so the host could not even undo it. Block moving today ships via
+   the side menu's .scryb-side-menu-drag, which has its own styles.)
+   ============================================================================= */
+
+.scryb-content {
+    position: relative;
+    outline: none;
+    /* 1.5, not the 1.6 this used to hardcode: both adapters advertise 1.5 as
+       the default line height and highlight it in the line-height menu, so a
+       stylesheet that renders 1.6 makes the menu lie about the document it is
+       describing. Exposed as a variable because it is the one line height a
+       host may reasonably want to set for its whole editor. */
+    line-height: var(--scryb-content-line-height, 1.5);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* =============================================================================
+   Headings
+   ============================================================================= */
+
+.scryb-content h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--tiptap-heading-color, var(--scryb-heading-color, inherit));
+}
+
+.scryb-content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--tiptap-heading-color, var(--scryb-heading-color, inherit));
+}
+
+.scryb-content h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: var(--tiptap-heading-color, var(--scryb-heading-color, inherit));
+}
+
+/* =============================================================================
+   Paragraphs
+   ============================================================================= */
+
+.scryb-content p {
+    margin: 0;
+}
+
+/* =============================================================================
+   Blockquote
+   ============================================================================= */
+
+.scryb-content blockquote {
+    border-left: 4px solid var(--tiptap-blockquote-border, var(--scryb-blockquote-border, #e2e8f0));
+    margin: 0;
+    font-style: italic;
+    background: var(--tiptap-blockquote-bg, var(--scryb-blockquote-bg, #f8f9fa));
+    padding: 0.5em 1em;
+    border-radius: 0 4px 4px 0;
+}
+
+/* =============================================================================
+   Code
+   ============================================================================= */
+
+.scryb-content code {
+    background: var(--tiptap-code-bg, var(--scryb-code-bg, #f1f5f9));
+    /* Final fallback mirrors --scryb-color-code in tokens.css, for consumers
+       importing ./content without the theme sheet. Keep the two in step. */
+    color: var(--tiptap-code-color, var(--scryb-code-color, #bf2b2b));
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: "Monaco", "Consolas", monospace;
+    font-size: 0.9em;
+}
+
+.scryb-content pre {
+    background: var(--tiptap-pre-bg, var(--scryb-pre-bg, #1a202c));
+    color: var(--tiptap-pre-color, var(--scryb-pre-color, #e2e8f0));
+    padding: 1em;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0;
+    /* A code block is drawn on --scryb-pre-bg, which is dark in BOTH themes.
+       Left alone, the light theme renders a light scrollbar on a dark surface —
+       the one place in this editor where the classic "bright stripe on dark"
+       problem is real, because the surface is dark independently of the theme
+       class. */
+    color-scheme: dark;
+    /* A horizontal flick on a wide code block must not reach the browser's
+       back-navigation gesture. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scryb-scrollbar-thumb, #718096)
+        var(--scryb-scrollbar-track, transparent);
+}
+
+/* The same recipe components.css applies to the editor's chrome, repeated here
+   because content.css also ships in viewer.css, which never loads
+   components.css — a code block in read-only output scrolls too. See the
+   scrollbar section of components.css for why the two mechanisms cannot be
+   combined, and why the transparent border must survive refactoring. */
+@supports selector(::-webkit-scrollbar) {
+    .scryb-content pre {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+    }
+
+    .scryb-content pre::-webkit-scrollbar {
+        width: var(--scryb-scrollbar-size, 10px);
+        height: var(--scryb-scrollbar-size, 10px);
+    }
+
+    .scryb-content pre::-webkit-scrollbar-track,
+    .scryb-content pre::-webkit-scrollbar-corner {
+        background: var(--scryb-scrollbar-track, transparent);
+    }
+
+    .scryb-content pre::-webkit-scrollbar-thumb {
+        background-color: var(--scryb-scrollbar-thumb, #718096);
+        border: var(--scryb-scrollbar-inset, 3px) solid transparent;
+        background-clip: padding-box;
+        border-radius: var(--scryb-scrollbar-size, 10px);
+    }
+
+    .scryb-content pre::-webkit-scrollbar-thumb:hover {
+        background-color: var(--scryb-scrollbar-thumb-hover, #4a5568);
+    }
+}
+
+.scryb-content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+/* =============================================================================
+   Placeholder
+   ============================================================================= */
+
+.scryb-content p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    color: var(--tiptap-text-placeholder, var(--scryb-text-placeholder, #a0aec0));
+    pointer-events: none;
+    float: left;
+    height: 0;
+}
+
+/* =============================================================================
+   Images
+   ============================================================================= */
+
+.scryb-content img {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.scryb-content .tiptap-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 0.5em 0;
+    display: block;
+}
+
+/* =============================================================================
+   Table Styles
+   ============================================================================= */
+
+.scryb-content table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    table-layout: fixed;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table width mode
+   -----------------------------------------------------------------------------
+   A table fills the content column by default. `scryb-table-width-auto` lets it
+   shrink to its content instead.
+
+   This is the saved-HTML rule, where the class renders onto the <table> itself.
+   The editor needs its own: a resizable table is drawn by prosemirror-tables'
+   node view, which ignores renderHTML, so the class arrives as a node
+   decoration and ProseMirror puts it on the node view's outer element — the
+   .tableWrapper. That rule lives beside the other wrapper rules in
+   components.css, which is also where the declarations it has to outrank are. */
+.scryb-content table.scryb-table-width-auto {
+    /* Both !important, and neither is optional. Tiptap's table renderHTML always
+       writes an inline `min-width`, and swaps it for an inline `width` once every
+       column carries a colwidth — so saved HTML arrives as
+       `<table class="scryb-table-width-auto" style="min-width: 100px">` and an
+       inline declaration outranks any class rule. Without these the setting was
+       a no-op everywhere it was serialised: in saved output and in the viewer,
+       which is the half the editor's own !important never covered. */
+    width: auto !important;
+    table-layout: auto;
+    min-width: 0 !important;
+}
+
+/* The floor is written twice, and both copies have to come off.
+   -----------------------------------------------------------------------------
+   Tiptap writes `min-width: <cellMinWidth>` onto every <col> as well as the sum
+   of them onto the table, and a table is at least as wide as its columns — so
+   clearing only the table's floor above moved nothing on a table with more
+   columns than the container has room for. */
+.scryb-content table.scryb-table-width-auto > colgroup > col {
+    min-width: 0 !important;
+}
+
+/* A saved table with no column widths fits the container it lands in.
+   -----------------------------------------------------------------------------
+   The editor's fit mode is a decoration, and a decoration cannot be serialised:
+   the class never reaches saved HTML, so this rule has to recognise the state
+   from the markup instead. It can. Tiptap writes each column as either
+   `<col style="width: 356px">` — a width someone dragged — or
+   `<col style="min-width: 100px">`, the floor it gives every column. The
+   attribute selector below tells the two apart, so a table nobody has resized
+   is matched and one that has been resized is left at the width it was given.
+
+   Without this the editor and the viewer disagreed about the same table: the
+   editor fitted it into a narrow column and the saved output kept a
+   `columns × cellMinWidth` floor and overflowed.
+
+   `:has()` is the whole mechanism, and where it is missing this rule simply
+   does not apply — which is the behaviour that shipped before.
+
+   Read-only output only. The editor's own element carries `.scryb-content` too,
+   and there the same job is done by the fit decoration, which knows when a
+   column is being dragged. This rule cannot: it reads the markup, and mid-drag
+   the markup has no width on it yet — so inside the editor it held the table
+   still under a pointer that was dragging it wider. */
+.scryb-content:not(.ProseMirror)
+    table:not(.scryb-table-width-auto):not(:has(> colgroup > col[style^="width"])) {
+    min-width: 0 !important;
+}
+
+.scryb-content:not(.ProseMirror)
+    table:not(.scryb-table-width-auto):not(:has(> colgroup > col[style^="width"]))
+    > colgroup
+    > col {
+    min-width: 0 !important;
+}
+
+.scryb-content table td,
+.scryb-content table th {
+    border: none;
+    border-right: 1px solid var(--tiptap-table-border, var(--scryb-table-border, #e2e8f0));
+    border-bottom: 1px solid var(--tiptap-table-border, var(--scryb-table-border, #e2e8f0));
+    box-sizing: border-box;
+    min-width: 1em;
+    padding: 8px 12px;
+    position: relative;
+    vertical-align: top;
+    background: var(--tiptap-editor-bg, var(--scryb-editor-bg, white));
+}
+
+/* Cell alignment
+   -----------------------------------------------------------------------------
+   `text-align` is inherited, so setting it on the cell reaches every block
+   inside it — a cell holding two paragraphs aligns as one thing rather than
+   needing the attribute on each. `vertical-align` is not inherited and is a
+   table-cell property in the first place, so it belongs on the cell either way.
+
+   These beat the `vertical-align: top` in the base cell rule above by carrying
+   one more class at the same position, so an untouched cell keeps the default
+   the editor has always drawn. */
+.scryb-content table td.scryb-cell-align-left,
+.scryb-content table th.scryb-cell-align-left {
+    text-align: left;
+}
+
+.scryb-content table td.scryb-cell-align-center,
+.scryb-content table th.scryb-cell-align-center {
+    text-align: center;
+}
+
+.scryb-content table td.scryb-cell-align-right,
+.scryb-content table th.scryb-cell-align-right {
+    text-align: right;
+}
+
+.scryb-content table td.scryb-cell-valign-top,
+.scryb-content table th.scryb-cell-valign-top {
+    vertical-align: top;
+}
+
+.scryb-content table td.scryb-cell-valign-middle,
+.scryb-content table th.scryb-cell-valign-middle {
+    vertical-align: middle;
+}
+
+.scryb-content table td.scryb-cell-valign-bottom,
+.scryb-content table th.scryb-cell-valign-bottom {
+    vertical-align: bottom;
+}
+
+.scryb-content table td:first-child,
+.scryb-content table th:first-child {
+    border-left: 1px solid var(--tiptap-table-border, var(--scryb-table-border, #e2e8f0));
+}
+
+.scryb-content table tr:first-child td,
+.scryb-content table tr:first-child th {
+    border-top: 1px solid var(--tiptap-table-border, var(--scryb-table-border, #e2e8f0));
+}
+
+.scryb-content table tr:first-child th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.scryb-content table tr:first-child th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.scryb-content table tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+
+.scryb-content table tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
+.scryb-content table th {
+    background: var(--tiptap-table-header-bg, var(--scryb-table-header-bg, #f8f9fa));
+    font-weight: 600;
+    color: var(--tiptap-table-header-color, var(--scryb-table-header-color, #374151));
+    text-align: left;
+}
+
+.scryb-content table p {
+    margin: 0;
+}
+
+.scryb-content table tbody tr:nth-child(even) {
+    background-color: var(--tiptap-table-row-even-bg, var(--scryb-table-row-even-bg, #fafbfc));
+}
+
+.scryb-content table tbody tr:hover {
+    background-color: var(--tiptap-table-row-hover-bg, var(--scryb-table-row-hover-bg, #f1f5f9));
+}
+
+/* ═══════════════ Invisible Characters ═══════════════ */
+/*
+ * Styles the decoration spans injected by @tiptap/extension-invisible-characters.
+ * The extension's own CSS is disabled via `injectCSS: false` in buildExtensions()
+ * so that we fully control theming through CSS variables (QW-10 dark-theme rule).
+ *
+ * Class hierarchy (from the extension source):
+ *   .tiptap-invisible-character
+ *   .tiptap-invisible-character--space
+ *   .tiptap-invisible-character--paragraph
+ *   .tiptap-invisible-character--break
+ */
+.scryb-content .tiptap-invisible-character {
+    color: var(--tiptap-invisible-char-color, var(--scryb-text-muted));
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Paragraph pilcrow marker — rendered inline at the end of each block */
+.scryb-content .tiptap-invisible-character--paragraph::before {
+    content: "¶";
+}
+
+/* Line-break marker — rendered where hard breaks occur */
+.scryb-content .tiptap-invisible-character--break::before {
+    content: "↵";
+}
+
+/* Space marker — rendered in place of literal space characters */
+.scryb-content .tiptap-invisible-character--space::before {
+    content: "·";
+}
+
+/* Dark theme — inherit --scryb-text-muted (themes.css rebinds it for .scryb-theme-dark)
+ * and bump opacity slightly for readable contrast on dark backgrounds. */
+.scryb-theme-dark .scryb-content .tiptap-invisible-character {
+    color: var(--tiptap-invisible-char-color, var(--scryb-text-muted));
+    opacity: 0.65;
+}
+
+/* =============================================================================
+   YouTube Embed
+   =============================================================================
+
+   Responsive 16:9 wrapper for embedded YouTube videos. Applies to both the
+   Scryb-branded class emitted by our HTMLAttributes config
+   (.scryb-youtube-embed) and the default attribute set by Tiptap's Youtube
+   extension NodeView (div[data-youtube-video]). The iframe inside is
+   absolutely positioned to fill the aspect-ratio box.
+
+   Uses only CSS custom properties from themes.css / tokens.css — no
+   hardcoded colors. Dark theme automatically inherits --scryb-editor-border
+   and --scryb-editor-bg via the theme token rebinding.
+   ============================================================================= */
+
+.scryb-content .scryb-youtube-embed,
+.scryb-content div[data-youtube-video] {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 1rem 0;
+    border-radius: var(--scryb-radius-md, 6px);
+    overflow: hidden;
+    background: var(--scryb-editor-bg);
+    border: 1px solid var(--scryb-editor-border);
+}
+
+.scryb-content .scryb-youtube-embed iframe,
+.scryb-content div[data-youtube-video] iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+/* Dark theme — explicit rebind so the border is visible against the dark
+ * editor background. --scryb-editor-border already resolves to the dark
+ * variant under .scryb-theme-dark, this selector exists as a defensive
+ * hook for future per-theme overrides. */
+.scryb-theme-dark .scryb-content .scryb-youtube-embed,
+.scryb-theme-dark .scryb-content div[data-youtube-video] {
+    background: var(--scryb-editor-bg);
+    border-color: var(--scryb-editor-border);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Task List (QW-03)
+ *
+ * Interactive checkbox list support for the Tiptap TaskList / TaskItem
+ * extensions. Selectors cover both the Scryb-branded HTMLAttributes class
+ * (.tiptap-task-list / .tiptap-task-item) and Tiptap's default data-attribute
+ * markers ([data-type="taskList"] / [data-type="taskItem"]) so the styling
+ * works regardless of whether the class override is applied.
+ *
+ * All colors come from --scryb-* CSS variables — zero hardcoded hex.
+ * --scryb-link-color already rebinds under .scryb-theme-dark.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+/* Task list overrides — the generic .scryb-content ul / .scryb-content li rules
+ * above use !important, so task-list-specific rules must also use !important
+ * to win specificity. Without this, task items render as disc bullets with
+ * the checkbox label stacked above the content div instead of inline. */
+.scryb-content ul.tiptap-task-list,
+.scryb-content ul[data-type="taskList"] {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+.scryb-content ul.tiptap-task-list li,
+.scryb-content ul[data-type="taskList"] li[data-type="taskItem"] {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    margin: 0.25rem 0 !important;
+    list-style-type: none !important;
+}
+
+.scryb-content ul.tiptap-task-list li > label,
+.scryb-content ul[data-type="taskList"] li > label {
+    flex-shrink: 0;
+    margin-top: 0.2em;
+    user-select: none;
+    cursor: pointer;
+}
+
+.scryb-content ul.tiptap-task-list li > label > input[type="checkbox"],
+.scryb-content ul[data-type="taskList"] li > label > input[type="checkbox"] {
+    width: 1em;
+    height: 1em;
+    accent-color: var(--scryb-link-color);
+    cursor: pointer;
+    margin: 0;
+}
+
+.scryb-content ul.tiptap-task-list li > div,
+.scryb-content ul[data-type="taskList"] li > div {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Completed state: strikethrough + muted color on the label content. */
+.scryb-content ul.tiptap-task-list li[data-checked="true"] > div,
+.scryb-content ul[data-type="taskList"] li[data-checked="true"] > div {
+    text-decoration: line-through;
+    color: var(--scryb-text-muted);
+}
+
+/* Nested task lists — small indent so hierarchy is visually clear. */
+.scryb-content ul.tiptap-task-list ul.tiptap-task-list,
+.scryb-content ul[data-type="taskList"] ul[data-type="taskList"] {
+    margin-left: 1rem;
+}
+
+/* Dark theme — --scryb-link-color and --scryb-text-muted both rebind
+ * under .scryb-theme-dark. An explicit color-scheme hint keeps the
+ * native checkbox rendering in dark mode. */
+.scryb-theme-dark .scryb-content ul.tiptap-task-list li > label > input[type="checkbox"],
+.scryb-theme-dark .scryb-content ul[data-type="taskList"] li > label > input[type="checkbox"] {
+    accent-color: var(--scryb-link-color);
+    color-scheme: dark;
+}

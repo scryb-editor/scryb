@@ -1,0 +1,102 @@
+/* ═══════════════ Licence Banner ═══════════════
+   Styles the notice both framework adapters render in place of the editor
+   chrome when licence assessment lands on a state that warrants one. The
+   module that decides is not part of this package, and naming it here is a
+   dangling reference wherever it is absent. Only four of the seven license
+   states render
+   a banner at all — "banner", "restricted", "missing", "invalid" — so those
+   are the only modifiers defined here. "valid", "gpl" and "notice" stay
+   silent by design and need no styling.
+
+   Both adapters emit the same two classes: `.scryb-license-banner` plus a
+   state modifier `.scryb-license-banner--{state}`. Values are drawn from
+   the existing token set in tokens.css/themes.css; nothing here is a new
+   token, and every var() carries a literal fallback matching the rest of
+   this package's convention.
+   ══════════════════════════════════════════════════ */
+
+.scryb-license-banner {
+    padding: var(--scryb-spacing-md, 8px) var(--scryb-spacing-lg, 16px);
+    font-size: 13px;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--scryb-editor-border, #e2e8f0);
+    background: var(--scryb-toolbar-bg, #f8f9fa);
+    color: var(--scryb-text-color, #2d3748);
+}
+
+/* "banner": expired key, still editable. Same neutral surface as the base
+   class — this is a heads-up, not yet a problem the author needs to react
+   to with urgency. */
+
+/* "restricted": expired past the grace window, editor is read-only. Tinted
+   with the same error token the rest of the package already uses for
+   destructive/error states (accessibility issues, table delete affordance). */
+.scryb-license-banner--restricted {
+    background: color-mix(in oklch, var(--scryb-color-error, #c53030) 8%, transparent);
+    border-bottom-color: var(--scryb-color-error, #c53030);
+    color: var(--scryb-color-error, #c53030);
+}
+
+/* "missing" / "invalid": no usable key at all, and by definition never
+   blocking — both stay fully editable forever, unlike "restricted".
+
+   Warning, not error. These are the two states a new evaluator lands in on
+   their first mount and a mis-configured CI lands in on every build, and they
+   are reachable in a paying customer's own product from nothing worse than an
+   environment variable that did not survive a deploy. An error red bar there
+   claims something is broken when nothing is: the editor works, and the
+   integrator has a configuration note to act on. Error stays reserved for
+   "restricted", which is the one state where the product really has stopped
+   accepting edits. */
+.scryb-license-banner--missing,
+.scryb-license-banner--invalid {
+    background: color-mix(in oklch, var(--scryb-color-warning-dark, #854d0e) 8%, transparent);
+    border-bottom-color: var(--scryb-color-warning-dark, #854d0e);
+    color: var(--scryb-color-warning-dark, #854d0e);
+}
+
+/* Both light treatments above are picked for a light surface and go muddy on a
+   dark one. These two blocks mirror the dark treatments components.css already
+   gives .severity-warning and .severity-error, so every severity surface in
+   this package agrees in both themes.
+
+   Literal colours rather than var() here: unlike the light rules above, these
+   two hues have no token in tokens.css, and inventing a var() name that
+   resolves to nothing but its own fallback would contradict this file's header
+   and read as a token that exists. */
+.scryb-theme-dark .scryb-license-banner--missing,
+.scryb-theme-dark .scryb-license-banner--invalid {
+    background: rgba(245, 158, 11, 0.1);
+    border-bottom-color: #fbbf24;
+    color: #fbbf24;
+}
+
+/* "restricted" is the state a customer most needs to read, because it is the
+   only one where the editor has actually stopped accepting edits. The light
+   #c53030 is too dark against the dark toolbar surface to carry that. */
+.scryb-theme-dark .scryb-license-banner--restricted {
+    background: rgba(239, 68, 68, 0.1);
+    border-bottom-color: #f87171;
+    color: #f87171;
+}
+
+/* theme="auto" resolves to dark from the OS, and scoping the two blocks above
+   to .scryb-theme-dark alone left it on the light treatment: the exact muddy
+   result those blocks exist to prevent, for the theme a consumer is most
+   likely to pick. Repeated rather than folded into the selector lists above
+   because a media query cannot be expressed inside a selector; this mirrors
+   how components.css pairs .scryb-theme-dark with .scryb-theme-auto. */
+@media (prefers-color-scheme: dark) {
+    .scryb-theme-auto .scryb-license-banner--missing,
+    .scryb-theme-auto .scryb-license-banner--invalid {
+        background: rgba(245, 158, 11, 0.1);
+        border-bottom-color: #fbbf24;
+        color: #fbbf24;
+    }
+
+    .scryb-theme-auto .scryb-license-banner--restricted {
+        background: rgba(239, 68, 68, 0.1);
+        border-bottom-color: #f87171;
+        color: #f87171;
+    }
+}
