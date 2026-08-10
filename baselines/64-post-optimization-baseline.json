@@ -1,0 +1,37 @@
+{
+  "recorded": "2026-04-08T20:24:20Z",
+  "phase": "64-post-optimization",
+  "environment": {
+    "machine": "Apple M3 Max, 36 GB RAM",
+    "browser": "Chromium 147.0.7727.15 (playwright chromium v1217)",
+    "node": "v24.1.0",
+    "buildMode": "production",
+    "strictMode": false,
+    "note": "React demo production Vite build verified (no react-refresh, minified bundle), served via bunx serve on port 4302 (reuseExistingServer: true). Cold cache --incognito, workers: 1, fullyParallel: false, retries: 0. Bundle sizes measured with size-limit @size-limit/file preset against pre-built dist artifacts. Same machine, same Chromium version, same methodology as 60-pre-optimization-baseline.json."
+  },
+  "bundleSize": {
+    "editorCore": { "minGzip_kB": 11.59, "limit_kB": 12 },
+    "editorReact": { "minGzip_kB": 25.69, "limit_kB": 26 },
+    "editorAngular": { "minGzip_kB": 64.95, "limit_kB": 68 }
+  },
+  "initTime": {
+    "reactDemo_firstEditorMs": 427,
+    "reactDemo_p50Ms": 77,
+    "reactDemo_p95Ms": 302,
+    "runs": [302, 88, 77, 62, 65],
+    "note": "5 cold-cache runs, .ProseMirror visible, production build. First run measured separately (includes initial page load overhead); p50/p95 from 5 cold-start navigations."
+  },
+  "multiInstance": {
+    "1instance_totalMs": 63,
+    "1instance_avgMs": 63,
+    "5instances_totalMs": 118,
+    "5instances_avgMs": 24,
+    "10instances_totalMs": 135,
+    "10instances_avgMs": 14,
+    "20instances_totalMs": 224,
+    "20instances_avgMs": 11
+  },
+  "jsHeap": {
+    "afterSingleEditorMB": 6.7
+  }
+}

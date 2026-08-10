@@ -1,0 +1,37 @@
+{
+  "recorded": "2026-04-08",
+  "phase": "60-pre-optimization",
+  "environment": {
+    "machine": "Apple M3 Max, 36 GB RAM",
+    "browser": "Chromium 147.0.7727.15 (playwright chromium v1217)",
+    "node": "v24.1.0",
+    "buildMode": "production",
+    "strictMode": false,
+    "note": "React demo production Vite build, --incognito, cold cache, workers: 1. Port 4302 used (4301 occupied by dev server). Production build verified: minified bundle, no react-refresh or HMR scripts."
+  },
+  "bundleSize": {
+    "editorCore": { "minGzip_kB": 11.57, "limit_kB": 12 },
+    "editorReact": { "minGzip_kB": 25.12, "limit_kB": 26 },
+    "editorAngular": { "minGzip_kB": 64.95, "limit_kB": 68 }
+  },
+  "initTime": {
+    "reactDemo_firstEditorMs": 429,
+    "reactDemo_p50Ms": 121,
+    "reactDemo_p95Ms": 279,
+    "runs": [279, 104, 69, 121, 137],
+    "note": "5 cold-cache runs, .ProseMirror visible, production build. First run measured separately (includes initial page load overhead); p50/p95 from 5 cold-start navigations."
+  },
+  "multiInstance": {
+    "1instance_totalMs": 64,
+    "1instance_avgMs": 64,
+    "5instances_totalMs": 89,
+    "5instances_avgMs": 18,
+    "10instances_totalMs": 142,
+    "10instances_avgMs": 14,
+    "20instances_totalMs": 268,
+    "20instances_avgMs": 13
+  },
+  "jsHeap": {
+    "afterSingleEditorMB": 6.74
+  }
+}
