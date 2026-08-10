@@ -7,7 +7,7 @@
     },
     "packages/core": {
       "name": "@scryb-editor/core",
-      "version": "3.4.0",
+      "version": "3.5.0",
       "dependencies": {
         "@intevation/tiptap-extension-office-paste": "^0.1.2",
         "@scryb-editor/extensions": "*",
@@ -47,7 +47,7 @@
     },
     "packages/extensions": {
       "name": "@scryb-editor/extensions",
-      "version": "3.4.0",
+      "version": "3.5.0",
       "dependencies": {
         "@intevation/tiptap-extension-office-paste": "^0.1.2",
         "@tiptap/core": "^3.0.0",
@@ -75,11 +75,11 @@
     },
     "packages/themes": {
       "name": "@scryb-editor/themes",
-      "version": "3.4.0",
+      "version": "3.5.0",
     },
     "packages/viewer": {
       "name": "@scryb-editor/viewer",
-      "version": "3.4.0",
+      "version": "3.5.0",
       "devDependencies": {
         "@scryb-editor/core": "*",
         "@scryb-editor/extensions": "*",
