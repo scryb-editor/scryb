@@ -173,6 +173,8 @@ export {
   visibleImageBubbleMenuItems,
 } from "./bubble-menu/image-item-config";
 export { BUBBLE_MENU_ITEM_CONFIG } from "./bubble-menu/item-config";
+export { createBubbleMenuOutsideDismiss } from "./bubble-menu/outside-dismiss";
+export type { BubbleMenuOutsideDismissOptions } from "./bubble-menu/outside-dismiss";
 
 // ─── Block Menu ──────────────────────────────────────────────────────────────
 export {

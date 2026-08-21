@@ -24,10 +24,6 @@
     color: var(--scryb-text-color, #2d3748);
 }
 
-/* "banner": expired key, still editable. Same neutral surface as the base
-   class — this is a heads-up, not yet a problem the author needs to react
-   to with urgency. */
-
 /* "restricted": expired past the grace window, editor is read-only. Tinted
    with the same error token the rest of the package already uses for
    destructive/error states (accessibility issues, table delete affordance). */
@@ -37,8 +33,16 @@
     color: var(--scryb-color-error, #c53030);
 }
 
-/* "missing" / "invalid": no usable key at all, and by definition never
-   blocking — both stay fully editable forever, unlike "restricted".
+/* "banner" / "missing" / "invalid": the editor still accepts every edit, and
+   something about the licence needs attention.
+
+   "banner" was neutral here until it was seen next to the others. An expired
+   key is the state a paying customer reaches by losing something they had,
+   and it is thirty days from turning their editor read-only; rendering it
+   quieter than a missing environment variable put the loudest treatment on
+   the mildest problem. The ladder now only ever gets louder: silent for
+   "valid" and "notice", this warning for the three states that need a human,
+   error for "restricted", where editing has actually stopped.
 
    Warning, not error. These are the two states a new evaluator lands in on
    their first mount and a mis-configured CI lands in on every build, and they
@@ -48,6 +52,7 @@
    integrator has a configuration note to act on. Error stays reserved for
    "restricted", which is the one state where the product really has stopped
    accepting edits. */
+.scryb-license-banner--banner,
 .scryb-license-banner--missing,
 .scryb-license-banner--invalid {
     background: color-mix(in oklch, var(--scryb-color-warning-dark, #854d0e) 8%, transparent);
@@ -64,6 +69,7 @@
    two hues have no token in tokens.css, and inventing a var() name that
    resolves to nothing but its own fallback would contradict this file's header
    and read as a token that exists. */
+.scryb-theme-dark .scryb-license-banner--banner,
 .scryb-theme-dark .scryb-license-banner--missing,
 .scryb-theme-dark .scryb-license-banner--invalid {
     background: rgba(245, 158, 11, 0.1);
@@ -87,6 +93,7 @@
    because a media query cannot be expressed inside a selector; this mirrors
    how components.css pairs .scryb-theme-dark with .scryb-theme-auto. */
 @media (prefers-color-scheme: dark) {
+    .scryb-theme-auto .scryb-license-banner--banner,
     .scryb-theme-auto .scryb-license-banner--missing,
     .scryb-theme-auto .scryb-license-banner--invalid {
         background: rgba(245, 158, 11, 0.1);
