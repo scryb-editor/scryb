@@ -7,32 +7,32 @@
     },
     "packages/core": {
       "name": "@scryb-editor/core",
-      "version": "3.6.0",
+      "version": "3.7.0",
       "dependencies": {
         "@intevation/tiptap-extension-office-paste": "^0.1.2",
         "@scryb-editor/extensions": "*",
-        "@tiptap/core": "^3.0.0",
-        "@tiptap/extension-character-count": "^3.0.0",
-        "@tiptap/extension-details": "3.29.0",
-        "@tiptap/extension-emoji": "3.29.0",
-        "@tiptap/extension-invisible-characters": "^3.0.0",
-        "@tiptap/extension-link": "^3.0.0",
-        "@tiptap/extension-mention": "3.29.0",
-        "@tiptap/extension-placeholder": "^3.0.0",
-        "@tiptap/extension-subscript": "^3.0.0",
-        "@tiptap/extension-superscript": "^3.0.0",
-        "@tiptap/extension-table-of-contents": "3.29.0",
-        "@tiptap/extension-task-item": "^3.0.0",
-        "@tiptap/extension-task-list": "^3.0.0",
-        "@tiptap/extension-text-align": "^3.0.0",
-        "@tiptap/extension-text-style": "^3.0.0",
-        "@tiptap/extension-typography": "^3.0.0",
-        "@tiptap/extension-underline": "^3.0.0",
-        "@tiptap/extension-unique-id": "^3.0.0",
-        "@tiptap/extension-youtube": "^3.0.0",
-        "@tiptap/pm": "^3.0.0",
-        "@tiptap/starter-kit": "^3.0.0",
-        "@tiptap/suggestion": "^3.0.0",
+        "@tiptap/core": "^3.30.2",
+        "@tiptap/extension-character-count": "^3.30.2",
+        "@tiptap/extension-details": "3.30.2",
+        "@tiptap/extension-emoji": "3.30.2",
+        "@tiptap/extension-invisible-characters": "^3.30.2",
+        "@tiptap/extension-link": "^3.30.2",
+        "@tiptap/extension-mention": "3.30.2",
+        "@tiptap/extension-placeholder": "^3.30.2",
+        "@tiptap/extension-subscript": "^3.30.2",
+        "@tiptap/extension-superscript": "^3.30.2",
+        "@tiptap/extension-table-of-contents": "3.30.2",
+        "@tiptap/extension-task-item": "^3.30.2",
+        "@tiptap/extension-task-list": "^3.30.2",
+        "@tiptap/extension-text-align": "^3.30.2",
+        "@tiptap/extension-text-style": "^3.30.2",
+        "@tiptap/extension-typography": "^3.30.2",
+        "@tiptap/extension-underline": "^3.30.2",
+        "@tiptap/extension-unique-id": "^3.30.2",
+        "@tiptap/extension-youtube": "^3.30.2",
+        "@tiptap/pm": "^3.30.2",
+        "@tiptap/starter-kit": "^3.30.2",
+        "@tiptap/suggestion": "^3.30.2",
       },
       "devDependencies": {
         "@size-limit/esbuild": "^13.0.1",
@@ -47,23 +47,23 @@
     },
     "packages/extensions": {
       "name": "@scryb-editor/extensions",
-      "version": "3.6.0",
+      "version": "3.7.0",
       "dependencies": {
         "@intevation/tiptap-extension-office-paste": "^0.1.2",
-        "@tiptap/core": "^3.0.0",
-        "@tiptap/extension-bubble-menu": "^3.0.0",
-        "@tiptap/extension-drag-handle": "^3.0.0",
-        "@tiptap/extension-image": "^3.0.0",
-        "@tiptap/extension-table": "^3.0.0",
-        "@tiptap/extension-table-cell": "^3.0.0",
-        "@tiptap/extension-table-header": "^3.0.0",
-        "@tiptap/extension-table-row": "^3.0.0",
-        "@tiptap/extension-text-style": "^3.0.0",
-        "@tiptap/pm": "^3.0.0",
+        "@tiptap/core": "^3.30.2",
+        "@tiptap/extension-bubble-menu": "^3.30.2",
+        "@tiptap/extension-drag-handle": "^3.30.2",
+        "@tiptap/extension-image": "^3.30.2",
+        "@tiptap/extension-table": "^3.30.2",
+        "@tiptap/extension-table-cell": "^3.30.2",
+        "@tiptap/extension-table-header": "^3.30.2",
+        "@tiptap/extension-table-row": "^3.30.2",
+        "@tiptap/extension-text-style": "^3.30.2",
+        "@tiptap/pm": "^3.30.2",
         "dompurify": "^3.4.12",
       },
       "devDependencies": {
-        "@tiptap/starter-kit": "^3.0.0",
+        "@tiptap/starter-kit": "^3.30.2",
         "happy-dom": "^20.11.1",
         "jsdom": "^29.1.1",
         "prosemirror-model": "^1.25.11",
@@ -75,17 +75,17 @@
     },
     "packages/themes": {
       "name": "@scryb-editor/themes",
-      "version": "3.6.0",
+      "version": "3.7.0",
     },
     "packages/viewer": {
       "name": "@scryb-editor/viewer",
-      "version": "3.6.0",
+      "version": "3.7.0",
       "devDependencies": {
         "@scryb-editor/core": "*",
         "@scryb-editor/extensions": "*",
-        "@tiptap/core": "^3.29.0",
-        "@tiptap/html": "^3.29.0",
-        "@tiptap/pm": "^3.29.0",
+        "@tiptap/core": "^3.30.2",
+        "@tiptap/html": "^3.30.2",
+        "@tiptap/pm": "^3.30.2",
         "tsdown": "^0.22.14",
         "typescript": "~6.0.3",
         "vitest": "^4.1.10",
@@ -258,7 +258,7 @@
 
     "@tiptap/extension-collaboration": ["@tiptap/extension-collaboration@3.30.2", "", { "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/pm": "3.30.2", "@tiptap/y-tiptap": "^3.0.7", "yjs": "^13" } }, "sha512-n0de2+ZVQCJGrHzlvtZr1jA3qasr9AMlohGNrv/F6DFasXPNFYIzt+2Jin/Zx9mRvfiL47GPPQxg/pQftHTmjA=="],
 
-    "@tiptap/extension-details": ["@tiptap/extension-details@3.29.0", "", { "peerDependencies": { "@tiptap/core": "3.29.0", "@tiptap/extension-text-style": "3.29.0", "@tiptap/pm": "3.29.0" } }, "sha512-1dZFl1oVnjjpWOmPn50Bhm+Ttfo/idNSIUgpPt2BhTUub1P1kSFSF6N1HMYMgPhMoa9W4tr00BqNAOcTc4/sZw=="],
+    "@tiptap/extension-details": ["@tiptap/extension-details@3.30.2", "", { "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/extension-text-style": "3.30.2", "@tiptap/pm": "3.30.2" } }, "sha512-TItNBcvwycW5Bpe+SH7bCYeBvMDmLvzsoY8uOn8PoJ/Chls6Wl+t89QWKo0bU5i7Tt1gdgMoTngb+WXpjP0fhQ=="],
 
     "@tiptap/extension-document": ["@tiptap/extension-document@3.30.2", "", { "peerDependencies": { "@tiptap/core": "3.30.2" } }, "sha512-+xIv67V+/2L1uvz98FAT5W7kWEfHwfNV3MD7b4UsKPU0lhcCWuVOXy0JB8yYmdNExqpI7xT9g3MWzREoBvBQSg=="],
 
@@ -266,7 +266,7 @@
 
     "@tiptap/extension-dropcursor": ["@tiptap/extension-dropcursor@3.30.2", "", { "peerDependencies": { "@tiptap/extensions": "3.30.2" } }, "sha512-nyRKUmItATnKI9AiRChmjhcBbCEsNxRu+AaCz+cx8EvnAcNHsVRdNYL5PmBs3WlNA/Et4Eb2DG0hVQDnNF61eg=="],
 
-    "@tiptap/extension-emoji": ["@tiptap/extension-emoji@3.29.0", "", { "dependencies": { "emoji-regex": "^10.6.0", "emojibase-data": "^17", "is-emoji-supported": "^0.0.5" }, "peerDependencies": { "@tiptap/core": "3.29.0", "@tiptap/pm": "3.29.0", "@tiptap/suggestion": "3.29.0" } }, "sha512-WvWaHr4Mk+VGto9A9N6c7JtG8nqMRcIV21UUBcl9STZNabAxRXxBveRGfX8hVXRBZaqIWvpm17gRkuAspJkIOA=="],
+    "@tiptap/extension-emoji": ["@tiptap/extension-emoji@3.30.2", "", { "dependencies": { "emoji-regex": "^10.6.0", "emojibase-data": "^17", "is-emoji-supported": "^0.0.5" }, "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/pm": "3.30.2", "@tiptap/suggestion": "3.30.2" } }, "sha512-rNjhWk/Xaz1+GQ6+k9KhoBDAHA4420o7fjTE9prnCDeml+OISH//LD+Loz38y3AaYy+gXaZjgHa4y/E5W7NMiw=="],
 
     "@tiptap/extension-gapcursor": ["@tiptap/extension-gapcursor@3.30.2", "", { "peerDependencies": { "@tiptap/extensions": "3.30.2" } }, "sha512-7Xk0ut6FM+RAsvKxDN3bAtk7zvYZ6Aa8pawJ6s7dLAmLR9JwrZevlcL4FSrj4bR7rqKOj92RYCFxzgTEbWimag=="],
 
@@ -290,7 +290,7 @@
 
     "@tiptap/extension-list-keymap": ["@tiptap/extension-list-keymap@3.30.2", "", { "peerDependencies": { "@tiptap/extension-list": "3.30.2" } }, "sha512-TTve3WOlQaYu1ahMqsQ/T0wzaxfgZvcOl3/OuPyInOi8QtxXhqGhFjmYe5jOr56G9W2QDuFWVsZecVwfDte9zg=="],
 
-    "@tiptap/extension-mention": ["@tiptap/extension-mention@3.29.0", "", { "peerDependencies": { "@tiptap/core": "3.29.0", "@tiptap/pm": "3.29.0", "@tiptap/suggestion": "3.29.0" } }, "sha512-mlWKKOOD70gbvQaS3B4V7AhBnBjJ8gzJDOU8yVo9+DH6xgGkXbGomqercoDC0IfTkCqA5tQT5GiIHXiV5EoDMw=="],
+    "@tiptap/extension-mention": ["@tiptap/extension-mention@3.30.2", "", { "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/pm": "3.30.2", "@tiptap/suggestion": "3.30.2" } }, "sha512-x3W9+p5G0Ex/QrQPgfC8Cy+rwr6wrXmizdrwMpslfvpEJZmlgHEBd5LntqKGztI21X9QldIge2by0005D7A6iA=="],
 
     "@tiptap/extension-node-range": ["@tiptap/extension-node-range@3.30.2", "", { "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/pm": "3.30.2" } }, "sha512-dRjt2cMrSYuivBo1cxOp7geZMdQ9uKdWy4j/vQv6kby2C/Or4eWsPVC7m8UyAu1ADnU/9lfiBBbaqp05zq5gxg=="],
 
@@ -312,7 +312,7 @@
 
     "@tiptap/extension-table-header": ["@tiptap/extension-table-header@3.30.2", "", { "peerDependencies": { "@tiptap/extension-table": "3.30.2" } }, "sha512-qcpMr8x1XvevEG5QZdk4JGLzsjZal1zzNfy4xmEtwUYVYkXkWaXklQvxEXC6GUkVpTGTOSXtHl25/cSbnJ5qbg=="],
 
-    "@tiptap/extension-table-of-contents": ["@tiptap/extension-table-of-contents@3.29.0", "", { "dependencies": { "uuid": "^14.0.0" }, "peerDependencies": { "@tiptap/core": "3.29.0", "@tiptap/pm": "3.29.0" } }, "sha512-wtNOvllm+qhWdwNtqLyjK/hiEYhsfGoiVecPyn/jYdOQNS7a+O5njDpBNq6ZlVJXTydqAKlCrguTbhxs/Swn1g=="],
+    "@tiptap/extension-table-of-contents": ["@tiptap/extension-table-of-contents@3.30.2", "", { "dependencies": { "uuid": "^14.0.0" }, "peerDependencies": { "@tiptap/core": "3.30.2", "@tiptap/pm": "3.30.2" } }, "sha512-4qkTktPMiWbDsbsMis7Kd5GtTvU3HKCTYQaa623+oL9seuKYRMVSNQ6jWizOBmvavCK4muTFTt7yFEC1UYr+Zg=="],
 
     "@tiptap/extension-table-row": ["@tiptap/extension-table-row@3.30.2", "", { "peerDependencies": { "@tiptap/extension-table": "3.30.2" } }, "sha512-dlbkcmgb5eiMI9hLX5C6CaPGuGcpyyPxJCjIYcI1l4glimYcbgxxEeqtGIvySgDewxWgofY/V3CLOGHrfyBCkQ=="],
 

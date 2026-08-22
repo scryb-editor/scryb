@@ -1,5 +1,7 @@
 # @scryb-editor/themes
 
+[![The Scryb editor: typing, the toolbar, and the bubble menu](https://scryb.dev/scryb-editor.gif)](https://scryb.dev)
+
 Stylesheets and design tokens for the [Scryb](https://scryb.dev) rich text editor. Plain
 CSS custom properties, light and dark themes, and content styles that match what the editor
 writes.

@@ -1,6 +1,6 @@
 {
   "name": "@scryb-editor/viewer",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "SSR-safe renderer that turns Tiptap JSON into an HTML string with no DOM and no client-side editor, for read-only pages",
   "keywords": [
     "rich-text-editor",
@@ -59,9 +59,9 @@
     "@scryb-editor/extensions": "*"
   },
   "devDependencies": {
-    "@tiptap/html": "^3.29.0",
-    "@tiptap/core": "^3.29.0",
-    "@tiptap/pm": "^3.29.0",
+    "@tiptap/html": "^3.30.2",
+    "@tiptap/core": "^3.30.2",
+    "@tiptap/pm": "^3.30.2",
     "@scryb-editor/core": "*",
     "@scryb-editor/extensions": "*",
     "tsdown": "^0.22.14",

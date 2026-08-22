@@ -1,5 +1,7 @@
 # @scryb-editor/core
 
+[![The Scryb editor: typing, the toolbar, and the bubble menu](https://scryb.dev/scryb-editor.gif)](https://scryb.dev)
+
 Framework-agnostic core for the [Scryb](https://scryb.dev) rich text editor. Builds a
 configured [Tiptap](https://tiptap.dev) editor with the Scryb extension set, and ships the
 commands, internationalization and accessibility checking that the React and Angular

@@ -3,7 +3,7 @@ import { createScrybEditor, buildExtensions, buildViewerExtensions } from "../ed
 import { createEmojiCallbackStore } from "../emoji/callback-store";
 import { createMentionCallbackStore } from "../mention/callback-store";
 import type { MentionItem } from "../mention/callback-store";
-import { Editor } from "@tiptap/core";
+import { Editor, Node } from "@tiptap/core";
 
 describe("createScrybEditor", () => {
   let editor: Editor | undefined;
@@ -55,6 +55,63 @@ describe("createScrybEditor", () => {
     editor = createScrybEditor({ editorProps: { attributes: () => ({ class: "fn-cls" }) } });
     expect(editor.view.dom.classList.contains("scryb-content")).toBe(true);
     expect(editor.view.dom.classList.contains("fn-cls")).toBe(true);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Caller-supplied extensions
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// This is the contract both adapters build their `extensions` input on: the
+// caller's extensions are appended AFTER the Scryb defaults, never instead of
+// them. Order is the load-bearing half — Tiptap resolves conflicts by
+// position and priority, so an implementation that prepended them would let a
+// caller silently displace a default rather than extend it, and nothing else
+// in the suite would notice.
+
+describe("createScrybEditor — caller-supplied extensions", () => {
+  let editor: Editor | undefined;
+
+  afterEach(() => {
+    editor?.destroy();
+    editor = undefined;
+  });
+
+  const CustomBlock = Node.create({
+    name: "customTestBlock",
+    group: "block",
+    content: "inline*",
+    parseHTML: () => [{ tag: "custom-test-block" }],
+    renderHTML: () => ["custom-test-block", 0],
+  });
+
+  it("registers a caller's custom node in the schema", () => {
+    editor = createScrybEditor({ extensions: [CustomBlock] });
+    expect(editor.schema.nodes["customTestBlock"]).toBeDefined();
+  });
+
+  it("keeps the Scryb defaults alongside it", () => {
+    editor = createScrybEditor({ extensions: [CustomBlock] });
+    expect(editor.schema.nodes["paragraph"]).toBeDefined();
+    expect(editor.schema.marks["underline"]).toBeDefined();
+  });
+
+  it("appends the caller's extensions after the defaults, not before", () => {
+    editor = createScrybEditor({ extensions: [CustomBlock] });
+    const names = editor.extensionManager.extensions.map((ext) => ext.name);
+    expect(names).toContain("customTestBlock");
+    expect(names.indexOf("customTestBlock")).toBe(names.length - 1);
+  });
+
+  it("produces the same defaults when no extensions are supplied", () => {
+    const withNone = createScrybEditor();
+    const baseline = withNone.extensionManager.extensions.map((e) => e.name);
+    withNone.destroy();
+
+    editor = createScrybEditor({ extensions: [CustomBlock] });
+    const withCustom = editor.extensionManager.extensions.map((e) => e.name);
+
+    expect(withCustom.filter((n) => n !== "customTestBlock")).toEqual(baseline);
   });
 });
 
