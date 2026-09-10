@@ -168,7 +168,7 @@
 }
 
 .scryb-editor:focus-within {
-    border-color: var(--scryb-editor-border-focus, #3182ce);
+    border-color: var(--scryb-editor-border-focus, #d1d5db);
 }
 
 /* The inner ScrybEditorContent element reuses the .scryb-editor class

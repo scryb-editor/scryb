@@ -45,7 +45,12 @@ export function createDragGhost(
     "position:fixed", "top:0", "left:0",
     `width:${rect.width}px`, "pointer-events:none", "z-index:9999",
     "opacity:0.5", "box-shadow:0 4px 12px rgba(0,0,0,0.15)",
-    "border-radius:4px", "background:var(--scryb-editor-bg,white)",
+    // Floating UI surface, not the editor surface: the ghost is appended to
+    // document.body, so it never inherits from the editor host anyway — and
+    // `--scryb-editor-bg: transparent` is the documented way to flatten the
+    // card, which would leave the ghost see-through mid-drag for anyone who
+    // set it high enough (`:root`) for body to inherit it.
+    "border-radius:4px", "background:var(--scryb-surface-elevated,white)",
     `transform:translate(${rect.left}px,${rect.top}px)`,
     `max-width:${rect.width}px`, "overflow:hidden",
   ].join(";");

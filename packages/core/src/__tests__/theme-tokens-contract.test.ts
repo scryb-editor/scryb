@@ -32,7 +32,39 @@ function stripComments(css: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, "");
 }
 
-const themes = stripComments(readCss("themes.css"));
+/** Splits a sheet at `@layer <name> { … }`, returning the layer body and
+ *  everything outside it. The four editor-card tokens live in the
+ *  `scryb-theme` layer so a consumer's unlayered rule outranks them whatever
+ *  its specificity; every other token stays unlayered. The naive
+ *  "first `.scryb-theme-dark {` block" regexes below cannot tell the two
+ *  apart on their own — without this split they read the layer and report a
+ *  missing `--scryb-surface-elevated` that is right there, one block down. */
+function splitLayer(css: string, layer: string): { inside: string; outside: string } {
+  const opener = new RegExp(`@layer\\s+${layer}\\s*\\{`, "g");
+  let inside = "";
+  let outside = "";
+  let cursor = 0;
+
+  for (let match = opener.exec(css); match !== null; match = opener.exec(css)) {
+    outside += css.slice(cursor, match.index);
+    let depth = 1;
+    let i = match.index + match[0].length;
+    const bodyStart = i;
+    for (; i < css.length && depth > 0; i++) {
+      if (css[i] === "{") depth++;
+      else if (css[i] === "}") depth--;
+    }
+    inside += css.slice(bodyStart, i - 1);
+    cursor = i;
+    opener.lastIndex = i;
+  }
+
+  outside += css.slice(cursor);
+  return { inside, outside };
+}
+
+const themesFull = stripComments(readCss("themes.css"));
+const { inside: cardLayer, outside: themes } = splitLayer(themesFull, "scryb-theme");
 const tokens = stripComments(readCss("tokens.css"));
 const components = stripComments(readCss("components.css"));
 
@@ -44,21 +76,21 @@ describe("theme tokens contract — editor-bg is an opaque card surface", () => 
   // it with `--scryb-editor-bg: transparent; border: none; box-shadow: none;`,
   // documented in the themes.css block comment.
   it("light theme sets --scryb-editor-bg to an opaque white", () => {
-    const lightBlock = themes.match(/\.scryb-editor:not\(\.scryb-theme-dark\)[^{]*\{([^}]*)\}/s);
+    const lightBlock = cardLayer.match(/\.scryb-editor:not\(\.scryb-theme-dark\)[^{]*\{([^}]*)\}/s);
     expect(lightBlock, "light theme selector not found").toBeTruthy();
     expect(lightBlock![1]).toMatch(/--scryb-editor-bg:\s*var\(--scryb-color-white\)/);
     expect(lightBlock![1]).not.toMatch(/--scryb-editor-bg:\s*transparent/);
   });
 
   it("dark theme sets --scryb-editor-bg to an opaque dark surface", () => {
-    const darkBlock = themes.match(/\.scryb-theme-dark\s*\{([^}]*)\}/s);
+    const darkBlock = cardLayer.match(/\.scryb-theme-dark\s*\{([^}]*)\}/s);
     expect(darkBlock, ".scryb-theme-dark block not found").toBeTruthy();
     expect(darkBlock![1]).toMatch(/--scryb-editor-bg:\s*var\(--scryb-color-dark-100\)/);
     expect(darkBlock![1]).not.toMatch(/--scryb-editor-bg:\s*transparent/);
   });
 
   it("auto theme (@media prefers-color-scheme: dark) sets an opaque dark surface", () => {
-    const autoBlock = themes.match(/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{[^}]*\.scryb-theme-auto\s*\{([^}]*)\}/s);
+    const autoBlock = cardLayer.match(/@media\s*\(prefers-color-scheme:\s*dark\)\s*\{[^}]*\.scryb-theme-auto\s*\{([^}]*)\}/s);
     expect(autoBlock, "auto theme dark block not found").toBeTruthy();
     expect(autoBlock![1]).toMatch(/--scryb-editor-bg:\s*var\(--scryb-color-dark-100\)/);
     expect(autoBlock![1]).not.toMatch(/--scryb-editor-bg:\s*transparent/);
@@ -67,7 +99,7 @@ describe("theme tokens contract — editor-bg is an opaque card surface", () => 
   it("the card chrome tokens are declared alongside the surface", () => {
     // Guards the redesign as a set: a future revert that drops only the border
     // or only the shadow leaves a half-card, which is worse than either look.
-    const lightBlock = themes.match(/\.scryb-editor:not\(\.scryb-theme-dark\)[^{]*\{([^}]*)\}/s);
+    const lightBlock = cardLayer.match(/\.scryb-editor:not\(\.scryb-theme-dark\)[^{]*\{([^}]*)\}/s);
     expect(lightBlock![1]).toMatch(/--scryb-editor-border:/);
     expect(lightBlock![1]).toMatch(/--scryb-editor-shadow:/);
   });

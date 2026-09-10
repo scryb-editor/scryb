@@ -10,6 +10,91 @@
    ============================================================================= */
 
 /* =============================================================================
+   Editor Card Tokens — in a cascade layer on purpose
+
+   The editor is a self-contained card: solid surface, hairline border, 12px
+   radius, whisper of a shadow. Consumers embedding it inside their own field
+   chrome flatten it back with
+
+     .scryb-editor {
+         --scryb-editor-bg: transparent;
+         --scryb-editor-border: transparent;
+         --scryb-editor-border-focus: transparent;
+         --scryb-editor-shadow: none;
+     }
+
+   That recipe used to do nothing at all. These four were declared inline in
+   the theme blocks below, where the light one is `.scryb-editor:not(
+   .scryb-theme-dark)` — specificity (0,2,0). A consumer who followed the
+   documentation and wrote `.scryb-editor` got (0,1,0) and lost, however late
+   their stylesheet loaded. The visible symptom: an editor embedded in a host
+   form field grew a 1px card border the moment it took focus, and nothing the
+   consumer wrote could remove it.
+
+   An unlayered declaration beats a layered one no matter the specificity, so
+   moving just these four into a layer hands the consumer the win while
+   leaving them declared — `var(--scryb-editor-bg)` still resolves for anyone
+   READING the token, which the adapters' colour pickers do. Nothing else in
+   this package is layered: the fix is scoped to the four names the
+   documentation tells consumers to set.
+
+   What a layer does NOT beat is inheritance. The editor host carries these
+   declarations itself, and an element's own declaration wins over a value
+   inherited from an ancestor whatever the layer, so an override has to match
+   the host — `:root { --scryb-editor-bg: … }` does not reach the card. That
+   was equally true before this change; the alternative, dropping the
+   declarations so nothing on the host shadows an ancestor, is what makes the
+   token unreadable at runtime.
+
+   The three rules stay in light → dark → auto order for the same reason the
+   unlayered blocks do: ordering inside a layer follows the normal cascade, so
+   `.scryb-editor.scryb-theme-auto` (0,2,0) has to come last to beat the light
+   fallback it ties with.
+
+   Trade-off worth knowing: an unscoped override now applies to BOTH themes.
+   Scope it with `.scryb-theme-dark { … }` when they need different values.
+   ============================================================================= */
+
+@layer scryb-theme {
+    .scryb-editor:not(.scryb-theme-dark),
+    .scryb-theme-light,
+    .scryb-toc:not(.scryb-theme-dark),
+    .scryb-emoji-popup:not(.scryb-theme-dark),
+    .scryb-mention-popup:not(.scryb-theme-dark),
+    .scryb-editor-portal:not(.scryb-theme-dark) {
+        --scryb-editor-bg: var(--scryb-color-white);
+        --scryb-editor-border: var(--scryb-color-gray-200);
+        /* One neutral step darker, not the primary blue: editors keep focus
+           for the whole writing session, so a saturated focus border would be
+           a permanent frame around the content. Focus rings on controls stay
+           blue. */
+        --scryb-editor-border-focus: var(--scryb-color-gray-300);
+        --scryb-editor-shadow: 0 1px 2px rgba(22, 24, 31, 0.04);
+    }
+
+    .scryb-theme-dark {
+        --scryb-editor-bg: var(--scryb-color-dark-100);
+        --scryb-editor-border: var(--scryb-color-dark-border);
+        --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+        --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .scryb-theme-auto,
+        .scryb-editor.scryb-theme-auto,
+        .scryb-toc.scryb-theme-auto,
+        .scryb-emoji-popup.scryb-theme-auto,
+        .scryb-mention-popup.scryb-theme-auto,
+        .scryb-editor-portal.scryb-theme-auto {
+            --scryb-editor-bg: var(--scryb-color-dark-100);
+            --scryb-editor-border: var(--scryb-color-dark-border);
+            --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+            --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+/* =============================================================================
    Light Theme (Default)
 
    Defined on .scryb-editor so all themes inherit these values.
@@ -36,22 +121,8 @@
 .scryb-editor-portal:not(.scryb-theme-dark) {
     color-scheme: light;
 
-    /* ─────────────────────────────────────────────────────────────────────────
-     Editor Container
-     ─────────────────────────────────────────────────────────────────────────
-     The editor is a self-contained card: solid surface, hairline border,
-     12px radius, whisper of a shadow. Consumers embedding it inside their
-     own card can flatten it back with
-     `.scryb-editor { --scryb-editor-bg: transparent; border: none; box-shadow: none; }`.
-     Floating UI (popups, menus, modals) uses `--scryb-surface-elevated`
-     (see the non-popup-scope rule below). */
-    --scryb-editor-bg: var(--scryb-color-white);
-    --scryb-editor-border: var(--scryb-color-gray-200);
-    /* One neutral step darker, not the primary blue: editors keep focus for
-       the whole writing session, so a saturated focus border would be a
-       permanent frame around the content. Focus rings on controls stay blue. */
-    --scryb-editor-border-focus: var(--scryb-color-gray-300);
-    --scryb-editor-shadow: 0 1px 2px rgba(22, 24, 31, 0.04);
+    /* The four editor-card tokens live in the `scryb-theme` cascade layer
+       instead of here — see the block after this one. */
 
     /* ─────────────────────────────────────────────────────────────────────────
      Text Colors
@@ -200,14 +271,9 @@
 .scryb-theme-dark {
     color-scheme: dark;
 
-    /* Editor Container — a solid dark card, mirroring the light theme.
-     * Flatten with `--scryb-editor-bg: transparent; border: none;` if the
-     * editor sits inside your own dark card. */
-    --scryb-editor-bg: var(--scryb-color-dark-100);
+    /* Editor Container — the four card tokens are in the `scryb-theme` layer
+     * near the top of this file; only the popup surface is declared here. */
     --scryb-surface-elevated: var(--scryb-color-dark-100);
-    --scryb-editor-border: var(--scryb-color-dark-border);
-    --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
-    --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 
     /* Text Colors */
     --scryb-text-color: var(--scryb-color-gray-200);
@@ -371,12 +437,8 @@
     .scryb-emoji-popup.scryb-theme-auto,
     .scryb-mention-popup.scryb-theme-auto,
     .scryb-editor-portal.scryb-theme-auto {
-        /* Editor Container */
-        --scryb-editor-bg: var(--scryb-color-dark-100);
+        /* Editor Container — card tokens live in the `scryb-theme` layer. */
         --scryb-surface-elevated: var(--scryb-color-dark-100);
-        --scryb-editor-border: var(--scryb-color-dark-border);
-        --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
-        --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 
         /* Text Colors */
         --scryb-text-color: var(--scryb-color-gray-200);

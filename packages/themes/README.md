@@ -81,6 +81,28 @@ The dark surfaces are near-neutral by design (saturation ≤5%) and blue appears
 interaction — links, selection, focus — never on a surface. An editor embedded in someone else's
 product should not bring an opinion about their brand hue with it.
 
+### Flattening the editor card
+
+The editor draws as a card. Four tokens undo it, and they are the one group this stylesheet
+puts in a cascade layer (`scryb-theme`) — an unlayered rule beats a layered one whatever its
+specificity, so a plain `.scryb-editor { … }` wins without out-specifying anything:
+
+```css
+.scryb-editor {
+  --scryb-editor-bg: transparent;
+  --scryb-editor-border: transparent;
+  --scryb-editor-border-focus: transparent;
+  --scryb-editor-shadow: none;
+}
+```
+
+Set the focus one too. It is a separate value, so a card with an invisible resting border still
+paints a border the moment the editor takes focus. An unscoped override applies to both themes;
+scope it with `.scryb-theme-dark { … }` when they need different values.
+
+Target the editor element. A layer outranks specificity, not inheritance: the editor carries
+the declaration itself, so setting these on an ancestor (`:root`, a wrapper) does not reach it.
+
 Primitives are declared on `.scryb-editor`, `.scryb-toc`, `.scryb-emoji-popup`,
 `.scryb-mention-popup`, `.scryb-editor-portal` and on `.scryb-theme-light` / `-dark` / `-auto`.
 The theme classes are in that list on purpose: a bare `.scryb-content` viewer wrapped in
