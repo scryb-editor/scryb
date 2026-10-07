@@ -39,6 +39,11 @@ export interface BlockMenuItem {
   header?: boolean;
   /** Destructive action — rendered in the error color at rest */
   danger?: boolean;
+  /**
+   * Platform-neutral keyboard shortcut for this entry ("Mod+Shift+ArrowUp").
+   * Adapters render it with formatShortcut and announce it via aria-keyshortcuts.
+   */
+  shortcut?: string;
 }
 
 // =============================================================================
@@ -116,6 +121,9 @@ export interface BlockMenuLabels {
   readonly alignMiddle?: string;
   readonly alignBottom?: string;
   readonly fitToWidth?: string;
+  /** Labels for the non-drag reorder entries; omitted labels drop the entries. */
+  readonly moveUp?: string;
+  readonly moveDown?: string;
   /** Labels for individual color options */
   colorNames: {
     default: string;

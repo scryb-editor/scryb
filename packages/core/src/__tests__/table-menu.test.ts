@@ -17,6 +17,7 @@ import {
   hasLaneForRowGrips,
   isGripAnchorVisible,
   TABLE_GRIP_ANCHOR_OFFSET_PX,
+  TABLE_ROW_GRIP_LANE_PX,
 } from "../table-menu/geometry";
 import { getSideMenuGutterGap, getSideMenuLeftOffset } from "../side-menu/constants";
 import {
@@ -34,6 +35,8 @@ import {
 import { normalizeColorValue } from "../block-menu/actions";
 import type { BlockMenuItem } from "../block-menu/types";
 import type { TableLineMenuLabels } from "../table-menu/types";
+import { tableGripLabel } from "../table-menu/grip-label";
+import { en } from "../i18n/locales/en";
 
 // =============================================================================
 // Row and column menus
@@ -328,6 +331,14 @@ describe("where the row grips go", () => {
     // Nothing to hang them on: no gutter, no side menu.
     expect(hasLaneForRowGrips(0, false)).toBe(false);
   });
+
+  it("asks for a lane as wide as the part of the 24px target outside the table", () => {
+    // The target reaches 4px into the table's border and padding; the other
+    // 20px need a gutter, or the target would sit under whatever is beside it.
+    expect(TABLE_ROW_GRIP_LANE_PX).toBe(20);
+    expect(hasLaneForRowGrips(TABLE_ROW_GRIP_LANE_PX, false)).toBe(true);
+    expect(hasLaneForRowGrips(TABLE_ROW_GRIP_LANE_PX - 1, false)).toBe(false);
+  });
 });
 
 describe("grips anchored to the table's top edge", () => {
@@ -339,18 +350,18 @@ describe("grips anchored to the table's top edge", () => {
   // column grip entirely and was caught in a browser, not by a test.
   const viewport = { index: 0, top: 0, left: 100, width: 400, height: 300 };
 
-  it("allows the grip once the edge clears the top by the grip's own height", () => {
+  it("allows the grip once the edge clears the top by the grip's own reach", () => {
     expect(isGripAnchorVisible(TABLE_GRIP_ANCHOR_OFFSET_PX, viewport)).toBe(true);
     expect(isGripAnchorVisible(120, viewport)).toBe(true);
     expect(isGripAnchorVisible(300, viewport)).toBe(true);
   });
 
-  it("refuses it in the band where the edge fits but the bar does not", () => {
-    // The grip paints twelve pixels above its anchor (8px tall, translated up
-    // by its own height plus 4). An edge sitting flush with the top of the
-    // content box is inside the box; the bar drawn from it is over the toolbar,
-    // which is the symptom this whole check exists to remove. Scrolling a table
-    // until its first row meets the top edge is where a reader naturally lands.
+  it("refuses it in the band where the edge fits but the target does not", () => {
+    // The column and corner grips' targets reach 24px above their anchor.
+    // An edge sitting flush with the top of the content box is inside the box;
+    // the target drawn from it is over the toolbar, which is the symptom this
+    // whole check exists to remove. Scrolling a table until its first row meets
+    // the top edge is where a reader naturally lands.
     expect(isGripAnchorVisible(0, viewport)).toBe(false);
     expect(isGripAnchorVisible(TABLE_GRIP_ANCHOR_OFFSET_PX - 1, viewport)).toBe(false);
   });
@@ -1019,5 +1030,12 @@ describe("a cell colour written by the browser", () => {
       TABLE_LINE_MENU_IDS.colors,
     );
     expect(activeLabels(swatches)).toEqual(["Yellow"]);
+  });
+});
+
+describe("tableGripLabel", () => {
+  it("names the grip by its 1-based index", () => {
+    expect(tableGripLabel(en.table, "column", 1)).toBe("Column 2 actions");
+    expect(tableGripLabel(en.table, "row", 0)).toBe("Row 1 actions");
   });
 });

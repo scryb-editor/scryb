@@ -8,6 +8,7 @@ import { IMAGE_RESIZE_PRESETS, applyImageWidthPreset } from "../image/presets";
 /** Every control the image bubble menu can show. */
 export type ImageBubbleMenuItemKey =
   | "changeImage"
+  | "editAltText"
   | "resizeSmall"
   | "resizeMedium"
   | "resizeLarge"
@@ -27,7 +28,14 @@ export interface ImageBubbleMenuItemConfig {
   /** Short label, for controls that mark a point on a scale */
   readonly text?: string;
   /** Key into `translations.imageBubbleMenu` for the accessible name */
-  readonly labelKey: "changeImage" | "resizeSmall" | "resizeMedium" | "resizeLarge" | "resizeOriginal" | "deleteImage";
+  readonly labelKey:
+    | "changeImage"
+    | "editAltText"
+    | "resizeSmall"
+    | "resizeMedium"
+    | "resizeLarge"
+    | "resizeOriginal"
+    | "deleteImage";
   /** Destructive styling */
   readonly danger?: boolean;
   /**
@@ -63,6 +71,12 @@ export const IMAGE_BUBBLE_MENU_ITEM_CONFIG: Record<ImageBubbleMenuItemKey, Image
   changeImage: {
     icon: "drive_file_rename_outline",
     labelKey: "changeImage",
+    command: null,
+  },
+  // Opens the adapter's alt-text editor; command null like changeImage.
+  editAltText: {
+    icon: "text_fields",
+    labelKey: "editAltText",
     command: null,
   },
   resizeSmall: {
@@ -110,12 +124,14 @@ export const IMAGE_BUBBLE_MENU_ITEM_CONFIG: Record<ImageBubbleMenuItemKey, Image
 /**
  * The order both adapters render.
  *
- * `changeImage` leads because it replaces the whole subject of the menu; the
+ * `changeImage` leads because it replaces the whole subject of the menu, and
+ * `editAltText` sits beside it as the other edit to the image itself; the
  * sizes follow as a group; delete is last and separated, as it is everywhere
  * else in the editor.
  */
 export const DEFAULT_IMAGE_BUBBLE_MENU_ORDER: readonly ImageBubbleMenuItemKey[] = [
   "changeImage",
+  "editAltText",
   "separator",
   "resizeSmall",
   "resizeMedium",

@@ -10,7 +10,8 @@ import {
   getIssuesByType,
 } from "../accessibility/checker";
 import type { AccessibilityCheckResult } from "../accessibility/types";
-import type { Editor } from "@tiptap/core";
+import { Editor as TiptapEditor, type Editor } from "@tiptap/core";
+import { StarterKit } from "@tiptap/starter-kit";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 // =============================================================================
@@ -87,15 +88,30 @@ describe("checkImageAltText", () => {
     expect(issues[0].severity).toBe("error");
   });
 
-  it("flags images with empty alt text", () => {
+  it("treats empty alt as decorative: emptyAltText warning, no missingAltText error", () => {
     const doc = createMockDoc([
       { typeName: "image", attrs: { src: "photo.jpg", alt: "" } },
     ]);
     const issues = checkImageAltText(doc);
-    // Should have both missingAltText (empty trim) and emptyAltText
-    const emptyAltIssues = issues.filter((i) => i.type === "emptyAltText");
-    expect(emptyAltIssues.length).toBe(1);
-    expect(emptyAltIssues[0].severity).toBe("warning");
+    expect(issues.map((i) => i.type)).toEqual(["emptyAltText"]);
+    expect(issues[0].severity).toBe("warning");
+  });
+
+  it("flags a genuinely absent alt as missingAltText only", () => {
+    const doc = createMockDoc([
+      { typeName: "image", attrs: { src: "photo.jpg", alt: null } },
+    ]);
+    const issues = checkImageAltText(doc);
+    expect(issues.map((i) => i.type)).toEqual(["missingAltText"]);
+    expect(issues[0].severity).toBe("error");
+  });
+
+  it("treats whitespace-only alt as missing, not decorative", () => {
+    const doc = createMockDoc([
+      { typeName: "image", attrs: { src: "photo.jpg", alt: "   " } },
+    ]);
+    const issues = checkImageAltText(doc);
+    expect(issues.map((i) => i.type)).toEqual(["missingAltText"]);
   });
 
   it("does not flag images with valid alt text", () => {
@@ -156,7 +172,7 @@ describe("checkHeadingHierarchy", () => {
     const issues = checkHeadingHierarchy(doc);
     expect(issues.length).toBe(1);
     expect(issues[0].type).toBe("missingHeadingHierarchy");
-    expect(issues[0].message).toContain("Expected h1");
+    expect(issues[0].message).toContain("expected h1");
     expect(issues[0].message).toContain("found h2");
   });
 
@@ -167,7 +183,7 @@ describe("checkHeadingHierarchy", () => {
     ]);
     const issues = checkHeadingHierarchy(doc);
     expect(issues.length).toBe(1);
-    expect(issues[0].message).toContain("Expected h2");
+    expect(issues[0].message).toContain("expected h2");
     expect(issues[0].message).toContain("found h3");
   });
 
@@ -197,47 +213,87 @@ describe("checkHeadingHierarchy", () => {
 // =============================================================================
 
 describe("checkLinkText", () => {
+  // Links are marks in Tiptap, so these run against a real StarterKit document.
+  const linkDoc = (...texts: Array<{ text: string; href?: string }>): ProseMirrorNode =>
+    new TiptapEditor({
+      extensions: [StarterKit],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: texts.map(({ text, href }) => ({
+              type: "text",
+              text,
+              ...(href ? { marks: [{ type: "link", attrs: { href } }] } : {}),
+            })),
+          },
+        ],
+      },
+    }).state.doc;
+
   it("flags links with empty text", () => {
-    const doc = createMockDoc([
-      { typeName: "link", attrs: { href: "https://example.com" }, textContent: "" },
-    ]);
+    const doc = linkDoc({ text: "See " }, { text: "  ", href: "https://example.com" });
     const issues = checkLinkText(doc);
     const emptyLinks = issues.filter((i) => i.type === "emptyLinkText");
     expect(emptyLinks.length).toBe(1);
     expect(emptyLinks[0].severity).toBe("error");
+    expect(emptyLinks[0].data).toEqual({ href: "https://example.com" });
   });
 
   it("flags links with generic text like 'click here'", () => {
-    const doc = createMockDoc([
-      { typeName: "link", attrs: { href: "https://example.com" }, textContent: "Click here" },
-    ]);
+    const doc = linkDoc({ text: "Click here", href: "https://example.com" });
     const issues = checkLinkText(doc);
     const genericLinks = issues.filter((i) => i.type === "genericLinkText");
     expect(genericLinks.length).toBe(1);
     expect(genericLinks[0].severity).toBe("warning");
+    expect(genericLinks[0].location).toMatchObject({ from: 1, to: 11, nodeType: "link" });
   });
 
   it("flags 'read more' as generic text", () => {
-    const doc = createMockDoc([
-      { typeName: "link", attrs: { href: "https://example.com" }, textContent: "Read more" },
-    ]);
+    const doc = linkDoc({ text: "Read more", href: "https://example.com" });
     const issues = checkLinkText(doc);
     const genericLinks = issues.filter((i) => i.type === "genericLinkText");
     expect(genericLinks.length).toBe(1);
   });
 
   it("does not flag links with descriptive text", () => {
-    const doc = createMockDoc([
-      { typeName: "link", attrs: { href: "https://example.com" }, textContent: "Visit our documentation" },
-    ]);
+    const doc = linkDoc({ text: "Visit our documentation", href: "https://example.com" });
     const issues = checkLinkText(doc);
     expect(issues).toHaveLength(0);
   });
 
-  it("ignores non-link nodes", () => {
-    const doc = createMockDoc([
-      { typeName: "paragraph", textContent: "hello" },
+  it.each(["LinkedIn profile", "Where to buy", "Baltimore office", "There"])(
+    "does not flag descriptive text that merely contains a generic word: %s",
+    (text) => {
+      const doc = linkDoc({ text, href: "https://example.com" });
+      expect(checkLinkText(doc)).toHaveLength(0);
+    }
+  );
+
+  it("flags generic text regardless of case and trailing punctuation", () => {
+    const doc = linkDoc({ text: "Read more…", href: "/a" }, { text: " " }, { text: "HERE!", href: "/b" });
+    const issues = checkLinkText(doc);
+    expect(issues.map((i) => [i.type, i.data?.["href"]])).toEqual([
+      ["genericLinkText", "/a"],
+      ["genericLinkText", "/b"],
     ]);
+  });
+
+  it("treats a link split across differently formatted text nodes as one link", () => {
+    const doc = new TiptapEditor({
+      extensions: [StarterKit],
+      content: '<p><a href="/x">click <strong>here</strong></a> and <a href="/y">here</a></p>',
+    }).state.doc;
+    const issues = checkLinkText(doc);
+    expect(issues.map((i) => [i.type, i.data?.["href"], i.data?.["text"]])).toEqual([
+      ["genericLinkText", "/x", "click here"],
+      ["genericLinkText", "/y", "here"],
+    ]);
+  });
+
+  it("ignores text without a link mark", () => {
+    const doc = linkDoc({ text: "click here" });
     const issues = checkLinkText(doc);
     expect(issues).toHaveLength(0);
   });
@@ -304,6 +360,15 @@ describe("checkImageDimensions", () => {
     const issues = checkImageDimensions(doc, { maxImageWidth: 1920, maxImageHeight: 1080 });
     const heightIssues = issues.filter((i) => i.message.includes("height"));
     expect(heightIssues.length).toBe(1);
+  });
+
+  it("gives width and height issues on one image distinct ids", () => {
+    const doc = createMockDoc([
+      { typeName: "image", attrs: { src: "photo.jpg", width: "3000", height: "2000", alt: "test" } },
+    ]);
+    const issues = checkImageDimensions(doc, { maxImageWidth: 1920, maxImageHeight: 1080 });
+    expect(issues.map((i) => i.messageId)).toEqual(["imageTooWide", "imageTooTall"]);
+    expect(new Set(issues.map((i) => i.id)).size).toBe(2);
   });
 
   it("does not flag images within limits", () => {
@@ -408,6 +473,7 @@ describe("getIssuesAtPosition", () => {
         {
           id: "test-0-10",
           type: "missingAltText",
+          messageId: "missingAltText",
           severity: "error",
           message: "Image missing alt text",
           description: "desc",
@@ -416,6 +482,7 @@ describe("getIssuesAtPosition", () => {
         {
           id: "test-20-30",
           type: "missingAltText",
+          messageId: "missingAltText",
           severity: "error",
           message: "Another image",
           description: "desc",
@@ -440,6 +507,7 @@ describe("getIssuesAtPosition", () => {
         {
           id: "test-0-10",
           type: "missingAltText",
+          messageId: "missingAltText",
           severity: "error",
           message: "msg",
           description: "desc",
@@ -469,6 +537,7 @@ describe("getIssuesByType", () => {
         {
           id: "alt-0-10",
           type: "missingAltText",
+          messageId: "missingAltText",
           severity: "error",
           message: "msg",
           description: "desc",
@@ -477,6 +546,7 @@ describe("getIssuesByType", () => {
         {
           id: "heading-20-21",
           type: "missingHeadingHierarchy",
+          messageId: "missingHeadingHierarchy",
           severity: "warning",
           message: "msg",
           description: "desc",
@@ -485,6 +555,7 @@ describe("getIssuesByType", () => {
         {
           id: "alt-30-40",
           type: "missingAltText",
+          messageId: "missingAltText",
           severity: "error",
           message: "msg2",
           description: "desc",

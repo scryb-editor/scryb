@@ -84,4 +84,9 @@ describe("visibleImageBubbleMenuItems()", () => {
     const items: ImageBubbleMenuItemKey[] = visibleImageBubbleMenuItems({ separator: false });
     expect(items).not.toContain("separator");
   });
+
+  it("offers Edit alt text right after Change image", () => {
+    expect(visibleImageBubbleMenuItems().slice(0, 2)).toEqual(["changeImage", "editAltText"]);
+    expect(IMAGE_BUBBLE_MENU_ITEM_CONFIG.editAltText.command).toBeNull();
+  });
 });

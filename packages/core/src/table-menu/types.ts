@@ -61,3 +61,17 @@ export interface TableLineMenuLabels {
   /** Names of the colour swatches, shared with the block menu's palette */
   readonly colorNames: BlockMenuLabels["colorNames"];
 }
+
+/** Localized label set for the menu Shift+F10 opens inside a table cell. */
+export interface TableCellMenuLabels {
+  /** Title of the menu, naming what it acts on */
+  readonly cell: string;
+  /** Entry into the caret row's menu */
+  readonly rowActions: string;
+  /** Entry into the caret column's menu */
+  readonly columnActions: string;
+  /** Entry into the table's block menu */
+  readonly tableActions: string;
+  readonly toggleHeaderCell: string;
+  readonly splitCell: string;
+}

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { TOOLBAR_ITEM_CONFIG } from "../toolbar/item-config";
+import { resolveItemPressed, TOOLBAR_ITEM_CONFIG } from "../toolbar/item-config";
 import { DEFAULT_TOOLBAR_ORDER } from "../toolbar/config";
 import type { ToolbarItemKey } from "../toolbar/config";
+import type { Editor } from "@tiptap/core";
 
 // =============================================================================
 // Mock helpers
@@ -137,5 +138,16 @@ describe("TOOLBAR_ITEM_CONFIG", () => {
       expect(typeof config.icon, `${key}.icon should be a string`).toBe("string");
       expect(typeof config.label, `${key}.label should be a string`).toBe("string");
     }
+  });
+});
+
+describe("resolveItemPressed", () => {
+  const editor = { isActive: (name: string) => name === "bold" } as unknown as Editor;
+  it("is undefined for items with no active concept", () => {
+    expect(resolveItemPressed(editor, {})).toBeUndefined();
+  });
+  it("reads activeName, then isActive", () => {
+    expect(resolveItemPressed(editor, { activeName: "bold" })).toBe(true);
+    expect(resolveItemPressed(editor, { isActive: () => false })).toBe(false);
   });
 });

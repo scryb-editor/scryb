@@ -22,18 +22,25 @@ export interface ColorOption {
 // Labeled Palette (both adapters — curated text colour picker)
 // =============================================================================
 
-/** Default text colors for the labeled color picker. */
+/**
+ * Default text colors for the labeled color picker.
+ *
+ * Every entry clears WCAG 4.5:1 as text on the light editor surface (#ffffff).
+ * None can also clear it on the dark surface: one stored hex would need
+ * luminance ≤ 0.183 and ≥ 0.237 at once. Dark-surface contrast of an applied
+ * colour is the author's call (docs: reference/themes, "Text colour palette").
+ */
 export const DEFAULT_TEXT_COLORS: readonly ColorOption[] = [
   { color: "#000000", label: "Black" },
   { color: "#374151", label: "Gray" },
   { color: "#B91C1C", label: "Red" },
-  { color: "#D97706", label: "Orange" },
-  { color: "#059669", label: "Green" },
-  { color: "#0EA5E9", label: "Cyan" },
+  { color: "#C2410C", label: "Orange" },
+  { color: "#047857", label: "Green" },
+  { color: "#0E7490", label: "Cyan" },
   { color: "#7C3AED", label: "Purple" },
   { color: "#DB2777", label: "Pink" },
-  { color: "#6366F1", label: "Indigo" },
-  { color: "#84CC16", label: "Lime" },
+  { color: "#4F46E5", label: "Indigo" },
+  { color: "#4D7C0F", label: "Lime" },
 ] as const;
 
 // =============================================================================

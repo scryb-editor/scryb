@@ -17,7 +17,7 @@
    class the factory emits is left alone rather than renamed. */
 .scryb-link,
 .tiptap-link {
-    color: var(--scryb-link-color, #3b82f6);
+    color: var(--scryb-link-color, #1d4ed8);
     text-decoration: underline;
     cursor: pointer;
     transition: color var(--scryb-transition-normal, 0.2s ease);
@@ -25,7 +25,7 @@
 
 .scryb-link:hover,
 .tiptap-link:hover {
-    color: var(--scryb-link-hover-color, #1d4ed8);
+    color: var(--scryb-link-hover-color, #1e3a8a);
     text-decoration: underline;
 }
 
@@ -144,12 +144,32 @@
     margin: 0;
 }
 
+/* An empty block still takes a line.
+   The editor draws one because ProseMirror puts a <br> in every empty textblock.
+   Saved HTML has no <br>: an empty paragraph serialises as `<p></p>`, which is
+   zero pixels tall. So read-only output dropped the blank lines the author typed,
+   and an empty table row shrank to its cell padding (17px against the editor's
+   41px). `1lh` is the block's own line height, which is exactly what the <br>
+   gives it in the editor. */
+.scryb-content :is(p, h1, h2, h3, h4, h5, h6):empty {
+    min-height: 1lh;
+}
+
+/* =============================================================================
+   Text selection
+   ============================================================================= */
+
+.scryb-content ::selection,
+.scryb-content::selection {
+    background: var(--scryb-selection-bg, rgba(49, 130, 206, 0.2));
+}
+
 /* =============================================================================
    Blockquote
    ============================================================================= */
 
 .scryb-content blockquote {
-    border-left: 4px solid var(--tiptap-blockquote-border, var(--scryb-blockquote-border, #e2e8f0));
+    border-left: 4px solid var(--tiptap-blockquote-border, var(--scryb-blockquote-border, #7c8594));
     margin: 0;
     font-style: italic;
     background: var(--tiptap-blockquote-bg, var(--scryb-blockquote-bg, #f8f9fa));
@@ -238,7 +258,7 @@
 
 .scryb-content p.is-editor-empty:first-child::before {
     content: attr(data-placeholder);
-    color: var(--tiptap-text-placeholder, var(--scryb-text-placeholder, #a0aec0));
+    color: var(--tiptap-text-placeholder, var(--scryb-text-placeholder, #6b7280));
     pointer-events: none;
     float: left;
     height: 0;
@@ -410,19 +430,30 @@
     border-top: 1px solid var(--tiptap-table-border, var(--scryb-table-border, #e2e8f0));
 }
 
-.scryb-content table tr:first-child th:first-child {
+/* The corner cells carry the table's radius, td or th alike. The table clips to
+   its own 8px radius, but the rule is drawn by the cells; a square corner cell
+   has its border clipped off at the curve, which left a table without a header
+   row with a straight top rule and no rounded corners above it.
+
+   The first row's first and last cells are always the top corners: nothing
+   spans into the first row. The last row's are not once a cell above spans
+   down into it, because the spanning cell then holds the corner and the last
+   row's first child sits in an inner column, where a radius would curve an
+   inner junction. Selectors cannot find the spanning cell, so a table with a
+   row span leaves its bottom corners square. */
+.scryb-content table tr:first-child > :is(td, th):first-child {
     border-top-left-radius: 8px;
 }
 
-.scryb-content table tr:first-child th:last-child {
+.scryb-content table tr:first-child > :is(td, th):last-child {
     border-top-right-radius: 8px;
 }
 
-.scryb-content table tr:last-child td:first-child {
+.scryb-content table:not(:has([rowspan]:not([rowspan="1"]))) tr:last-child > :is(td, th):first-child {
     border-bottom-left-radius: 8px;
 }
 
-.scryb-content table tr:last-child td:last-child {
+.scryb-content table:not(:has([rowspan]:not([rowspan="1"]))) tr:last-child > :is(td, th):last-child {
     border-bottom-right-radius: 8px;
 }
 
@@ -458,8 +489,10 @@
  *   .tiptap-invisible-character--break
  */
 .scryb-content .tiptap-invisible-character {
-    color: var(--tiptap-invisible-char-color, var(--scryb-text-muted));
-    opacity: 0.55;
+    color: var(--tiptap-invisible-char-color, var(--scryb-text-muted, #5a6472));
+    /* 0.8, not lower: the mark is muted ink already, and below ~0.68 it drops
+       under the 3:1 a visible formatting mark needs (light 3.83:1, dark 5.21:1). */
+    opacity: 0.8;
     pointer-events: none;
     user-select: none;
 }
@@ -477,13 +510,6 @@
 /* Space marker — rendered in place of literal space characters */
 .scryb-content .tiptap-invisible-character--space::before {
     content: "·";
-}
-
-/* Dark theme — inherit --scryb-text-muted (themes.css rebinds it for .scryb-theme-dark)
- * and bump opacity slightly for readable contrast on dark backgrounds. */
-.scryb-theme-dark .scryb-content .tiptap-invisible-character {
-    color: var(--tiptap-invisible-char-color, var(--scryb-text-muted));
-    opacity: 0.65;
 }
 
 /* =============================================================================

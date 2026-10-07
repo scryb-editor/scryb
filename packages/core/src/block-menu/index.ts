@@ -57,3 +57,26 @@ export {
 
 // Drag
 export { executeBlockMove } from "./drag";
+
+// Keyboard reordering and the Shift+F10 caret menu
+export {
+  createCaretMenuItems,
+  getCaretBlock,
+  getDomCaretBlock,
+  getCaretMenuAnchorPos,
+  getCaretMenuBlockPos,
+  getCaretMenuStep,
+  getCaretMenuTarget,
+  remapCaretMenuTarget,
+  runCaretMenuAction,
+} from "./caret";
+export type { CaretMenuTarget } from "./caret";
+export type { BlockMoveDirection } from "./move";
+export {
+  MOVE_BLOCK_UP_SHORTCUT,
+  MOVE_BLOCK_DOWN_SHORTCUT,
+  getBlockMoveTarget,
+  moveBlockAtPos,
+  moveCaretBlock,
+  BlockMoveShortcutsExtension,
+} from "./move";

@@ -16,6 +16,8 @@ export const BLOCK_TYPES = new Set([
   "bulletList",
   "orderedList",
   "listItem",
+  "taskList",
+  "taskItem",
   "blockquote",
   "codeBlock",
   "table",
@@ -68,7 +70,7 @@ export function isBlockNode(typeName: string): boolean {
 /**
  * Returns the priority for a block node type.
  * Lower values win when multiple candidate blocks are found at the same position.
- * Priority ordering: listItem < blockquote < codeBlock < table < image < heading < paragraph < bulletList/orderedList < horizontalRule < unknown
+ * Priority ordering: listItem/taskItem < blockquote < codeBlock < table < image < heading < paragraph < bulletList/orderedList/taskList < horizontalRule < unknown
  *
  * @param typeName - ProseMirror node type name
  * @returns Priority number (0 = highest, 99 = lowest/unknown)
@@ -76,6 +78,7 @@ export function isBlockNode(typeName: string): boolean {
 export function getBlockTypePriority(typeName: string): number {
   switch (typeName) {
     case "listItem":
+    case "taskItem":
       return 0;
     case "blockquote":
       return 1;
@@ -91,6 +94,7 @@ export function getBlockTypePriority(typeName: string): number {
       return 6;
     case "bulletList":
     case "orderedList":
+    case "taskList":
       return 7;
     case "horizontalRule":
       return 8;

@@ -21,13 +21,17 @@ import { UniqueID } from "@tiptap/extension-unique-id";
 import { Youtube } from "@tiptap/extension-youtube";
 import { StarterKit } from "@tiptap/starter-kit";
 
+import { EditableSemanticsExtension } from "./accessibility/editable-semantics";
 import {
   AccessibilityCheckerExtension,
   BlockBackgroundExtension,
   BlockMenuTargetExtension,
+  BlockMoveExtension,
   FontFamilyExtension,
   FontSizeExtension,
   IndentExtension,
+  KeyboardReleaseExtension,
+  KeyboardShortcutsExtension,
   LetterSpacingExtension,
   LineHeightExtension,
   MarkdownAutoformatExtension,
@@ -52,6 +56,7 @@ import type {
 } from "./config/editor-config";
 import type { ImageUploadConfig } from "./image/types";
 import { createImagePasteExtension } from "./image/paste";
+import { BlockMoveShortcutsExtension } from "./block-menu/move";
 import type { EmojiSuggestionProps } from "./emoji/callback-store";
 import { POPULAR_EMOJIS } from "./emoji/popular";
 import { filterEmojis } from "./emoji/search";
@@ -300,6 +305,8 @@ export function buildExtensions(
   options: Pick<CreateScrybEditorOptions, "runOutsideZone" | "placeholder" | "maxCharacters" | "uniqueId" | "typography" | "invisibleCharacters" | "youtube" | "autosave" | "details" | "toc" | "emoji" | "mention" | "image" | "onImageError"> = {},
 ): AnyExtension[] {
   const extensions: AnyExtension[] = [
+    // ─── Editable semantics (owns view.dom role; first so it is always registered) ─
+    EditableSemanticsExtension,
     // ─── Base / StarterKit ──────────────────────────────────────────────────
     StarterKit.configure({
       bulletList: { HTMLAttributes: { class: "tiptap-bullet-list" } },
@@ -339,6 +346,15 @@ export function buildExtensions(
     LineHeightExtension,
     LetterSpacingExtension,
     IndentExtension,
+    // Tab indents and walks table cells; this is the documented way out
+    // (Esc, then Tab). It adds no schema: the viewer's renderToHTML builds its
+    // schema from this list too, and there the plugin is inert.
+    KeyboardReleaseExtension,
+    // Alt+F10 and Shift+F10/ContextMenu — see the extension.
+    KeyboardShortcutsExtension,
+    // moveBlock on every editor, not only those with a drag handle, plus its keys.
+    BlockMoveExtension,
+    BlockMoveShortcutsExtension,
     BlockBackgroundExtension,
     // Decoration only, no schema and no document change — the editor is
     // byte-identical whether or not an adapter ever calls setBlockMenuTarget.

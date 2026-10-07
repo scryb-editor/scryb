@@ -23,6 +23,17 @@ export type AccessibilityIssueType =
   | "imageTooLarge"
   | "missingFormLabels";
 
+/** Catalog key for an issue's localised texts. Mirrors core's `AccessibilityMessageId`. */
+export type AccessibilityMessageId =
+  | "missingAltText"
+  | "emptyAltText"
+  | "missingHeadingHierarchy"
+  | "emptyLinkText"
+  | "genericLinkText"
+  | "missingTableHeaders"
+  | "imageTooWide"
+  | "imageTooTall";
+
 /**
  * Location information for an accessibility issue
  */
@@ -45,6 +56,9 @@ export interface AccessibilityIssue {
   readonly id: string;
   /** Type of issue */
   readonly type: AccessibilityIssueType;
+  /** Catalog key for the localised message, description and fix. Optional so
+   * issues built by consumer code stay valid; the checker always sets it. */
+  readonly messageId?: AccessibilityMessageId;
   /** Severity level */
   readonly severity: AccessibilityIssueSeverity;
   /** Human-readable message describing the issue */

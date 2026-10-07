@@ -58,24 +58,24 @@
 @layer scryb-theme {
     .scryb-editor:not(.scryb-theme-dark),
     .scryb-theme-light,
-    .scryb-toc:not(.scryb-theme-dark),
-    .scryb-emoji-popup:not(.scryb-theme-dark),
-    .scryb-mention-popup:not(.scryb-theme-dark),
+    .scryb-toc:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
+    .scryb-emoji-popup:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
+    .scryb-mention-popup:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
     .scryb-editor-portal:not(.scryb-theme-dark) {
         --scryb-editor-bg: var(--scryb-color-white);
         --scryb-editor-border: var(--scryb-color-gray-200);
-        /* One neutral step darker, not the primary blue: editors keep focus
-           for the whole writing session, so a saturated focus border would be
-           a permanent frame around the content. Focus rings on controls stay
-           blue. */
-        --scryb-editor-border-focus: var(--scryb-color-gray-300);
+        /* A neutral step, not the primary blue: editors keep focus for the
+           whole writing session, so a saturated focus border would be a
+           permanent frame around the content. It still clears 3:1 against
+           the card (WCAG 1.4.11): 3.72:1 light, 3.59:1 dark. */
+        --scryb-editor-border-focus: var(--scryb-border-strong);
         --scryb-editor-shadow: 0 1px 2px rgba(22, 24, 31, 0.04);
     }
 
     .scryb-theme-dark {
         --scryb-editor-bg: var(--scryb-color-dark-100);
         --scryb-editor-border: var(--scryb-color-dark-border);
-        --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+        --scryb-editor-border-focus: var(--scryb-border-strong);
         --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
 
@@ -88,7 +88,7 @@
         .scryb-editor-portal.scryb-theme-auto {
             --scryb-editor-bg: var(--scryb-color-dark-100);
             --scryb-editor-border: var(--scryb-color-dark-border);
-            --scryb-editor-border-focus: var(--scryb-color-dark-border-hover);
+            --scryb-editor-border-focus: var(--scryb-border-strong);
             --scryb-editor-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
     }
@@ -112,12 +112,14 @@
    `color` rule in components.css, this lets consumers that opt out of theme
    classes inherit `color` from their ancestor. Mirrors the pattern used for
    `--scryb-editor-bg` in commit 00ced39. See
-   .planning/debug/editor-color-no-inherit.md. */
+   .planning/debug/editor-color-no-inherit.md. The TOC and popup selectors
+   exclude elements under any theme class: those inherit from their themed
+   ancestor instead of re-declaring light values on themselves. */
 .scryb-editor:not(.scryb-theme-dark),
 .scryb-theme-light,
-.scryb-toc:not(.scryb-theme-dark),
-.scryb-emoji-popup:not(.scryb-theme-dark),
-.scryb-mention-popup:not(.scryb-theme-dark),
+.scryb-toc:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
+.scryb-emoji-popup:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
+.scryb-mention-popup:not(.scryb-theme-dark):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)),
 .scryb-editor-portal:not(.scryb-theme-dark) {
     color-scheme: light;
 
@@ -133,7 +135,8 @@
      measured 3.8:1 on gray-50 — under the 4.5:1 AA floor. #5a6472 measures
      6.0:1 on white and 5.7:1 on gray-50. */
     --scryb-text-muted: #5a6472;
-    --scryb-text-placeholder: var(--scryb-color-gray-400);
+    --scryb-text-placeholder: var(--scryb-color-gray-550);
+    --scryb-link-editor-placeholder: var(--scryb-text-placeholder);
 
     /* ─────────────────────────────────────────────────────────────────────────
      Toolbar
@@ -173,19 +176,22 @@
      Content Elements
      ───────────────────────────────────────────────────────────────────────── */
     --scryb-heading-color: inherit;
-    --scryb-link-color: var(--scryb-color-primary-500);
-    --scryb-link-hover-color: var(--scryb-color-primary-700);
+    --scryb-link-color: var(--scryb-color-primary-700);
+    --scryb-link-hover-color: var(--scryb-color-primary-800);
     --scryb-code-bg: var(--scryb-color-gray-100);
     --scryb-code-color: var(--scryb-color-code);
     --scryb-pre-bg: var(--scryb-color-gray-900);
     --scryb-pre-color: var(--scryb-color-gray-200);
     --scryb-blockquote-bg: var(--scryb-color-gray-50);
-    --scryb-blockquote-border: var(--scryb-color-gray-200);
+    --scryb-blockquote-border: var(--scryb-border-strong);
     --scryb-hr-color: var(--scryb-color-gray-200);
 
     /* ─────────────────────────────────────────────────────────────────────────
      Table
      ───────────────────────────────────────────────────────────────────────── */
+    /* A hairline grid on purpose, below 3:1. The rules are decorative: cell
+       text, its alignment and the table semantics carry the structure. A 3:1
+       grid drew every cell as a box and outweighed the content it frames. */
     --scryb-table-border: var(--scryb-color-gray-200);
     --scryb-table-header-bg: var(--scryb-color-gray-50);
     --scryb-table-header-color: var(--scryb-color-gray-700);
@@ -222,7 +228,7 @@
      ───────────────────────────────────────────────────────────────────────── */
     --scryb-sidemenu-bg: transparent;
     --scryb-sidemenu-hover-bg: var(--scryb-color-gray-100);
-    --scryb-sidemenu-icon-color: var(--scryb-color-gray-400);
+    --scryb-sidemenu-icon-color: var(--scryb-text-muted);
     --scryb-sidemenu-border: transparent;
     --scryb-sidemenu-shadow: none;
 
@@ -234,6 +240,91 @@
     --scryb-block-menu-shadow: var(--scryb-shadow-lg);
     --scryb-block-menu-item-hover-bg: var(--scryb-color-gray-100);
     --scryb-block-menu-separator-color: var(--scryb-color-gray-200);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Popovers & menus (block menu, slash menu, link editor, image upload)
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-popover-border: rgba(0, 0, 0, 0.06);
+    --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --scryb-menu-item-hover-bg: rgba(0, 0, 0, 0.04);
+    --scryb-menu-item-selected-bg: rgba(0, 0, 0, 0.06);
+    --scryb-link-editor-divider: #e5e7eb;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Form inputs
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-input-border: var(--scryb-border-strong);
+    --scryb-input-border-hover: var(--scryb-text-muted);
+    --scryb-input-drop-bg: rgba(0, 0, 0, 0.02);
+    --scryb-input-drop-bg-hover: rgba(0, 0, 0, 0.04);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Table grips
+     ───────────────────────────────────────────────────────────────────────── */
+    /* The grip is the only cue for a row/column handle: ≥ 3:1 at rest. */
+    --scryb-table-grip-bg: rgba(15, 23, 42, 0.5);
+    --scryb-table-grip-hover-bg: rgba(15, 23, 42, 0.65);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Accessibility checker panel and severity badges
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-a11y-header-bg: var(--scryb-color-gray-50);
+    --scryb-a11y-suggestion-bg: var(--scryb-color-gray-50);
+    --scryb-a11y-error-bg: #fef2f2;
+    --scryb-a11y-error-text: #b91c1c;
+    --scryb-a11y-warning-bg: #fffbeb;
+    --scryb-a11y-warning-text: #a16207;
+    --scryb-a11y-info-bg: #eff6ff;
+    --scryb-a11y-info-text: var(--scryb-color-primary-700);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Danger & error text. #c53030 is tuned for white surfaces.
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-danger-text: var(--scryb-color-error);
+    --scryb-upload-error-color: #9b2c2c;
+    --scryb-upload-error-bg: #fed7d7;
+    --scryb-upload-error-border: #feb2b2;
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Status text (save status, link-editor preview) and primary-on-tint text
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-color-primary: var(--scryb-color-primary-700);
+    --scryb-color-success: var(--scryb-color-success-dark);
+    --scryb-color-danger: var(--scryb-danger-text);
+    --scryb-upload-drag-color: var(--scryb-color-primary-700);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Solid buttons (image-upload Insert / file picker) and link editor
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-button-solid-bg: var(--scryb-color-gray-800);
+    --scryb-button-solid-bg-hover: var(--scryb-color-gray-900);
+    --scryb-button-solid-text: var(--scryb-color-white);
+    --scryb-link-editor-text: var(--scryb-text-color, var(--scryb-color-gray-800));
+    --scryb-link-editor-btn-color: var(--scryb-text-muted);
+    --scryb-link-editor-btn-hover-color: var(--scryb-button-hover-text);
+    --scryb-link-editor-focus: var(--scryb-color-primary-600);
+    --scryb-link-editor-active: var(--scryb-color-primary-700);
+    --scryb-link-editor-active-bg: var(--scryb-color-primary-100);
+    --scryb-link-editor-apply-hover: var(--scryb-color-primary-700);
+    --scryb-link-editor-remove-hover: var(--scryb-danger-text);
+    --scryb-link-editor-preview-hover: var(--scryb-color-success);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Strong boundaries: input edges, table rules, blockquote rule, swatch rings.
+     ≥ 3:1 against every surface they sit on (WCAG 1.4.11).
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-border-strong: var(--scryb-color-gray-450);
+
+    /* ─────────────────────────────────────────────────────────────────────────
+     Control states: pressed fill, side-menu focus ring, warning accent
+     ───────────────────────────────────────────────────────────────────────── */
+    --scryb-button-active-bg-press: var(--scryb-color-gray-200);
+    --scryb-focus-ring: var(--scryb-color-primary-600);
+    --scryb-a11y-warning-accent: var(--scryb-color-amber-700);
+
+    /* Selected / active indicator: the bar beside a keyboard-selected row and
+       under an active toolbar button. Neutral, ≥ 3:1 against the fill it marks. */
+    --scryb-selected-indicator: var(--scryb-text-muted);
 }
 
 /* =============================================================================
@@ -261,6 +352,15 @@
     --scryb-text-color: var(--scryb-color-gray-800);
 }
 
+/* An emoji or mention popup mounted with no theme class above it paints its
+   own white surface, so it cannot inherit the page's text colour the way the
+   editor does: on a dark page that is white text on white. It gets the light
+   text colour; one under a theme class takes that theme's. The editor host is
+   not in this list on purpose — see the comment above. */
+:is(.scryb-emoji-popup, .scryb-mention-popup):not(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)) {
+    --scryb-text-color: var(--scryb-color-gray-800);
+}
+
 /* =============================================================================
    Dark Theme
 
@@ -278,7 +378,9 @@
     /* Text Colors */
     --scryb-text-color: var(--scryb-color-gray-200);
     --scryb-text-muted: var(--scryb-color-gray-400);
-    --scryb-text-placeholder: var(--scryb-color-gray-600);
+    /* gray-400, the same value as muted text: 7.37:1 on dark-100 (gray-600 was 2.21:1). */
+    --scryb-text-placeholder: var(--scryb-color-gray-400);
+    --scryb-link-editor-placeholder: var(--scryb-text-placeholder);
 
     /* Toolbar — transparent on the dark card, hairline boundary. */
     --scryb-toolbar-bg: transparent;
@@ -310,7 +412,7 @@
     --scryb-pre-bg: var(--scryb-color-dark-300);
     --scryb-pre-color: var(--scryb-color-gray-200);
     --scryb-blockquote-bg: var(--scryb-color-dark-200);
-    --scryb-blockquote-border: var(--scryb-color-dark-border-hover);
+    --scryb-blockquote-border: var(--scryb-border-strong);
     --scryb-hr-color: var(--scryb-color-dark-border);
 
     /* Scrollbars
@@ -337,7 +439,7 @@
     /* Character Count */
     --scryb-char-count-bg: transparent;
     --scryb-char-count-border: var(--scryb-color-dark-border);
-    --scryb-char-count-color: var(--scryb-color-gray-400);
+    --scryb-char-count-color: var(--scryb-text-muted);
 
     /* Selection & Highlight */
     --scryb-selection-bg: var(--scryb-color-accent-300);
@@ -346,7 +448,7 @@
     /* Side Menu */
     --scryb-sidemenu-bg: transparent;
     --scryb-sidemenu-hover-bg: var(--scryb-color-dark-border);
-    --scryb-sidemenu-icon-color: var(--scryb-color-gray-500);
+    --scryb-sidemenu-icon-color: var(--scryb-text-muted);
     --scryb-sidemenu-border: transparent;
     --scryb-sidemenu-shadow: none;
 
@@ -369,18 +471,18 @@
        borderless container, hairline rail, accent rail on active item. */
     --scryb-toc-bg: transparent;
     --scryb-toc-border: var(--scryb-color-dark-border);
-    --scryb-toc-item-color: var(--scryb-color-gray-500);
+    --scryb-toc-item-color: var(--scryb-text-muted);
     --scryb-toc-item-hover-bg: transparent;
     --scryb-toc-item-active-bg: transparent;
     --scryb-toc-item-active-color: var(--scryb-color-accent-400);
-    --scryb-toc-title-color: var(--scryb-color-gray-500);
+    --scryb-toc-title-color: var(--scryb-text-muted);
 
     /* Emoji Popup (Phase 68) */
     --scryb-emoji-popup-border: rgba(255, 255, 255, 0.06);
     --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     --scryb-emoji-item-hover-bg: rgba(255, 255, 255, 0.04);
     --scryb-emoji-item-selected-bg: rgba(255, 255, 255, 0.06);
-    --scryb-emoji-group-header-color: var(--scryb-color-gray-500);
+    --scryb-emoji-group-header-color: var(--scryb-text-muted);
 
     /* Mention Popup & Pill */
     --scryb-mention-popup-border: rgba(255, 255, 255, 0.06);
@@ -391,6 +493,70 @@
     --scryb-mention-avatar-color: var(--scryb-color-accent-400);
     --scryb-mention-pill-bg: var(--scryb-color-accent-200);
     --scryb-mention-pill-color: var(--scryb-color-accent-400);
+    /* Popovers & menus */
+    --scryb-popover-border: rgba(255, 255, 255, 0.06);
+    --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+    --scryb-menu-item-hover-bg: rgba(255, 255, 255, 0.05);
+    --scryb-menu-item-selected-bg: rgba(255, 255, 255, 0.06);
+    --scryb-link-editor-divider: var(--scryb-color-dark-border);
+
+    /* Form inputs */
+    --scryb-input-border: var(--scryb-border-strong);
+    --scryb-input-border-hover: var(--scryb-text-muted);
+    --scryb-input-drop-bg: rgba(255, 255, 255, 0.02);
+    --scryb-input-drop-bg-hover: rgba(255, 255, 255, 0.04);
+
+    /* Table grips */
+    --scryb-table-grip-bg: rgba(255, 255, 255, 0.45);
+    --scryb-table-grip-hover-bg: rgba(255, 255, 255, 0.6);
+
+    /* Accessibility checker */
+    --scryb-a11y-header-bg: var(--scryb-color-dark-100);
+    --scryb-a11y-suggestion-bg: var(--scryb-color-dark-50);
+    --scryb-a11y-error-bg: rgba(239, 68, 68, 0.1);
+    --scryb-a11y-error-text: var(--scryb-color-error-light);
+    --scryb-a11y-warning-bg: rgba(245, 158, 11, 0.1);
+    --scryb-a11y-warning-text: var(--scryb-color-amber-400);
+    --scryb-a11y-info-bg: var(--scryb-color-accent-100);
+    --scryb-a11y-info-text: var(--scryb-color-accent-500);
+
+    /* Danger & error text — #f87171 is 6.0:1 on dark-100. */
+    --scryb-danger-text: var(--scryb-color-error-light);
+    --scryb-upload-error-color: var(--scryb-color-error-light);
+    --scryb-upload-error-bg: rgba(239, 68, 68, 0.15);
+    --scryb-upload-error-border: rgba(239, 68, 68, 0.4);
+
+    /* Status text and accent-on-tint text */
+    --scryb-color-primary: var(--scryb-color-accent-500);
+    --scryb-color-success: var(--scryb-color-success-light);
+    --scryb-color-danger: var(--scryb-danger-text);
+    --scryb-upload-drag-color: var(--scryb-color-accent-400);
+
+    /* Solid buttons invert with the theme; link editor follows the dark text ramp */
+    --scryb-button-solid-bg: var(--scryb-color-gray-200);
+    --scryb-button-solid-bg-hover: var(--scryb-color-white);
+    --scryb-button-solid-text: var(--scryb-color-dark-100);
+    --scryb-link-editor-text: var(--scryb-text-color);
+    --scryb-link-editor-btn-color: var(--scryb-text-muted);
+    --scryb-link-editor-btn-hover-color: var(--scryb-button-hover-text);
+    --scryb-link-editor-focus: var(--scryb-color-accent-500);
+    --scryb-link-editor-active: var(--scryb-color-accent-400);
+    --scryb-link-editor-active-bg: var(--scryb-color-accent-200);
+    --scryb-link-editor-apply-hover: var(--scryb-color-accent-400);
+    --scryb-link-editor-remove-hover: var(--scryb-danger-text);
+    --scryb-link-editor-preview-hover: var(--scryb-color-success);
+
+    /* Strong boundaries */
+    --scryb-border-strong: var(--scryb-color-dark-border-strong);
+
+    /* Control states */
+    --scryb-button-active-bg-press: rgba(255, 255, 255, 0.17);
+    --scryb-focus-ring: var(--scryb-color-accent-500);
+    --scryb-a11y-warning-accent: var(--scryb-color-amber-400);
+
+    /* Selected / active indicator: the bar beside a keyboard-selected row and
+       under an active toolbar button. Neutral, ≥ 3:1 against the fill it marks. */
+    --scryb-selected-indicator: var(--scryb-text-muted);
 }
 
 /* =============================================================================
@@ -443,7 +609,8 @@
         /* Text Colors */
         --scryb-text-color: var(--scryb-color-gray-200);
         --scryb-text-muted: var(--scryb-color-gray-400);
-        --scryb-text-placeholder: var(--scryb-color-gray-600);
+        --scryb-text-placeholder: var(--scryb-color-gray-400);
+        --scryb-link-editor-placeholder: var(--scryb-text-placeholder);
 
         /* Toolbar */
         --scryb-toolbar-bg: transparent;
@@ -474,7 +641,7 @@
         --scryb-pre-bg: var(--scryb-color-dark-300);
         --scryb-pre-color: var(--scryb-color-gray-200);
         --scryb-blockquote-bg: var(--scryb-color-dark-200);
-        --scryb-blockquote-border: var(--scryb-color-dark-border-hover);
+        --scryb-blockquote-border: var(--scryb-border-strong);
         --scryb-hr-color: var(--scryb-color-dark-border);
 
         /* Scrollbars — see the .scryb-theme-dark block above for the reasoning. */
@@ -498,7 +665,7 @@
         /* Character Count */
         --scryb-char-count-bg: transparent;
         --scryb-char-count-border: var(--scryb-color-dark-border);
-        --scryb-char-count-color: var(--scryb-color-gray-400);
+        --scryb-char-count-color: var(--scryb-text-muted);
 
         /* Selection & Highlight */
         --scryb-selection-bg: var(--scryb-color-accent-300);
@@ -507,7 +674,7 @@
         /* Side Menu */
         --scryb-sidemenu-bg: transparent;
         --scryb-sidemenu-hover-bg: var(--scryb-color-dark-border);
-        --scryb-sidemenu-icon-color: var(--scryb-color-gray-500);
+        --scryb-sidemenu-icon-color: var(--scryb-text-muted);
         --scryb-sidemenu-border: transparent;
         --scryb-sidemenu-shadow: none;
 
@@ -525,21 +692,21 @@
         --scryb-details-chevron-color: var(--scryb-color-gray-400);
         --scryb-details-chevron-active-color: var(--scryb-color-accent-500);
 
-        /* Table of Contents (Phase 68) */
-        --scryb-toc-bg: var(--scryb-color-dark-200);
+        /* Table of Contents (Phase 68) — identical to .scryb-theme-dark. */
+        --scryb-toc-bg: transparent;
         --scryb-toc-border: var(--scryb-color-dark-border);
-        --scryb-toc-item-color: var(--scryb-color-gray-300);
-        --scryb-toc-item-hover-bg: var(--scryb-color-dark-border);
-        --scryb-toc-item-active-bg: var(--scryb-color-accent-200);
+        --scryb-toc-item-color: var(--scryb-text-muted);
+        --scryb-toc-item-hover-bg: transparent;
+        --scryb-toc-item-active-bg: transparent;
         --scryb-toc-item-active-color: var(--scryb-color-accent-400);
-        --scryb-toc-title-color: var(--scryb-color-gray-500);
+        --scryb-toc-title-color: var(--scryb-text-muted);
 
         /* Emoji Popup (Phase 68) */
         --scryb-emoji-popup-border: rgba(255, 255, 255, 0.06);
         --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
         --scryb-emoji-item-hover-bg: rgba(255, 255, 255, 0.04);
         --scryb-emoji-item-selected-bg: rgba(255, 255, 255, 0.06);
-        --scryb-emoji-group-header-color: var(--scryb-color-gray-500);
+        --scryb-emoji-group-header-color: var(--scryb-text-muted);
 
         /* Mention Popup & Pill */
         --scryb-mention-popup-border: rgba(255, 255, 255, 0.06);
@@ -550,5 +717,69 @@
         --scryb-mention-avatar-color: var(--scryb-color-accent-400);
         --scryb-mention-pill-bg: var(--scryb-color-accent-200);
         --scryb-mention-pill-color: var(--scryb-color-accent-400);
+        /* Popovers & menus */
+        --scryb-popover-border: rgba(255, 255, 255, 0.06);
+        --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+        --scryb-menu-item-hover-bg: rgba(255, 255, 255, 0.05);
+        --scryb-menu-item-selected-bg: rgba(255, 255, 255, 0.06);
+        --scryb-link-editor-divider: var(--scryb-color-dark-border);
+
+        /* Form inputs */
+        --scryb-input-border: var(--scryb-border-strong);
+        --scryb-input-border-hover: var(--scryb-text-muted);
+        --scryb-input-drop-bg: rgba(255, 255, 255, 0.02);
+        --scryb-input-drop-bg-hover: rgba(255, 255, 255, 0.04);
+
+        /* Table grips */
+        --scryb-table-grip-bg: rgba(255, 255, 255, 0.45);
+        --scryb-table-grip-hover-bg: rgba(255, 255, 255, 0.6);
+
+        /* Accessibility checker */
+        --scryb-a11y-header-bg: var(--scryb-color-dark-100);
+        --scryb-a11y-suggestion-bg: var(--scryb-color-dark-50);
+        --scryb-a11y-error-bg: rgba(239, 68, 68, 0.1);
+        --scryb-a11y-error-text: var(--scryb-color-error-light);
+        --scryb-a11y-warning-bg: rgba(245, 158, 11, 0.1);
+        --scryb-a11y-warning-text: var(--scryb-color-amber-400);
+        --scryb-a11y-info-bg: var(--scryb-color-accent-100);
+        --scryb-a11y-info-text: var(--scryb-color-accent-500);
+
+        /* Danger & error text — #f87171 is 6.0:1 on dark-100. */
+        --scryb-danger-text: var(--scryb-color-error-light);
+        --scryb-upload-error-color: var(--scryb-color-error-light);
+        --scryb-upload-error-bg: rgba(239, 68, 68, 0.15);
+        --scryb-upload-error-border: rgba(239, 68, 68, 0.4);
+
+        /* Status text and accent-on-tint text */
+        --scryb-color-primary: var(--scryb-color-accent-500);
+        --scryb-color-success: var(--scryb-color-success-light);
+        --scryb-color-danger: var(--scryb-danger-text);
+        --scryb-upload-drag-color: var(--scryb-color-accent-400);
+
+        /* Solid buttons invert with the theme; link editor follows the dark text ramp */
+        --scryb-button-solid-bg: var(--scryb-color-gray-200);
+        --scryb-button-solid-bg-hover: var(--scryb-color-white);
+        --scryb-button-solid-text: var(--scryb-color-dark-100);
+        --scryb-link-editor-text: var(--scryb-text-color);
+        --scryb-link-editor-btn-color: var(--scryb-text-muted);
+        --scryb-link-editor-btn-hover-color: var(--scryb-button-hover-text);
+        --scryb-link-editor-focus: var(--scryb-color-accent-500);
+        --scryb-link-editor-active: var(--scryb-color-accent-400);
+        --scryb-link-editor-active-bg: var(--scryb-color-accent-200);
+        --scryb-link-editor-apply-hover: var(--scryb-color-accent-400);
+        --scryb-link-editor-remove-hover: var(--scryb-danger-text);
+        --scryb-link-editor-preview-hover: var(--scryb-color-success);
+
+        /* Strong boundaries */
+        --scryb-border-strong: var(--scryb-color-dark-border-strong);
+
+        /* Control states */
+        --scryb-button-active-bg-press: rgba(255, 255, 255, 0.17);
+        --scryb-focus-ring: var(--scryb-color-accent-500);
+        --scryb-a11y-warning-accent: var(--scryb-color-amber-400);
+
+        /* Selected / active indicator: the bar beside a keyboard-selected row and
+           under an active toolbar button. Neutral, ≥ 3:1 against the fill it marks. */
+        --scryb-selected-indicator: var(--scryb-text-muted);
     }
 }

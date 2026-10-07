@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getScrollableAncestor } from "../utils/dom-scroll";
+import { getScrollableAncestor, prefersReducedMotion, scrollBehavior } from "../utils/dom-scroll";
 
 // ═══════════════ Test Helpers ═══════════════
 
@@ -174,5 +174,42 @@ describe("getScrollableAncestor", () => {
     } finally {
       restore();
     }
+  });
+});
+
+// ═══════════════ Reduced motion ═══════════════
+
+
+function stubReducedMotion(reduce: boolean): void {
+  vi.spyOn(window, "matchMedia").mockImplementation(
+    (query: string) =>
+      ({
+        matches: reduce && query === "(prefers-reduced-motion: reduce)",
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }) as unknown as MediaQueryList,
+  );
+}
+
+describe("reduced motion", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("jumps instead of animating when the user prefers reduced motion", () => {
+    stubReducedMotion(true);
+    expect(prefersReducedMotion()).toBe(true);
+    expect(scrollBehavior()).toBe("auto");
+  });
+
+  it("scrolls smoothly otherwise", () => {
+    stubReducedMotion(false);
+    expect(prefersReducedMotion()).toBe(false);
+    expect(scrollBehavior()).toBe("smooth");
   });
 });

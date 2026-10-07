@@ -25,14 +25,27 @@ const APPLE_KEYS: Record<string, string> = {
 };
 
 /**
+ * Key names drawn as glyphs on every platform. Shortcuts keep the ARIA name
+ * ("ArrowUp") because `aria-keyshortcuts` requires it; read verbatim on a
+ * menu label it is noise.
+ */
+const KEY_GLYPHS: Record<string, string> = {
+  ArrowUp: "↑",
+  ArrowDown: "↓",
+  ArrowLeft: "←",
+  ArrowRight: "→",
+};
+
+/**
  * Renders a platform-neutral shortcut ("Mod+Shift+S") for the current
- * platform: "⌘⇧S" on Apple devices, "Ctrl+Shift+S" elsewhere.
+ * platform: "⌘⇧S" on Apple devices, "Ctrl+Shift+S" elsewhere. Arrow keys
+ * become arrows on both ("⌘⇧↑", "Ctrl+Shift+↑").
  *
  * @param shortcut - Platform-neutral shortcut string using "+" separators.
  * @returns The platform-specific display string.
  */
 export function formatShortcut(shortcut: string): string {
-  const parts = shortcut.split("+");
+  const parts = shortcut.split("+").map((part) => KEY_GLYPHS[part] ?? part);
   if (IS_APPLE) {
     return parts.map((part) => APPLE_KEYS[part] ?? part).join("");
   }

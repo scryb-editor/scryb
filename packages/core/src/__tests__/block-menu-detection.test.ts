@@ -13,8 +13,8 @@ import type { ResolvedPos } from "@tiptap/pm/model";
 // =============================================================================
 
 describe("BLOCK_TYPES", () => {
-  it("contains exactly 10 entries", () => {
-    expect(BLOCK_TYPES.size).toBe(10);
+  it("contains exactly 12 entries", () => {
+    expect(BLOCK_TYPES.size).toBe(12);
   });
 
   const expectedTypes = [
@@ -23,6 +23,8 @@ describe("BLOCK_TYPES", () => {
     "bulletList",
     "orderedList",
     "listItem",
+    "taskList",
+    "taskItem",
     "blockquote",
     "codeBlock",
     "table",
@@ -83,6 +85,10 @@ describe("getBlockTypePriority", () => {
     expect(getBlockTypePriority("listItem")).toBe(0);
   });
 
+  it("returns 0 for taskItem, like listItem", () => {
+    expect(getBlockTypePriority("taskItem")).toBe(0);
+  });
+
   it("returns 1 for blockquote", () => {
     expect(getBlockTypePriority("blockquote")).toBe(1);
   });
@@ -113,6 +119,10 @@ describe("getBlockTypePriority", () => {
 
   it("returns 7 for orderedList", () => {
     expect(getBlockTypePriority("orderedList")).toBe(7);
+  });
+
+  it("returns 7 for taskList, like the other lists", () => {
+    expect(getBlockTypePriority("taskList")).toBe(7);
   });
 
   it("returns 8 for horizontalRule", () => {

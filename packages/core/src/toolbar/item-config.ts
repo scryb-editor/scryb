@@ -341,3 +341,21 @@ export const TOOLBAR_ITEM_CONFIG = {
     command: null,
   },
 } as const satisfies Record<ToolbarItemKey, ToolbarItemConfig>;
+
+/**
+ * Pressed state for a toolbar or bubble item, or undefined when the item is
+ * an action with no on/off state (so no `aria-pressed` is rendered).
+ *
+ * @param editor - Editor to read active state from
+ * @param config - Item config (`activeName` preferred over `isActive`)
+ * @returns true/false for toggles, undefined for actions
+ * @example resolveItemPressed(editor, TOOLBAR_ITEM_CONFIG.bold)
+ */
+export function resolveItemPressed(
+  editor: Editor,
+  config: { activeName?: string; isActive?: ((editor: Editor) => boolean) | null },
+): boolean | undefined {
+  if (config.activeName) return editor.isActive(config.activeName);
+  if (config.isActive) return config.isActive(editor);
+  return undefined;
+}

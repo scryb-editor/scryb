@@ -1,5 +1,5 @@
 import type { BlockMenuLabels } from "../block-menu/types";
-import type { TableLineMenuLabels } from "../table-menu/types";
+import type { TableCellMenuLabels, TableLineMenuLabels } from "../table-menu/types";
 import type { TiptapTranslations } from "./types";
 
 /**
@@ -35,6 +35,8 @@ export function buildBlockMenuLabels(translations: TiptapTranslations): BlockMen
     alignMiddle: side.alignMiddle,
     alignBottom: side.alignBottom,
     fitToWidth: side.fitToWidth,
+    moveUp: side.moveUp,
+    moveDown: side.moveDown,
     colorNames: side.colorNames,
     blockTypes: side.blockTypes,
   };
@@ -85,5 +87,23 @@ export function buildTableLineMenuLabels(
     alignMiddle: side.alignMiddle,
     alignBottom: side.alignBottom,
     colorNames: side.colorNames,
+  };
+}
+
+/**
+ * Collects the words of the menu Shift+F10 opens in a table cell.
+ *
+ * @param translations - A resolved translation catalog
+ * @returns The label set createTableCellMenuItems expects
+ */
+export function buildTableCellMenuLabels(translations: TiptapTranslations): TableCellMenuLabels {
+  const table = translations.table;
+  return {
+    cell: table.cellMenu ?? "Table cell",
+    rowActions: table.rowMenu ?? "Row actions",
+    columnActions: table.columnMenu ?? "Column actions",
+    tableActions: table.tableMenu ?? "Table actions",
+    toggleHeaderCell: table.toggleHeaderCell,
+    splitCell: table.splitCell,
   };
 }

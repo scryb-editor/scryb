@@ -51,6 +51,8 @@ export interface ImageInsertOutcome {
  * @param editor - The editor instance
  * @param file - The local file the user chose or dropped
  * @param config - Image config, merged over the defaults
+ * @param alt - Alt text the user supplied: `""` marks the image decorative,
+ *   null (the default) stores none so the accessibility checker reports it
  * @returns The outcome; never throws for a rejected, unreadable or failed file
  *
  * @example
@@ -62,7 +64,8 @@ export interface ImageInsertOutcome {
 export async function insertImageFile(
   editor: Editor,
   file: File,
-  config: ImageUploadConfig = {}
+  config: ImageUploadConfig = {},
+  alt: string | null = null
 ): Promise<ImageInsertOutcome> {
   const resolved = { ...DEFAULT_IMAGE_UPLOAD_CONFIG, ...config };
 
@@ -76,12 +79,12 @@ export async function insertImageFile(
   }
 
   if (config.upload) {
-    return await uploadAndInsert(editor, file, resolved, config.upload);
+    return await uploadAndInsert(editor, file, resolved, config.upload, alt);
   }
 
   try {
     const result = await processFile(file, resolved);
-    insertImageNode(editor, result.src, result);
+    insertImageNode(editor, result.src, result, alt);
     return { ok: true, result };
   } catch (error) {
     return {
@@ -117,16 +120,18 @@ function processFile(
 
 /**
  * Inserts the image node itself. The single place that names the command, so
- * the two branches above cannot drift on alt/title/dimension handling.
+ * the two branches above cannot drift on alt/dimension handling.
+ *
+ * Alt comes only from the user (null ⇒ none); the filename is never used as
+ * alt or title — it would become the image's accessible name.
  */
-function insertImageNode(editor: Editor, src: string, result: ImageUploadResult): void {
+function insertImageNode(editor: Editor, src: string, result: ImageUploadResult, alt: string | null): void {
   editor
     .chain()
     .focus()
     .setResizableImage({
       src,
-      alt: result.name,
-      title: `${result.name} (${result.width}×${result.height})`,
+      ...(alt !== null ? { alt } : {}),
       width: result.width,
       height: result.height,
     })
@@ -147,7 +152,8 @@ async function uploadAndInsert(
   editor: Editor,
   file: File,
   resolved: Required<Omit<ImageUploadConfig, "upload">>,
-  upload: NonNullable<ImageUploadConfig["upload"]>
+  upload: NonNullable<ImageUploadConfig["upload"]>,
+  alt: string | null
 ): Promise<ImageInsertOutcome> {
   const placeholderId = addImagePlaceholder(editor, file.name);
   const controller = new AbortController();
@@ -182,7 +188,7 @@ async function uploadAndInsert(
     };
 
     editor.commands.setTextSelection(position);
-    insertImageNode(editor, src, uploadedResult);
+    insertImageNode(editor, src, uploadedResult, alt);
 
     return { ok: true, result: uploadedResult };
   } catch (error) {
@@ -205,6 +211,8 @@ async function uploadAndInsert(
  *
  * @param editor - The editor instance
  * @param url - The image URL; surrounding whitespace is trimmed
+ * @param alt - Alt text the user supplied: `""` marks the image decorative,
+ *   null (the default) stores none
  * @returns false if the URL was blank
  *
  * @example
@@ -212,11 +220,15 @@ async function uploadAndInsert(
  * insertImageUrl(editor, "https://example.com/photo.png");
  * ```
  */
-export function insertImageUrl(editor: Editor, url: string): boolean {
+export function insertImageUrl(editor: Editor, url: string, alt: string | null = null): boolean {
   const src = url.trim();
   if (!src) return false;
 
-  editor.chain().focus().setResizableImage({ src }).run();
+  editor
+    .chain()
+    .focus()
+    .setResizableImage({ src, ...(alt !== null ? { alt } : {}) })
+    .run();
   return true;
 }
 

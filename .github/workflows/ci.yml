@@ -20,4 +20,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun run build
+      # The themes contrast suite renders the stylesheets in headless
+      # Chromium, which bun install does not fetch.
+      - run: bunx playwright install --with-deps chromium
       - run: bun run test

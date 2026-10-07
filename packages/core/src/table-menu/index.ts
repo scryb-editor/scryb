@@ -43,5 +43,18 @@ export type { SharedCellAttr, TableCellScope } from "./cell-attrs";
 // Actions
 export { TABLE_LINE_MENU_IDS, createTableLineMenuItems, handleTableLineMenuAction } from "./actions";
 
+// Cell menu (Shift+F10 in a table cell)
+export {
+  TABLE_CELL_MENU_IDS,
+  createTableCellMenuItems,
+  getCaretTableCell,
+  handleTableCellMenuAction,
+  mapTablePosThrough,
+} from "./cell-menu";
+export type { CaretTableCell } from "./cell-menu";
+
 // Types
-export type { TableLineMenuLabels } from "./types";
+export type { TableCellMenuLabels, TableLineMenuLabels } from "./types";
+
+// Grip labels
+export { tableGripLabel } from "./grip-label";

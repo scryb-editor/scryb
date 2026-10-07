@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { Mark, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import {
   DEFAULT_ACCESSIBILITY_CHECKER_CONFIG,
   type AccessibilityCheckResult,
@@ -8,41 +8,43 @@ import {
   type AccessibilityIssueLocation,
   type AccessibilityIssueSeverity,
   type AccessibilityIssueType,
+  type AccessibilityMessageId,
 } from "./types";
+import { en } from "../i18n/locales/en";
+import { localizeAccessibilityIssue } from "./localize";
 
 // =============================================================================
 // Private helpers
 // =============================================================================
 
 /**
- * Generates a unique ID for an accessibility issue.
+ * Generates a unique ID for an accessibility issue. Keyed on the message id so
+ * an image both too wide and too tall yields two distinct ids.
  */
-function generateIssueId(type: AccessibilityIssueType, location: AccessibilityIssueLocation): string {
-  return `${type}-${location.from}-${location.to}`;
+function generateIssueId(messageId: AccessibilityMessageId, location: AccessibilityIssueLocation): string {
+  return `${messageId}-${location.from}-${location.to}`;
 }
 
 /**
- * Creates an AccessibilityIssue object.
+ * Creates an AccessibilityIssue object. Its English message, description and
+ * fix come from the `en` catalog, interpolated with `data`.
  */
 function createAccessibilityIssue(
   type: AccessibilityIssueType,
+  messageId: AccessibilityMessageId,
   severity: AccessibilityIssueSeverity,
-  message: string,
-  description: string,
   location: AccessibilityIssueLocation,
-  fix?: string,
   data?: Record<string, unknown>
 ): AccessibilityIssue {
-  return {
-    id: generateIssueId(type, location),
+  const issue = {
+    id: generateIssueId(messageId, location),
     type,
+    messageId,
     severity,
-    message,
-    description,
     location,
-    fix,
     data,
   };
+  return { ...issue, ...localizeAccessibilityIssue(issue as AccessibilityIssue, en.accessibilityChecker) };
 }
 
 /**
@@ -98,15 +100,15 @@ export function checkImageAltText(
 
       const alt = attrs["alt"] as string | undefined;
 
-      if (cfg.checkMissingAltText && (!alt || alt.trim().length === 0)) {
+      // `alt=""` marks a decorative image (sanctioned; `emptyAltText` warns below);
+      // only an absent or whitespace-only alt is an error.
+      if (cfg.checkMissingAltText && (alt == null || (alt !== "" && alt.trim().length === 0))) {
         issues.push(
           createAccessibilityIssue(
             "missingAltText",
+            "missingAltText",
             "error",
-            "Image missing alt text",
-            "Images must have descriptive alt text for screen readers.",
             location,
-            "Add an alt attribute describing the image content.",
             { src: attrs["src"] as string }
           )
         );
@@ -116,11 +118,9 @@ export function checkImageAltText(
         issues.push(
           createAccessibilityIssue(
             "emptyAltText",
+            "emptyAltText",
             "warning",
-            "Image has empty alt text",
-            "Empty alt text is only appropriate for decorative images. If the image conveys information, add descriptive alt text.",
             location,
-            "Add descriptive alt text or mark the image as decorative.",
             { src: attrs["src"] as string }
           )
         );
@@ -159,11 +159,10 @@ export function checkHeadingHierarchy(doc: ProseMirrorNode): AccessibilityIssue[
     issues.push(
       createAccessibilityIssue(
         "missingHeadingHierarchy",
+        "missingHeadingHierarchy",
         "warning",
-        `Heading hierarchy issue: Expected h${issue.expectedLevel}, found h${issue.actualLevel}`,
-        "Headings should follow a logical hierarchy (h1 → h2 → h3, etc.) without skipping levels.",
         location,
-        `Change this heading to h${issue.expectedLevel} to maintain proper hierarchy.`
+        { expected: issue.expectedLevel, actual: issue.actualLevel }
       )
     );
   }
@@ -171,56 +170,79 @@ export function checkHeadingHierarchy(doc: ProseMirrorNode): AccessibilityIssue[
   return issues;
 }
 
+/** Whole link texts (normalised) that say nothing about the destination out of context. */
+const GENERIC_LINK_TEXTS: Record<string, true> = {
+  "click here": true,
+  here: true,
+  "read more": true,
+  link: true,
+  more: true,
+  "clique aqui": true,
+  aqui: true,
+  "leia mais": true,
+};
+
+/** Lowercases, collapses inner whitespace and drops trailing punctuation so "Read more…" matches "read more". */
+function normalizeLinkText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/gu, " ")
+    .replace(/[\s.!?…:;,]+$/u, "");
+}
+
 /**
- * Checks links for empty or generic link text.
+ * Checks links for empty or generic link text. Links are marks, so each link
+ * is the run of adjacent text nodes carrying an equal `link` mark.
  *
  * @param doc - ProseMirror document node
  * @returns Array of accessibility issues found
  */
 export function checkLinkText(doc: ProseMirrorNode): AccessibilityIssue[] {
   const issues: AccessibilityIssue[] = [];
+  const links: Array<{ mark: Mark; from: number; to: number; text: string }> = [];
 
   doc.descendants((node, pos) => {
-    if (node.type.name === "link") {
-      const attrs = node.attrs;
-      const text = node.textContent?.trim() || "";
-      const location: AccessibilityIssueLocation = {
-        from: pos,
-        to: pos + node.nodeSize,
-        nodeType: "link",
-      };
-
-      if (text.length === 0) {
-        issues.push(
-          createAccessibilityIssue(
-            "emptyLinkText",
-            "error",
-            "Link has no text content",
-            "Links must have descriptive text content for screen readers.",
-            location,
-            "Add text content to the link.",
-            { href: attrs["href"] as string }
-          )
-        );
-      }
-
-      const genericTexts = ["click here", "here", "read more", "link", "more", "clique aqui", "aqui", "leia mais"];
-      const lowerText = text.toLowerCase();
-      if (genericTexts.some((generic) => lowerText.includes(generic))) {
-        issues.push(
-          createAccessibilityIssue(
-            "genericLinkText",
-            "warning",
-            "Link uses generic text",
-            "Links should have descriptive text that makes sense out of context.",
-            location,
-            "Replace generic text with descriptive link text.",
-            { href: attrs["href"] as string, text }
-          )
-        );
-      }
+    if (!node.isText) return;
+    const mark = node.marks.find((m) => m.type.name === "link");
+    if (!mark) return;
+    const last = links[links.length - 1];
+    if (last && last.to === pos && last.mark.eq(mark)) {
+      last.to = pos + node.nodeSize;
+      last.text += node.text ?? "";
+    } else {
+      links.push({ mark, from: pos, to: pos + node.nodeSize, text: node.text ?? "" });
     }
   });
+
+  for (const link of links) {
+    const href = link.mark.attrs["href"] as string;
+    const text = link.text.trim();
+    const location: AccessibilityIssueLocation = { from: link.from, to: link.to, nodeType: "link" };
+
+    if (text.length === 0) {
+      issues.push(
+        createAccessibilityIssue(
+          "emptyLinkText",
+          "emptyLinkText",
+          "error",
+          location,
+          { href }
+        )
+      );
+    }
+
+    if (GENERIC_LINK_TEXTS[normalizeLinkText(text)] === true) {
+      issues.push(
+        createAccessibilityIssue(
+          "genericLinkText",
+          "genericLinkText",
+          "warning",
+          location,
+          { href, text }
+        )
+      );
+    }
+  }
 
   return issues;
 }
@@ -255,11 +277,9 @@ export function checkTableAccessibility(doc: ProseMirrorNode): AccessibilityIssu
         issues.push(
           createAccessibilityIssue(
             "missingTableHeaders",
+            "missingTableHeaders",
             "warning",
-            "Table missing header cells",
-            "Tables should have header cells (th) to identify column/row headers for screen readers.",
-            location,
-            "Add header cells to the first row or column of the table."
+            location
           )
         );
       }
@@ -303,12 +323,10 @@ export function checkImageDimensions(
         issues.push(
           createAccessibilityIssue(
             "imageTooLarge",
+            "imageTooWide",
             "info",
-            `Image width (${width}px) exceeds recommended maximum (${cfg.maxImageWidth}px)`,
-            "Large images can cause performance issues and poor user experience on mobile devices.",
             location,
-            `Resize the image to ${cfg.maxImageWidth}px or less.`,
-            { width, maxWidth: cfg.maxImageWidth }
+            { width, max: cfg.maxImageWidth }
           )
         );
       }
@@ -317,12 +335,10 @@ export function checkImageDimensions(
         issues.push(
           createAccessibilityIssue(
             "imageTooLarge",
+            "imageTooTall",
             "info",
-            `Image height (${height}px) exceeds recommended maximum (${cfg.maxImageHeight}px)`,
-            "Large images can cause performance issues and poor user experience on mobile devices.",
             location,
-            `Resize the image to ${cfg.maxImageHeight}px or less.`,
-            { height, maxHeight: cfg.maxImageHeight }
+            { height, max: cfg.maxImageHeight }
           )
         );
       }

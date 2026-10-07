@@ -150,8 +150,10 @@ function mousedownOn(target: HTMLElement): void {
   target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
 }
 
-function pressEscape(target: HTMLElement = document.body): void {
-  target.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+function pressEscape(target: HTMLElement = document.body): KeyboardEvent {
+  const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+  target.dispatchEvent(event);
+  return event;
 }
 
 function focusIn(to: HTMLElement, from: HTMLElement | null = null): void {
@@ -378,6 +380,69 @@ describe("createBubbleMenuOutsideDismiss", () => {
 
     expect(fake.setMeta).toHaveBeenCalledWith("scrybTextBubbleMenu", "hide");
     expect(fake.dispatch).toHaveBeenCalledTimes(1);
+  });
+
+  it("marks the Escape that dismissed the menu as used", () => {
+    arm();
+
+    // The editor's Esc-then-Tab release skips a key that is already spent.
+    expect(pressEscape(dom.editorDom).defaultPrevented).toBe(true);
+  });
+
+  it("leaves Escape unmarked when no menu was shown", () => {
+    arm();
+    dom.menuHost.appendChild(dom.menu);
+
+    expect(pressEscape(dom.editorDom).defaultPrevented).toBe(false);
+  });
+
+  it("marks the Escape an open overlay owns before it reaches the editor", () => {
+    arm();
+    openOverlays(dom);
+    // The overlay or the deferred dismissal will close something, so the
+    // editor's Esc-then-Tab release must see the key as spent.
+    let seenByEditor: boolean | undefined;
+    dom.editorDom.addEventListener("keydown", (event) => {
+      seenByEditor = event.defaultPrevented;
+    });
+
+    pressEscape(dom.editorDom);
+
+    expect(seenByEditor).toBe(true);
+  });
+
+  it("leaves that Escape unmarked for an overlay listening on the document", () => {
+    // Radix's DismissableLayer: a document capture listener that skips an
+    // Escape already defaultPrevented, so marking it first would keep it open.
+    let overlayClosed = false;
+    const overlay = (event: Event): void => {
+      if (event.defaultPrevented) return;
+      event.preventDefault();
+      overlayClosed = true;
+    };
+    document.addEventListener("keydown", overlay, true);
+    arm();
+    openOverlays(dom);
+
+    const event = pressEscape(dom.editorDom);
+    document.removeEventListener("keydown", overlay, true);
+
+    expect(overlayClosed).toBe(true);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("marks no later key when the Escape never reached the document", () => {
+    const swallow = (event: Event): void => event.stopImmediatePropagation();
+    document.addEventListener("keydown", swallow, true);
+    arm();
+    openOverlays(dom);
+    pressEscape(dom.editorDom);
+    document.removeEventListener("keydown", swallow, true);
+
+    const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    dom.editorDom.dispatchEvent(tab);
+
+    expect(tab.defaultPrevented).toBe(false);
   });
 
   it("leaves the first Escape to an open overlay", () => {

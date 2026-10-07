@@ -168,7 +168,7 @@
 }
 
 .scryb-editor:focus-within {
-    border-color: var(--scryb-editor-border-focus, #d1d5db);
+    border-color: var(--scryb-editor-border-focus, #7c8594);
 }
 
 /* The inner ScrybEditorContent element reuses the .scryb-editor class
@@ -272,7 +272,7 @@ scryb-icon {
     cursor: pointer;
     transition: background-color var(--scryb-transition-fast, 0.15s ease),
         color var(--scryb-transition-fast, 0.15s ease);
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     position: relative;
     flex-shrink: 0;
     padding: 0;
@@ -285,7 +285,7 @@ scryb-icon {
 }
 
 .scryb-toolbar-button:active:not(:disabled) {
-    background: var(--scryb-button-active-bg-press, #e5e7eb);
+    background: var(--scryb-button-active-bg-press, #e2e8f0);
 }
 
 .scryb-toolbar-button:focus-visible {
@@ -295,25 +295,37 @@ scryb-icon {
     outline-offset: 2px;
 }
 
+/* A pressed toggle is a solid ink chip, the same ink as the theme's solid
+   buttons. The fill is the state cue on its own: ≥ 3:1 against the toolbar in
+   both themes, where the old 10% tint was ~1.3:1 and needed a bar under the
+   button to pass, which read as a keycap. */
 .scryb-toolbar-button.is-active,
 .scryb-toolbar-button[data-state="on"] {
-    color: var(--scryb-button-active-text, #3182ce);
-    background: var(--scryb-button-active-bg, rgba(49, 130, 206, 0.1));
+    color: var(--scryb-button-pressed-text, var(--scryb-button-solid-text, #ffffff));
+    background: var(--scryb-button-pressed-bg, var(--scryb-button-solid-bg, #2d3748));
 }
 
-/* A dedicated hover token: referencing --scryb-button-active-bg here (as this
-   once did) resolves to the same value as the resting active state, leaving
-   active buttons inert on hover. */
-.scryb-toolbar-button.is-active:hover:not(:disabled),
-.scryb-toolbar-button[data-state="on"]:hover:not(:disabled) {
-    background: var(--scryb-button-active-bg-hover, rgba(49, 130, 206, 0.16));
+/* :active is listed beside :hover because the plain :active rule above
+   outranks .is-active, and its light press fill would hide the light icon of a
+   pressed toggle for as long as the click lasts. */
+.scryb-toolbar-button.is-active:is(:hover, :active):not(:disabled),
+.scryb-toolbar-button[data-state="on"]:is(:hover, :active):not(:disabled) {
+    color: var(--scryb-button-pressed-text, var(--scryb-button-solid-text, #ffffff));
+    background: var(--scryb-button-pressed-bg-hover, var(--scryb-button-solid-bg-hover, #1a202c));
 }
 
 .scryb-toolbar-button.is-disabled,
 .scryb-toolbar-button:disabled {
-    opacity: var(--scryb-button-disabled-opacity, 0.4);
     cursor: not-allowed;
     pointer-events: none;
+}
+
+/* aria-disabled items stay focusable (roving tabindex), so dim the content
+   and not the button: opacity on the button would fade its focus ring too.
+   The Angular tooltip keeps full contrast. */
+.scryb-toolbar-button.is-disabled > :not(.tooltip),
+.scryb-toolbar-button:disabled > :not(.tooltip) {
+    opacity: var(--scryb-button-disabled-opacity, 0.4);
 }
 
 .scryb-toolbar-button .material-symbols-outlined {
@@ -404,7 +416,10 @@ scryb-icon {
     border-bottom-color: var(--scryb-tooltip-bg, #1f2937);
 }
 
-.scryb-toolbar-button:hover:not(:disabled) .tooltip {
+/* Shown on hover and on keyboard focus; Escape adds .scryb-tooltip-dismissed
+   until the pointer leaves or focus moves (WCAG 1.4.13). */
+.scryb-toolbar-button:not(.scryb-tooltip-dismissed):hover:not(:disabled) .tooltip,
+.scryb-toolbar-button:not(.scryb-tooltip-dismissed):focus-visible .tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
@@ -626,7 +641,7 @@ scryb-icon {
     cursor: pointer;
     transition: background-color var(--scryb-transition-fast, 0.15s ease),
         color var(--scryb-transition-fast, 0.15s ease);
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
@@ -809,7 +824,7 @@ scryb-icon {
 .scryb-dropdown-header {
     font-size: 11px;
     font-weight: 600;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 4px 8px 8px;
@@ -847,6 +862,11 @@ scryb-icon {
 .scryb-dropdown-item:hover,
 .scryb-dropdown-item[data-highlighted] {
     background: var(--scryb-block-menu-item-hover-bg, #f3f4f6);
+}
+
+.scryb-dropdown-item:focus-visible {
+    outline: 2px solid var(--scryb-color-primary-600, #3182ce);
+    outline-offset: -2px;
 }
 
 .scryb-dropdown-item.is-active {
@@ -927,7 +947,7 @@ scryb-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     flex-shrink: 0;
 }
 
@@ -998,7 +1018,10 @@ scryb-icon {
     border-bottom-color: var(--scryb-tooltip-bg, #1f2937);
 }
 
-.scryb-toolbar-dropdown-trigger:hover .scryb-toolbar-tooltip {
+/* :not(.is-open) because the focus selector would otherwise outrank the
+   .is-open rule below, and an open dropdown keeps focus on its trigger. */
+.scryb-toolbar-dropdown-trigger:not(.scryb-tooltip-dismissed):not(.is-open):hover .scryb-toolbar-tooltip,
+.scryb-toolbar-dropdown-trigger:not(.scryb-tooltip-dismissed):not(.is-open):focus-visible .scryb-toolbar-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
@@ -1062,8 +1085,12 @@ scryb-icon {
 }
 
 .scryb-bubble-menu__button.is-active {
-    color: var(--scryb-button-active-text, #3182ce);
-    background: var(--scryb-button-active-bg, rgba(49, 130, 206, 0.1));
+    color: var(--scryb-button-pressed-text, var(--scryb-button-solid-text, #ffffff));
+    background: var(--scryb-button-pressed-bg, var(--scryb-button-solid-bg, #2d3748));
+}
+
+.scryb-bubble-menu__button.is-active:hover {
+    background: var(--scryb-button-pressed-bg-hover, var(--scryb-button-solid-bg-hover, #1a202c));
 }
 
 .scryb-bubble-menu__button:focus-visible {
@@ -1181,6 +1208,12 @@ scryb-icon {
     opacity: 1;
 }
 
+/* Keyboard focus reveals the menu even while typing has hidden it. */
+.scryb-side-menu:focus-within {
+    pointer-events: auto;
+    opacity: 1;
+}
+
 /* Ghost buttons: no fill at rest — the handles should read as faint marks in
    the margin (Notion/Tiptap convention), not as chrome competing with text.
    The hover fill is the only affordance. */
@@ -1194,7 +1227,7 @@ scryb-icon {
     background: var(--scryb-sidemenu-button-bg, transparent);
     border-radius: var(--scryb-radius-sm, 4px);
     cursor: pointer;
-    color: var(--scryb-sidemenu-icon-color, #9ca3af);
+    color: var(--scryb-sidemenu-icon-color, #5a6472);
     transition: background-color var(--scryb-transition-fast, 0.15s ease),
         color var(--scryb-transition-fast, 0.15s ease);
     padding: 0;
@@ -1207,7 +1240,7 @@ scryb-icon {
 }
 
 .scryb-side-menu-button:focus-visible {
-    outline: 2px solid var(--scryb-focus-ring, #2563eb);
+    outline: 2px solid var(--scryb-focus-ring, #3182ce);
     outline-offset: 2px;
 }
 
@@ -1245,9 +1278,9 @@ scryb-icon {
 
 .scryb-block-context-menu {
     background: var(--scryb-block-menu-bg, #ffffff);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
     padding: 6px;
     min-width: 200px;
     z-index: 1000;
@@ -1283,12 +1316,20 @@ scryb-icon {
 
 .scryb-block-context-menu-item:hover,
 .scryb-block-context-menu-item[data-highlighted] {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--scryb-menu-item-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
 .scryb-block-context-menu-item:focus-visible {
     outline: 2px solid var(--scryb-color-primary-600, #3182ce);
     outline-offset: -2px;
+}
+
+.scryb-block-context-menu-shortcut {
+    margin-left: auto;
+    padding-left: 12px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--scryb-text-muted, #5a6472);
 }
 
 .scryb-block-context-menu-item.is-active {
@@ -1298,12 +1339,12 @@ scryb-icon {
 }
 
 .scryb-block-context-menu-item--danger {
-    color: var(--scryb-color-error, #c53030);
+    color: var(--scryb-danger-text, #c53030);
 }
 
 .scryb-block-context-menu-item--danger:hover,
 .scryb-block-context-menu-item--danger[data-highlighted] {
-    color: var(--scryb-color-error, #c53030);
+    color: var(--scryb-danger-text, #c53030);
     background: rgba(197, 48, 48, 0.08);
 }
 
@@ -1337,7 +1378,7 @@ scryb-icon {
 
 .scryb-block-context-menu-separator {
     height: 1px;
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     margin: 4px 0;
 }
 
@@ -1351,7 +1392,7 @@ scryb-icon {
 }
 
 .scryb-block-context-menu-swatch.is-default {
-    border-color: var(--scryb-block-menu-border, #e2e8f0);
+    border-color: var(--scryb-border-strong, #7c8594);
 }
 
 .scryb-block-context-menu-check {
@@ -1363,23 +1404,30 @@ scryb-icon {
 /* =============================================================================
    Slash Commands Menu (.scryb-slash-commands)
 
-   Rendered by packages/react/src/components/features/slash-commands.tsx
+   Rendered by packages/react/src/components/features/slash-commands.tsx and
+   packages/angular/src/lib/components/features/tiptap-slash-commands.component.ts.
+   The outer box is the floating panel; the listbox inside it is the scroller,
+   so the scrolling region is the combobox's own popup.
    ============================================================================= */
 
 .scryb-slash-commands {
     display: none;
     background: var(--scryb-surface-elevated, #ffffff);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
     padding: 6px;
+    min-width: 240px;
+    outline: none;
+    z-index: 1000;
+}
+
+.scryb-slash-commands-list {
     max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
-    min-width: 240px;
     outline: none;
-    z-index: 1000;
 }
 
 /* React uses conditional rendering (element not in DOM when hidden), so display:none
@@ -1411,11 +1459,27 @@ scryb-icon {
 }
 
 .scryb-slash-commands-item:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--scryb-menu-item-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
 .scryb-slash-commands-item.is-selected {
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--scryb-menu-item-selected-bg, rgba(0, 0, 0, 0.06));
+    box-shadow: inset 2px 0 0 var(--scryb-selected-indicator, #5a6472);
+}
+
+/* Forced colors drop box-shadow, which is the selected/active cue above and in
+   emoji-popup.css and mention.css. A system-colour outline replaces it.
+   Buttons with a focus-visible ring keep that ring while focused. */
+@media (forced-colors: active) {
+    .scryb-slash-commands-item.is-selected,
+    .scryb-emoji-popup-item.is-selected,
+    .scryb-mention-popup-item.is-selected,
+    .scryb-toolbar-button.is-active:not(:focus-visible),
+    .scryb-toolbar-button[data-state="on"]:not(:focus-visible),
+    .scryb-bubble-menu__button.is-active:not(:focus-visible) {
+        outline: 2px solid Highlight;
+        outline-offset: -2px;
+    }
 }
 
 .scryb-slash-commands-item:focus-visible {
@@ -1464,7 +1528,7 @@ scryb-icon {
 .scryb-slash-commands-empty {
     padding: 16px;
     text-align: center;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     font-size: 13px;
 }
 
@@ -1499,16 +1563,19 @@ scryb-icon {
     transition: box-shadow var(--scryb-transition-fast, 0.15s ease);
     outline: none;
     padding: 0;
+    /* A neutral ring outside the coloured border: Black on the dark panel and
+       Lime on the light one would otherwise have no visible edge (1.4.11). */
+    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594);
 }
 
 .scryb-color-picker-swatch:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594), 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .scryb-color-picker-swatch.is-active {
     outline: 2px solid var(--scryb-color-primary-600, #3182ce);
     outline-offset: 1px;
-    box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.3);
+    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594), 0 0 0 3px rgba(49, 130, 206, 0.3);
 }
 
 .scryb-color-picker-swatch:focus-visible {
@@ -1618,7 +1685,7 @@ scryb-icon {
     background: var(--scryb-button-bg, transparent);
     border-radius: var(--scryb-radius-md, 6px);
     cursor: pointer;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     transition: background-color var(--scryb-transition-fast, 0.15s ease),
         color var(--scryb-transition-fast, 0.15s ease);
     padding: 0;
@@ -1699,9 +1766,9 @@ scryb-icon {
     gap: 2px;
     width: max-content;
     background: var(--scryb-surface-elevated, #ffffff);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
     padding: 4px 6px;
     z-index: 1001;
     will-change: transform, opacity;
@@ -1728,9 +1795,9 @@ scryb-icon {
 
 .scryb-image-upload {
     background: var(--scryb-surface-elevated, #ffffff);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
     padding: 16px;
     z-index: 1001;
     will-change: transform, opacity;
@@ -1745,7 +1812,7 @@ scryb-icon {
     display: flex;
     gap: 0;
     margin-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     padding-bottom: 0;
 }
 
@@ -1758,7 +1825,7 @@ scryb-icon {
     background: transparent;
     font-size: 13px;
     font-weight: 500;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     cursor: pointer;
     transition: color 0.15s ease, border-color 0.15s ease;
     outline: none;
@@ -1792,25 +1859,25 @@ scryb-icon {
 .scryb-image-upload-file-input {
     width: 100%;
     font-size: 13px;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     cursor: pointer;
     box-sizing: border-box;
     padding: 20px 16px;
-    border: 2px dashed rgba(0, 0, 0, 0.12);
+    border: 2px dashed var(--scryb-input-border, #7c8594);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--scryb-input-drop-bg, rgba(0, 0, 0, 0.02));
     transition: border-color 0.15s ease, background 0.15s ease;
     text-align: center;
 }
 
 .scryb-image-upload-file-input:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--scryb-input-border-hover, #5a6472);
+    background: var(--scryb-input-drop-bg-hover, rgba(0, 0, 0, 0.04));
 }
 
 .scryb-image-upload-file-input::file-selector-button {
-    background: var(--scryb-text-color, #2d3748);
-    color: #ffffff;
+    background: var(--scryb-button-solid-bg, #2d3748);
+    color: var(--scryb-button-solid-text, #ffffff);
     border: none;
     border-radius: 6px;
     padding: 6px 14px;
@@ -1822,7 +1889,7 @@ scryb-icon {
 }
 
 .scryb-image-upload-file-input::file-selector-button:hover {
-    background: #1a202c;
+    background: var(--scryb-button-solid-bg-hover, #1a202c);
 }
 
 /* Preview */
@@ -1843,7 +1910,7 @@ scryb-icon {
 /* Error message */
 .scryb-image-upload-error {
     font-size: 12px;
-    color: var(--scryb-color-error, #c53030);
+    color: var(--scryb-danger-text, #c53030);
     padding: 4px 0;
 }
 
@@ -1857,13 +1924,13 @@ scryb-icon {
 .scryb-image-upload-url-field label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
 }
 
 .scryb-image-upload-url-field input[type="url"] {
     height: 36px;
     padding: 0 12px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--scryb-input-border, #7c8594);
     border-radius: 8px;
     font-size: 13px;
     color: var(--scryb-text-color, #2d3748);
@@ -1878,14 +1945,89 @@ scryb-icon {
     border-color: var(--scryb-text-color, #2d3748);
 }
 
+/* Alt-text field */
+.scryb-image-upload-alt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.scryb-image-upload-alt-field > label:first-child,
+.scryb-image-alt-editor > label:first-child {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--scryb-text-muted, #5a6472);
+}
+
+.scryb-image-upload-alt-field input[type="text"],
+.scryb-image-alt-editor input[type="text"] {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--scryb-input-border, #7c8594);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--scryb-text-color, #2d3748);
+    background: var(--scryb-surface-elevated, #ffffff);
+    outline: none;
+    transition: border-color 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.scryb-image-upload-alt-field input[type="text"]:focus,
+.scryb-image-alt-editor input[type="text"]:focus {
+    border-color: var(--scryb-text-color, #2d3748);
+}
+
+.scryb-image-upload-alt-hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--scryb-text-muted);
+}
+
+.scryb-image-upload-decorative {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.scryb-image-alt-editor {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+    min-width: 240px;
+    /* React renders the form beside the bubble toolbar in an unstyled wrapper,
+       so it carries the bubble surface itself. */
+    background: var(--scryb-bubble-bg, #ffffff);
+    border: 1px solid var(--scryb-bubble-border, #e5e7eb);
+    border-radius: var(--scryb-bubble-radius, 10px);
+    box-shadow: var(--scryb-bubble-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
+}
+
+/* Angular nests the form inside the bubble menu, which already is the surface. */
+.scryb-bubble-menu .scryb-image-alt-editor {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.scryb-image-alt-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
 /* Insert button */
 .scryb-image-upload-insert {
     height: 36px;
     padding: 0 14px;
     border: none;
     border-radius: 8px;
-    background: var(--scryb-text-color, #2d3748);
-    color: #ffffff;
+    background: var(--scryb-button-solid-bg, #2d3748);
+    color: var(--scryb-button-solid-text, #ffffff);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -1895,7 +2037,7 @@ scryb-icon {
 }
 
 .scryb-image-upload-insert:hover:not(:disabled) {
-    background: #1a202c;
+    background: var(--scryb-button-solid-bg-hover, #1a202c);
 }
 
 .scryb-image-upload-insert:disabled {
@@ -1926,7 +2068,7 @@ scryb-icon {
 
 .scryb-bubble-menu__button--danger:hover {
     background: rgba(197, 48, 48, 0.1);
-    color: var(--scryb-color-error, #c53030);
+    color: var(--scryb-danger-text, #c53030);
 }
 
 /* =============================================================================
@@ -1958,7 +2100,7 @@ scryb-icon {
     background: transparent;
     border-radius: var(--scryb-radius-md, 6px);
     cursor: pointer;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     transition: background-color var(--scryb-transition-fast, 0.15s ease);
     outline: none;
     flex-shrink: 0;
@@ -2006,7 +2148,7 @@ scryb-icon {
     justify-content: space-between;
     padding: 16px 20px;
     border-bottom: 1px solid var(--scryb-block-menu-border, #e2e8f0);
-    background: var(--scryb-color-gray-50, #f9fafb);
+    background: var(--scryb-a11y-header-bg, #f8f9fa);
     border-radius: var(--scryb-radius-lg, 12px) var(--scryb-radius-lg, 12px) 0 0;
     flex-shrink: 0;
 }
@@ -2049,7 +2191,7 @@ scryb-icon {
     background: transparent;
     font-size: 13px;
     font-weight: 500;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     cursor: pointer;
     transition: background-color var(--scryb-transition-fast, 0.15s ease);
     outline: none;
@@ -2076,12 +2218,14 @@ scryb-icon {
     scrollbar-gutter: stable;
     padding: 8px 20px 16px;
     max-height: 400px;
+    list-style: none;
+    margin: 0;
 }
 
 .scryb-accessibility-checker-empty {
     padding: 24px;
     text-align: center;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     font-size: 13px;
 }
 
@@ -2101,6 +2245,12 @@ scryb-icon {
     outline: none;
 }
 
+/* The rows are the Tab stops of a focus-trapped modal (WCAG 2.4.7). */
+.scryb-accessibility-checker-issue:focus-visible {
+    outline: 2px solid var(--scryb-focus-ring, #3182ce);
+    outline-offset: 1px;
+}
+
 .scryb-accessibility-checker-issue:hover,
 .scryb-accessibility-checker-issue.is-selected {
     background: var(--scryb-block-menu-item-hover-bg, #f1f5f9);
@@ -2115,7 +2265,7 @@ scryb-icon {
 
 .scryb-accessibility-checker-issue--warning,
 .scryb-accessibility-checker-issue.issue-warning {
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid var(--scryb-a11y-warning-accent, #b45309);
 }
 
 .scryb-accessibility-checker-issue--info,
@@ -2144,24 +2294,24 @@ scryb-icon {
 
 /* Severity badge colors (Angular: state classes; React: BEM modifier + material-symbols child) */
 .scryb-accessibility-issue-severity.severity-error {
-    background: var(--scryb-color-red-50, #fef2f2);
-    color: var(--scryb-color-red-700, #b91c1c);
+    background: var(--scryb-a11y-error-bg, #fef2f2);
+    color: var(--scryb-a11y-error-text, #b91c1c);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 14px;
 }
 
 .scryb-accessibility-issue-severity.severity-warning {
-    background: var(--scryb-color-yellow-50, #fffbeb);
-    color: var(--scryb-color-yellow-700, #a16207);
+    background: var(--scryb-a11y-warning-bg, #fffbeb);
+    color: var(--scryb-a11y-warning-text, #a16207);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 14px;
 }
 
 .scryb-accessibility-issue-severity.severity-info {
-    background: var(--scryb-color-blue-50, #eff6ff);
-    color: var(--scryb-color-blue-700, #1d4ed8);
+    background: var(--scryb-a11y-info-bg, #eff6ff);
+    color: var(--scryb-a11y-info-text, #1d4ed8);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 14px;
@@ -2173,13 +2323,19 @@ scryb-icon {
 }
 
 .scryb-accessibility-issue-severity--warning .material-symbols-outlined {
-    color: #f59e0b;
+    color: var(--scryb-a11y-warning-accent, #b45309);
     font-size: 16px;
 }
 
 .scryb-accessibility-issue-severity--info .material-symbols-outlined {
     color: var(--scryb-color-primary-600, #3182ce);
     font-size: 16px;
+}
+
+.scryb-accessibility-issue-message,
+.scryb-accessibility-issue-description,
+.scryb-accessibility-issue-suggestion {
+    display: block;
 }
 
 .scryb-accessibility-issue-message {
@@ -2190,13 +2346,13 @@ scryb-icon {
 
 .scryb-accessibility-issue-description {
     font-size: 12px;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
 }
 
 .scryb-accessibility-issue-suggestion {
     margin-top: 8px;
     padding: 8px;
-    background: var(--scryb-color-gray-50, #f9fafb);
+    background: var(--scryb-a11y-suggestion-bg, #f8f9fa);
     border-radius: 4px;
     font-size: 12px;
     color: var(--scryb-text-color, #2d3748);
@@ -2318,7 +2474,10 @@ scryb-icon {
     border-bottom-color: var(--scryb-tooltip-bg, #1f2937);
 }
 
-.scryb-color-picker-trigger:hover .scryb-color-picker-tooltip {
+/* :not(.is-open): these selectors outrank the .is-open rule below, and an
+   open picker keeps hover and focus on its trigger. */
+.scryb-color-picker-trigger:not(.scryb-tooltip-dismissed):not(.is-open):hover .scryb-color-picker-tooltip,
+.scryb-color-picker-trigger:not(.scryb-tooltip-dismissed):not(.is-open):focus-visible .scryb-color-picker-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
@@ -2364,7 +2523,7 @@ scryb-icon {
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: var(--scryb-text-muted, #718096);
+    color: var(--scryb-text-muted, #5a6472);
     margin-bottom: 8px;
     transition: color 0.2s ease;
 }
@@ -2394,20 +2553,22 @@ scryb-icon {
     background: transparent;
     border: none;
     outline: none;
-    color: var(--scryb-link-editor-text, #1f2937);
+    color: var(--scryb-link-editor-text, #2d3748);
     font-size: 14px;
     padding: 6px 8px;
     min-width: 160px;
+    /* Inset ring, not a border: the field's edge without changing its box. */
+    box-shadow: inset 0 0 0 1px var(--scryb-input-border, #7c8594);
+    border-radius: 4px;
 }
 
 .scryb-link-editor-input::placeholder {
-    color: var(--scryb-link-editor-placeholder, #9ca3af);
+    color: var(--scryb-link-editor-placeholder, #6b7280);
 }
 
 .scryb-link-editor-input:focus {
-    outline: 2px solid var(--scryb-link-editor-focus, #3b82f6);
+    outline: 2px solid var(--scryb-link-editor-focus, #3182ce);
     outline-offset: -2px;
-    border-radius: 4px;
 }
 
 /* Individual action buttons */
@@ -2420,7 +2581,7 @@ scryb-icon {
     border: none;
     border-radius: 6px;
     background: transparent;
-    color: var(--scryb-link-editor-btn-color, #6b7280);
+    color: var(--scryb-link-editor-btn-color, #5a6472);
     cursor: pointer;
     transition: all 0.15s ease;
     position: relative;
@@ -2428,11 +2589,11 @@ scryb-icon {
 
 .scryb-link-editor-btn:hover:not(:disabled) {
     background: var(--scryb-button-hover-bg, #f3f4f6);
-    color: var(--scryb-link-editor-btn-hover-color, #1f2937);
+    color: var(--scryb-link-editor-btn-hover-color, #111827);
 }
 
 .scryb-link-editor-btn:focus-visible {
-    outline: 2px solid var(--scryb-link-editor-focus, #3b82f6);
+    outline: 2px solid var(--scryb-link-editor-focus, #3182ce);
     outline-offset: 2px;
 }
 
@@ -2447,21 +2608,21 @@ scryb-icon {
 
 /* Target button active state */
 .scryb-link-editor-target.is-active {
-    color: var(--scryb-link-editor-active, #3b82f6);
-    background: var(--scryb-link-editor-active-bg, rgba(59, 130, 246, 0.1));
+    color: var(--scryb-link-editor-active, #1d4ed8);
+    background: var(--scryb-link-editor-active-bg, rgba(49, 130, 206, 0.1));
 }
 
 /* Apply/preview/remove hover states */
 .scryb-link-editor-apply:hover:not(:disabled) {
-    color: var(--scryb-link-editor-apply-hover, #3b82f6);
+    color: var(--scryb-link-editor-apply-hover, #1d4ed8);
 }
 
 .scryb-link-editor-remove:hover {
-    color: var(--scryb-link-editor-remove-hover, #ef4444);
+    color: var(--scryb-link-editor-remove-hover, #c53030);
 }
 
 .scryb-link-editor-preview:hover {
-    color: var(--scryb-link-editor-preview-hover, #10b981);
+    color: var(--scryb-link-editor-preview-hover, #047857);
 }
 
 /* CSS-only tooltips on link editor action buttons */
@@ -2484,7 +2645,8 @@ scryb-icon {
     pointer-events: none;
 }
 
-.scryb-link-editor-btn:hover .btn-tooltip {
+.scryb-link-editor-btn:not(.scryb-tooltip-dismissed):hover .btn-tooltip,
+.scryb-link-editor-btn:not(.scryb-tooltip-dismissed):focus-visible .btn-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
@@ -2512,7 +2674,7 @@ scryb-icon {
     color: var(--scryb-text-color, #2d3748);
     padding: 10px 12px 4px 12px;
     margin-top: 4px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
 }
 
 .scryb-slash-commands-group-header:first-child {
@@ -2552,7 +2714,7 @@ scryb-icon {
 
 .scryb-image-upload-drag-content {
     text-align: center;
-    color: var(--scryb-upload-drag-color, #3182ce);
+    color: var(--scryb-upload-drag-color, #1d4ed8);
     font-weight: 600;
 }
 
@@ -2613,8 +2775,8 @@ scryb-icon {
     position: absolute;
     top: 100%;
     left: 0;
-    background: var(--scryb-upload-preview-bg, white);
-    border: 1px solid var(--scryb-upload-preview-border, #e2e8f0);
+    background: var(--scryb-upload-preview-bg, var(--scryb-surface-elevated, #ffffff));
+    border: 1px solid var(--scryb-upload-preview-border, var(--scryb-block-menu-border, #e2e8f0));
     border-radius: 8px;
     box-shadow: var(--scryb-upload-preview-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
     padding: 8px;
@@ -2633,7 +2795,7 @@ scryb-icon {
 .scryb-image-upload-preview-info {
     margin-top: 8px;
     font-size: 11px;
-    color: var(--scryb-upload-preview-info, #718096);
+    color: var(--scryb-upload-preview-info, var(--scryb-text-muted, #5a6472));
     text-align: center;
 }
 
@@ -2671,7 +2833,7 @@ scryb-icon {
     top: 100%;
     left: 0;
     background: var(--scryb-upload-error-bg, #fed7d7);
-    color: var(--scryb-upload-error-color, #c53030);
+    color: var(--scryb-upload-error-color, #9b2c2c);
     border: 1px solid var(--scryb-upload-error-border, #feb2b2);
     border-radius: 6px;
     padding: 8px 12px;
@@ -2720,9 +2882,9 @@ scryb-icon {
     overscroll-behavior: contain;
     padding: 6px;
     background: var(--scryb-surface-elevated, #ffffff);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
     z-index: 1001;
     animation: scryb-dropdown-fade-in 120ms ease;
 }
@@ -2758,11 +2920,11 @@ scryb-icon {
 }
 
 .scryb-block-context-menu-subitem:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--scryb-menu-item-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
 .scryb-block-context-menu-subitem:focus-visible {
-    outline: 2px solid var(--scryb-focus-ring, #2563eb);
+    outline: 2px solid var(--scryb-focus-ring, #3182ce);
     outline-offset: -2px;
 }
 
@@ -2810,154 +2972,6 @@ scryb-icon {
 }
 
 /* =============================================================================
-   Dark Theme Overrides
-
-   These selectors fix hardcoded light-mode values that are not expressed
-   through CSS custom properties and would not respond to .scryb-theme-dark.
-   All overrides are scoped to .scryb-theme-dark so they only apply when
-   the theme is active.
-   ============================================================================= */
-
-/* Side menu buttons carry no dark override: the base rule's tokens already
-   resolve per theme, and the navy chip this used to paint (rgba(30,30,60,.8))
-   was the one filled-at-rest control in either theme — light rests
-   transparent, so dark does too. */
-
-/* ─── Block Context Menu ────────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-block-context-menu {
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scryb-theme-dark .scryb-block-context-menu-item:hover,
-.scryb-theme-dark .scryb-block-context-menu-item[data-highlighted] {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.scryb-theme-dark .scryb-block-context-menu-header {
-    color: var(--scryb-text-muted, #9aa5b1);
-}
-
-.scryb-theme-dark .scryb-block-context-menu-separator {
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.scryb-theme-dark .scryb-block-context-menu-submenu {
-    background: var(--scryb-surface-elevated, #1e1e22);
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scryb-theme-dark .scryb-block-context-menu-subitem:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* ─── Table grips ───────────────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-table-grip {
-    background-color: var(--scryb-table-grip-bg, rgba(255, 255, 255, 0.14));
-}
-
-.scryb-theme-dark .scryb-table-grip:hover {
-    background-color: var(--scryb-table-grip-hover-bg, rgba(255, 255, 255, 0.32));
-}
-
-/* ─── Slash Commands ────────────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-slash-commands {
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scryb-theme-dark .scryb-slash-commands-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.scryb-theme-dark .scryb-slash-commands-item.is-selected {
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.scryb-theme-dark .scryb-slash-commands-group-header {
-    border-top-color: rgba(255, 255, 255, 0.06);
-}
-
-/* ─── Link Editor ───────────────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-link-editor {
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scryb-theme-dark .scryb-link-editor-actions {
-    border-left-color: var(--scryb-color-dark-border, #303036);
-}
-
-.scryb-theme-dark .scryb-link-editor-cancel {
-    background: var(--scryb-color-dark-border, #303036);
-    color: var(--scryb-text-color, #e2e8f0);
-}
-
-.scryb-theme-dark .scryb-link-editor-cancel:hover {
-    background: var(--scryb-color-dark-border-hover, #3f3f46);
-}
-
-/* ─── Image Upload ──────────────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-image-upload {
-    border-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scryb-theme-dark .scryb-image-upload-tabs {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
-}
-
-.scryb-theme-dark .scryb-image-upload-file-input {
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
-    color: #a0aec0;
-}
-
-.scryb-theme-dark .scryb-image-upload-file-input:hover {
-    border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.scryb-theme-dark .scryb-image-upload-url-field input[type="url"] {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.scryb-theme-dark .scryb-image-upload-url-field input[type="url"]:focus {
-    border-color: var(--scryb-text-color, #e2e8f0);
-}
-
-/* ─── Accessibility Checker ─────────────────────────────────────────────────── */
-
-.scryb-theme-dark .scryb-accessibility-checker-header {
-    background: var(--scryb-color-dark-100, #1e1e22);
-}
-
-.scryb-theme-dark .scryb-accessibility-issue-suggestion {
-    background: var(--scryb-color-dark-50, #26262b);
-}
-
-.scryb-theme-dark .scryb-accessibility-issue-severity.severity-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-}
-
-.scryb-theme-dark .scryb-accessibility-issue-severity.severity-warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: #fbbf24;
-}
-
-.scryb-theme-dark .scryb-accessibility-issue-severity.severity-info {
-    background: var(--scryb-color-accent-100, rgba(59, 130, 246, 0.12));
-    color: var(--scryb-color-accent-500, #60a5fa);
-}
-
-/* =============================================================================
    Word Count Widget (QW-05)
    ============================================================================= */
 
@@ -2976,7 +2990,7 @@ scryb-icon {
     /* Bottom corners follow the card radius (same reason as the toolbar). */
     border-radius: 0 0 calc(var(--scryb-radius-lg, 12px) - 1px) calc(var(--scryb-radius-lg, 12px) - 1px);
     font-size: 12px;
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #718096)));
+    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #5a6472)));
     user-select: none;
 }
 
@@ -2987,13 +3001,6 @@ scryb-icon {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     color: inherit;
-}
-
-/* Dark theme — rebinds via --scryb-char-count-* / --scryb-text-muted tokens */
-.scryb-theme-dark .scryb-editor .scryb-editor-footer {
-    border-top-color: var(--tiptap-char-count-border, var(--scryb-char-count-border, #2d3748));
-    background: var(--tiptap-char-count-bg, var(--scryb-char-count-bg, #1a202c));
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #a0aec0)));
 }
 
 /* =============================================================================
@@ -3019,7 +3026,7 @@ scryb-icon {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 11px;
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #718096)));
+    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #5a6472)));
     user-select: none;
     white-space: nowrap;
     transition: color 150ms ease;
@@ -3038,37 +3045,19 @@ scryb-icon {
 /* Per-status color variants — use theme tokens with safe fallbacks */
 .scryb-editor .tiptap-save-status.is-idle,
 .scryb-editor .tiptap-save-status.is-dirty {
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #718096)));
+    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #5a6472)));
 }
 
 .scryb-editor .tiptap-save-status.is-saving {
-    color: var(--scryb-color-primary, #3b82f6);
+    color: var(--scryb-color-primary, #1d4ed8);
 }
 
 .scryb-editor .tiptap-save-status.is-saved {
-    color: var(--scryb-color-success, #10b981);
+    color: var(--scryb-color-success, #047857);
 }
 
 .scryb-editor .tiptap-save-status.is-error {
-    color: var(--scryb-color-danger, #ef4444);
-}
-
-/* Dark theme adjustments — brighter variants for contrast on dark surfaces */
-.scryb-theme-dark .scryb-editor .tiptap-save-status.is-idle,
-.scryb-theme-dark .scryb-editor .tiptap-save-status.is-dirty {
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, var(--scryb-text-muted, #a0aec0)));
-}
-
-.scryb-theme-dark .scryb-editor .tiptap-save-status.is-saving {
-    color: var(--scryb-color-primary, #60a5fa);
-}
-
-.scryb-theme-dark .scryb-editor .tiptap-save-status.is-saved {
-    color: var(--scryb-color-success, #34d399);
-}
-
-.scryb-theme-dark .scryb-editor .tiptap-save-status.is-error {
-    color: var(--scryb-color-danger, #f87171);
+    color: var(--scryb-color-danger, #c53030);
 }
 
 /* ═══════════════ ProseMirror content chrome (editor-only) ═══════════════ */
@@ -3276,51 +3265,76 @@ tiptap-table-grips {
     display: contents;
 }
 
-/* The transparent border draws the gap between neighbouring grips: their boxes
-   are the exact width of the rows and columns they stand for, so without it
-   they meet and read as one continuous bar with no divisions. */
+/* Each grip is two boxes. The button is the target and is transparent; the bar
+   a user sees is its `::before`, drawn exactly where the bar always was. Where
+   the gap around the table has room, the target is 24px across its thin side
+   (WCAG 2.5.8) and reaches into that gap, never over cell text.
+
+   The bar's transparent border draws the gap between neighbouring grips: their
+   boxes are the exact width of the rows and columns they stand for, so without
+   it they meet and read as one continuous bar with no divisions. */
 .scryb-table-grip {
     position: absolute;
     padding: 0;
     box-sizing: border-box;
-    border: 1px solid transparent;
-    background-clip: padding-box;
-    background-color: var(--scryb-table-grip-bg, rgba(15, 23, 42, 0.16));
-    border-radius: 3px;
+    border: none;
+    background: transparent;
     cursor: pointer;
     pointer-events: auto;
+}
+
+.scryb-table-grip::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    background-color: var(--scryb-table-grip-bg, rgba(15, 23, 42, 0.5));
+    border-radius: 3px;
     transition: background-color var(--scryb-transition-fast, 0.15s ease);
 }
 
-.scryb-table-grip:hover {
-    background-color: var(--scryb-table-grip-hover-bg, rgba(15, 23, 42, 0.38));
+.scryb-table-grip:hover::before {
+    background-color: var(--scryb-table-grip-hover-bg, rgba(15, 23, 42, 0.65));
 }
 
-/* The `:hover` variants are not redundant. A grip whose menu is open is also
-   under the pointer that opened it, and the dark theme's hover rule carries a
-   theme class as well — three selectors' worth of specificity against this
-   rule's two, so without matching it the open grip stayed grey in dark mode
-   while it turned blue in light. */
-.scryb-table-grip.is-open,
-.scryb-table-grip.is-open:hover,
-.scryb-table-grip:focus-visible,
-.scryb-table-grip:focus-visible:hover {
+/* The `:hover` variants are not redundant: a grip whose menu is open is also
+   under the pointer that opened it, and the open state must win over hover. */
+.scryb-table-grip.is-open::before,
+.scryb-table-grip.is-open:hover::before,
+.scryb-table-grip:focus-visible::before,
+.scryb-table-grip:focus-visible:hover::before {
     background-color: var(--scryb-color-primary-600, #3182ce);
 }
 
+/* The ring hugs the bar it names rather than the larger target around it. */
 .scryb-table-grip:focus-visible {
+    outline: none;
+}
+
+.scryb-table-grip:focus-visible::before {
     outline: 2px solid var(--scryb-color-primary-600, #3182ce);
     outline-offset: 1px;
 }
 
 /* Translated off the table's own top edge rather than positioned by a computed
-   offset: the inline style carries the column's exact box, and shifting by 100%
-   of that box plus the gap keeps the grip aligned with its column at any zoom.
+   offset: the inline style carries the column's exact box, and the shift keeps
+   the grip aligned with its column at any zoom.
 
-   Nothing else lives above a table, so a column grip can sit outside it. */
+   Nothing else lives above a table, so a column grip can sit outside it: the
+   whole 24px target is above the table's top edge, in the wrapper's margin, and
+   the bar sits 4–12px above that edge. Core's TABLE_GRIP_ANCHOR_OFFSET_PX is
+   this shift. */
 .scryb-table-grip--column {
+    height: 24px;
+    transform: translateY(-24px);
+}
+
+.scryb-table-grip--column::before {
+    top: 12px;
+    left: 0;
+    right: 0;
     height: 8px;
-    transform: translateY(calc(-100% - 4px));
 }
 
 /* Row grips fall back to just INSIDE the table's left edge when the gutter has
@@ -3328,26 +3342,73 @@ tiptap-table-grips {
    leaves four pixels short of the content column, which is not a lane, and a row
    grip out there lands underneath the drag handle where it cannot be clicked.
 
-   Two pixels in, so the grip clears the table's own border. Cells carry twelve
-   pixels of horizontal padding, so an eight-pixel bar never reaches the text. */
+   The bar sits two pixels in, so it clears the table's own border, and is its
+   own target: cells carry twelve pixels of horizontal padding, which an 8px bar
+   fits in and a 24px target does not, and a target over the first cell's text
+   would take the clicks meant for it. Undersized, it relies on WCAG 2.5.8's
+   spacing exception: a 24px circle on the bar reaches the drag handle's edge
+   and no other control. */
 .scryb-table-grip--row {
     width: 8px;
     transform: translateX(2px);
 }
 
+.scryb-table-grip--row::before {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 8px;
+}
+
 /* Given a lane — a free gutter, or one the side menu yielded because the
    consumer reserved the padding to pay for it — the grips take the place they
    read best in: outside the table, beside the line they stand for, rather than
-   as a bar drawn down through the first column. */
+   as a bar drawn down through the first column. There the target is 24px wide:
+   it fills the 20px lane (core's TABLE_ROW_GRIP_LANE_PX) and reaches 4px into
+   the table's border and padding, and the bar ends 4px short of the table. */
 .scryb-table-grips--rows-outside .scryb-table-grip--row {
-    transform: translateX(calc(-100% - 4px));
+    width: 24px;
+    transform: translateX(-20px);
 }
 
+.scryb-table-grips--rows-outside .scryb-table-grip--row::before {
+    left: 8px;
+}
+
+/* The whole target stays up and to the left of the table's corner, so it
+   meets the first row's and first column's targets edge to edge instead of
+   overlapping them. */
 .scryb-table-grip--corner {
+    width: 24px;
+    height: 24px;
+    transform: translate(-24px, -24px);
+}
+
+.scryb-table-grip--corner::before {
+    top: 12px;
+    left: 12px;
     width: 8px;
     height: 8px;
     border-radius: 2px;
-    transform: translate(calc(-100% - 4px), calc(-100% - 4px));
+}
+
+/* Forced colours paint every background as Canvas, which would erase the bar:
+   it is the grip's only paint now that the button itself is transparent. The
+   bar takes the text colour at rest and Highlight when open or focused. */
+@media (forced-colors: active) {
+    .scryb-table-grip::before,
+    .scryb-table-grip:hover::before {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+    }
+
+    .scryb-table-grip.is-open::before,
+    .scryb-table-grip.is-open:hover::before,
+    .scryb-table-grip:focus-visible::before,
+    .scryb-table-grip:focus-visible:hover::before {
+        background-color: Highlight;
+        outline-color: Highlight;
+    }
 }
 
 /* Selected-node outline (shown when the user clicks the embed wrapper) */
@@ -3380,10 +3441,13 @@ tiptap-table-grips {
 }
 
 /* Inactive means "no chrome at all": the card's border and shadow have to go
-   with its background, or the editor still reads as a box on the page. */
+   with its background, or the editor still reads as a box on the page. The
+   border keeps its width and only loses its colour: dropping it to `none`
+   shifted every line 1px up and left, then back on focus, so the content
+   jumped under the pointer the moment the editor activated. */
 .scryb-editor .tiptap-editor.editor-inactive,
 .scryb-editor.editor-inactive {
-    border: none;
+    border-color: transparent;
     background: transparent;
     box-shadow: none;
     transition: background-color 0.3s ease;
@@ -3447,7 +3511,7 @@ tiptap-table-grips {
 .scryb-editor .character-count {
     padding: 8px 16px;
     font-size: 12px;
-    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, #718096));
+    color: var(--tiptap-char-count-color, var(--scryb-char-count-color, #5a6472));
     text-align: right;
     border-top: 1px solid var(--tiptap-char-count-border, var(--scryb-char-count-border, #e2e8f0));
     background: var(--tiptap-char-count-bg, var(--scryb-char-count-bg, #f8f9fa));
@@ -3786,7 +3850,29 @@ body.scryb-resizing .scryb-content .tiptap-image {
     100% { transform: translateX(260%); }
 }
 
+/* Reduced motion: every editor-owned animation and transition finishes in one
+   frame, so end states (an opened menu, a faded-in tooltip) still apply. The
+   portal covers React's popovers; the tooltip and the accessibility checker
+   are listed by name because React renders them straight into <body>, outside
+   both the host and the portal. */
 @media (prefers-reduced-motion: reduce) {
+    .scryb-editor,
+    .scryb-editor *,
+    .scryb-editor *::before,
+    .scryb-editor *::after,
+    .scryb-editor-portal *,
+    .scryb-editor-portal *::before,
+    .scryb-editor-portal *::after,
+    .scryb-toolbar-tooltip,
+    .scryb-toolbar-tooltip *,
+    .scryb-dialog-overlay,
+    .scryb-accessibility-checker,
+    .scryb-accessibility-checker * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
     .scryb-image-placeholder.is-indeterminate .scryb-image-placeholder__fill {
         animation: none;
         width: 100%;

@@ -20,16 +20,43 @@ let pointerTrackingInstalled = false;
  * the last one on record, and its own pointerup would erase it.
  */
 let lastPointerDownTarget: WeakRef<Node> | null = null;
+/**
+ * Whether the latest user input was a Tab press with no modifiers — the one
+ * input that moves focus forward through the page. A pointerdown or any other
+ * key clears it: Shift+Tab goes backward, Ctrl/Alt/Meta+Tab belong to the
+ * browser or OS, and an Enter whose handler calls `focus()` is app code
+ * choosing where focus goes.
+ */
+let lastInputWasForwardTab = false;
 
 function handlePointerDown(event: PointerEvent): void {
   lastPointerDownTarget = event.target instanceof Node ? new WeakRef(event.target) : null;
+  lastInputWasForwardTab = false;
+}
+
+function handleKeyDown(event: KeyboardEvent): void {
+  lastInputWasForwardTab =
+    event.key === "Tab" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey;
 }
 
 /**
- * Starts tracking pointerdown targets for {@link isScrollInducedBlur}.
+ * True when the most recent user input was an unmodified Tab press, so a focus
+ * change happening now is the browser's forward Tab navigation — not a click,
+ * a backward Tab, or app code reacting to some other key. Requires
+ * {@link installPointerTracking}; reports `false` without it.
  *
- * Idempotent and safe to call from every editor instance: one capture-phase
- * listener is installed for the document, never removed, and no-ops outside a
+ * @returns `true` when the latest input was a plain Tab
+ */
+export function isForwardTabFocus(): boolean {
+  return lastInputWasForwardTab;
+}
+
+/**
+ * Starts tracking pointerdown targets for {@link isScrollInducedBlur}, and the
+ * latest input — pointer, plain Tab, or another key — for {@link isForwardTabFocus}.
+ *
+ * Idempotent and safe to call from every editor instance: capture-phase
+ * listeners are installed for the document, never removed, and no-ops outside a
  * DOM environment. Adapters call this where they wire focus/blur, which always
  * runs before the pointerdown that can end the focus.
  *
@@ -44,6 +71,7 @@ export function installPointerTracking(): void {
   if (pointerTrackingInstalled || typeof document === "undefined") return;
   pointerTrackingInstalled = true;
   document.addEventListener("pointerdown", handlePointerDown, true);
+  document.addEventListener("keydown", handleKeyDown, true);
 }
 
 /**

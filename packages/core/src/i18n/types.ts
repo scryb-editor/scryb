@@ -127,8 +127,8 @@ export interface TiptapTranslations {
     openInSameTab: string;
     /** Insert emoji bubble menu tooltip (Phase 69, opt-in). */
     emoji?: string;
-    /** React link editor: label for the URL text field (Angular has no separate field label). */
-    linkUrlLabel: string;
+    /** @deprecated No longer rendered; the link actions group is named by `editor.regions.linkActions`. */
+    linkUrlLabel?: string;
   };
 
   slashCommands: {
@@ -189,11 +189,24 @@ export interface TiptapTranslations {
     moveColumnRight: string;
     duplicateRow: string;
     duplicateColumn: string;
-    /** Accessible name of the grip that selects a whole row or column. */
-    selectRow: string;
-    selectColumn: string;
+    /** @deprecated No longer rendered; row grips are named by `rowActions`. */
+    selectRow?: string;
+    /** @deprecated No longer rendered; column grips are named by `columnActions`. */
+    selectColumn?: string;
     /** Only rendered when no side menu is present to offer the table's menu. */
     selectTable: string;
+    /** Column grip name. `{index}` is 1-based. */
+    columnActions?: string;
+    /** Row grip name. `{index}` is 1-based. */
+    rowActions?: string;
+    /**
+     * Words for the menu Shift+F10 opens in a table cell: its title and the
+     * entries into the row, column and table menus. Optional: English fallback.
+     */
+    cellMenu?: string;
+    rowMenu?: string;
+    columnMenu?: string;
+    tableMenu?: string;
   };
 
   imageUpload: {
@@ -232,6 +245,12 @@ export interface TiptapTranslations {
     imageUrlPlaceholder: string;
     /** React image-upload popover: fallback message when file validation fails without a specific reason. */
     invalidImage: string;
+    /** Image panel: label of the optional alt-text field (file and URL tabs, alt editor). */
+    altText?: string;
+    /** Image panel: hint under the alt-text field. */
+    altTextHint?: string;
+    /** Image panel: checkbox marking the image decorative (`alt=""`). */
+    decorative?: string;
   };
 
   imageBubbleMenu: {
@@ -241,6 +260,8 @@ export interface TiptapTranslations {
     resizeLarge: string;
     resizeOriginal: string;
     deleteImage: string;
+    /** Opens the alt-text editor for the selected image. */
+    editAltText?: string;
     /** React image bubble menu: align image left (opt-in, no Angular equivalent). */
     alignLeft: string;
     /** React image bubble menu: align image center (opt-in, no Angular equivalent). */
@@ -257,16 +278,23 @@ export interface TiptapTranslations {
     linkPrompt: string;
     linkUrlPrompt: string;
     confirmDelete: string;
+    /** Hidden description of the character limit, referenced by the editable's
+     * `aria-describedby`. `{limit}` = the configured maximum. */
+    characterLimit?: string;
+    /** Announced once (polite) when the count first reaches 90% of the limit. */
+    characterLimitNear?: string;
+    /** Announced once (polite) when the count reaches the limit. */
+    characterLimitReached?: string;
     /** Accessible names for the editor's landmark regions — announced by
      * screen readers, never rendered visually. Optional: added after the
      * section shipped, so an existing full catalog stays valid without them
      * (each falls back to its English wording). */
     regions?: {
-      /** The editor as a whole (`role="application"`). */
+      /** The editor as a whole (host `role="group"`). */
       editor?: string;
       /** The main toolbar (`role="toolbar"`). */
       toolbar?: string;
-      /** The editable content area (`role="textbox"`). */
+      /** The editable content area (`view.dom`, `role="textbox"`). */
       content?: string;
       /** The text-selection bubble menu. */
       textFormatting?: string;
@@ -280,6 +308,30 @@ export interface TiptapTranslations {
       rowActions?: string;
       /** The table-cell bubble menu. */
       cellActions?: string;
+      /** The link editor popover dialog. */
+      linkEditor?: string;
+      /** The text-alignment dropdown menu. */
+      alignmentOptions?: string;
+      /** Indent dropdown group name. */
+      indentLevel?: string;
+      /** The accessibility checker's issue list. */
+      accessibilityIssues?: string;
+      /** The standalone image-upload component's preview group. */
+      imagePreview?: string;
+    };
+    /**
+     * Keyboard help read as the editable's description (`aria-describedby`).
+     * Optional: each sentence falls back to English.
+     */
+    keyboardHints?: {
+      /** How to leave the editor with the keyboard (Esc, then Tab). */
+      leaveEditor?: string;
+      /** Alt+F10 moves to the bubble menu or toolbar. */
+      toolbar?: string;
+      /** Shift+F10 opens the current block's (or table cell's) menu. */
+      blockMenu?: string;
+      /** Mod+Shift+Arrow; `{keys}` is replaced with the platform's key names. */
+      moveBlock?: string;
     };
   };
 
@@ -361,6 +413,9 @@ export interface TiptapTranslations {
     alignMiddle: string;
     alignBottom: string;
     fitToWidth: string;
+    /** Non-drag reorder entries (Mod+Shift+ArrowUp/Down). */
+    moveUp?: string;
+    moveDown?: string;
     colorNames: {
       default: string;
       yellow: string;
@@ -423,6 +478,22 @@ export interface TiptapTranslations {
     foundIssues: string | PluralForms;
     /** Re-run the accessibility check without closing the dialog. */
     recheck: string;
+    /** Visible severity label on each issue. Optional like every key added
+     * after its section shipped: missing ones fall back to English. */
+    severity?: { error: string; warning: string; info: string };
+    /** Localised issue texts, keyed by `AccessibilityIssue.messageId`.
+     * Placeholders come from `AccessibilityIssue.data`. */
+    issues?: Partial<Record<
+      | "missingAltText"
+      | "emptyAltText"
+      | "missingHeadingHierarchy"
+      | "emptyLinkText"
+      | "genericLinkText"
+      | "missingTableHeaders"
+      | "imageTooWide"
+      | "imageTooTall",
+      { message: string; description: string; fix: string }
+    >>;
   };
 
   invisibleCharacters: {

@@ -409,9 +409,15 @@ export function isWithinGripReach(
 }
 
 /**
- * Width a row grip needs beside the table: the grip itself plus its gap.
+ * Width a row grip needs beside the table: its 24px pointer target, of which
+ * this much sits outside the table and the rest reaches into the table's own
+ * border and padding (never its text). The visible bar is 8px of it, ending
+ * 4px short of the table.
+ *
+ * Kept in step with `.scryb-table-grips--rows-outside .scryb-table-grip--row`
+ * in `packages/themes/src/components.css` by hand.
  */
-export const TABLE_ROW_GRIP_LANE_PX = 12;
+export const TABLE_ROW_GRIP_LANE_PX = 20;
 
 /**
  * Whether the row grips can sit outside the table, beside the rows they name.
@@ -498,21 +504,21 @@ export function clampLineRectToViewport(
 }
 
 /**
- * How far above its anchor an edge-anchored grip actually paints.
+ * How far above its anchor an edge-anchored grip's target reaches.
  *
- * The column and corner grips are 8px tall and carry
- * `transform: translateY(calc(-100% - 4px))` in the theme, so the bar sits
- * twelve pixels above the `top` it is positioned at. Anything that asks
- * "is there room for this grip" has to ask about the bar, not the anchor:
- * checking the anchor alone leaves a twelve pixel band where the edge is
- * inside the scroll box and the grip drawn from it is not.
+ * The column and corner grips are 24px targets with the visible bar drawn
+ * inside them, and the theme translates each target up by its full 24px, so
+ * the whole target sits above the table's top edge. Anything that asks "is
+ * there room for this grip" has to ask about the target, not the anchor:
+ * checking the anchor alone leaves a band where the edge is inside the scroll
+ * box and the clickable box drawn from it is not.
  *
  * Kept in step with `.scryb-table-grip--column` and `--corner` in
  * `packages/themes/src/components.css` by hand. The alternative is measuring
- * the rendered bar, which means measuring an element that only exists once the
- * decision to draw it has already been made.
+ * the rendered target, which means measuring an element that only exists once
+ * the decision to draw it has already been made.
  */
-export const TABLE_GRIP_ANCHOR_OFFSET_PX = 12;
+export const TABLE_GRIP_ANCHOR_OFFSET_PX = 24;
 
 /**
  * Whether a grip anchored to a single edge of the table may be drawn.
@@ -536,8 +542,8 @@ export const TABLE_GRIP_ANCHOR_OFFSET_PX = 12;
  * and still clickable. The corner grip is the one control with no rect to
  * clamp, so nothing else was catching it.
  *
- * And the grip paints `TABLE_GRIP_ANCHOR_OFFSET_PX` above its anchor, so the
- * anchor has to clear the top edge by that much rather than merely reach it.
+ * And the grip's target reaches `TABLE_GRIP_ANCHOR_OFFSET_PX` above its anchor,
+ * so the anchor has to clear the top edge by that much rather than merely reach it.
  * Without it a table whose first row sits flush with the top of the content
  * box — where scrolling naturally lands — drew its column grip over the
  * toolbar, which is the symptom this function exists to prevent.

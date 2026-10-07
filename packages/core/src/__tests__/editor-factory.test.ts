@@ -3,7 +3,7 @@ import { createScrybEditor, buildExtensions, buildViewerExtensions } from "../ed
 import { createEmojiCallbackStore } from "../emoji/callback-store";
 import { createMentionCallbackStore } from "../mention/callback-store";
 import type { MentionItem } from "../mention/callback-store";
-import { Editor, Node } from "@tiptap/core";
+import { Editor, Node, getExtensionField } from "@tiptap/core";
 
 describe("createScrybEditor", () => {
   let editor: Editor | undefined;
@@ -98,7 +98,11 @@ describe("createScrybEditor — caller-supplied extensions", () => {
 
   it("appends the caller's extensions after the defaults, not before", () => {
     editor = createScrybEditor({ extensions: [CustomBlock] });
-    const names = editor.extensionManager.extensions.map((ext) => ext.name);
+    // Tiptap sorts by priority before list position, and the keyboard release
+    // runs at priority 1 on purpose, so compare within the default priority.
+    const names = editor.extensionManager.extensions
+      .filter((ext) => (getExtensionField<number>(ext, "priority") || 100) === 100)
+      .map((ext) => ext.name);
     expect(names).toContain("customTestBlock");
     expect(names.indexOf("customTestBlock")).toBe(names.length - 1);
   });

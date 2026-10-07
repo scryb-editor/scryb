@@ -21,6 +21,10 @@ export default defineConfig({
   dts: true,
   clean: true,
   minify: true,
+  // One output file per source module so `sideEffects: false` lets
+  // consumers tree-shake per module; shared chunks dragged impure top-levels
+  // (item configs, colour palettes) into every import. Entry paths unchanged.
+  unbundle: true,
   deps: {
     neverBundle: [
       /^@tiptap\//,

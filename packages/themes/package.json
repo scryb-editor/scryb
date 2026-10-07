@@ -1,6 +1,6 @@
 {
   "name": "@scryb-editor/themes",
-  "version": "3.9.0",
+  "version": "3.10.0",
   "description": "CSS design tokens, light and dark themes, and content styles for the Scryb rich text editor, with a viewer-only stylesheet for read-only pages",
   "keywords": [
     "css",
@@ -53,5 +53,8 @@
     "type": "git",
     "url": "https://github.com/scryb-editor/scryb.git",
     "directory": "packages/themes"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

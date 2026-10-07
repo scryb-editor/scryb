@@ -1,5 +1,8 @@
 /**
- * DOM scroll utilities for detecting scrollable ancestor containers.
+ * DOM scroll utilities: finding the nearest scrollable ancestor, and choosing a
+ * programmatic scroll's `behavior` from the user's reduced-motion preference.
+ *
+ * `getScrollableAncestor`:
  *
  * No longer used by the bubble menus. `BubbleMenuView` keeps a single scroll
  * listener and attaches it to `scrollTarget ?? window`, so naming one element
@@ -57,4 +60,28 @@ export function getScrollableAncestor(el: HTMLElement | null): HTMLElement | Win
   }
 
   return window;
+}
+
+/**
+ * Whether the user asked the OS to minimise motion. False outside a browser.
+ *
+ * @returns `true` when `(prefers-reduced-motion: reduce)` matches.
+ */
+export function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/**
+ * The `behavior` for a programmatic `scrollIntoView`/`scrollTo`: an instant
+ * jump under reduced motion, a smooth scroll otherwise.
+ *
+ * @example
+ * row.scrollIntoView({ block: "nearest", behavior: scrollBehavior() });
+ */
+export function scrollBehavior(): ScrollBehavior {
+  return prefersReducedMotion() ? "auto" : "smooth";
 }

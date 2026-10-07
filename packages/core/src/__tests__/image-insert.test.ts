@@ -23,7 +23,7 @@ vi.mock("../image/image-manager", async (importOriginal) => {
 });
 
 import { compressImage } from "../image/image-manager";
-import { dropImageFile, imageAcceptAttribute, insertImageFile, pickImageFile } from "../image/insert";
+import { dropImageFile, imageAcceptAttribute, insertImageFile, insertImageUrl, pickImageFile } from "../image/insert";
 import { DEFAULT_IMAGE_UPLOAD_CONFIG, SUPPORTED_IMAGE_MIME_TYPES } from "../image/types";
 
 function createEditor(): Editor {
@@ -65,6 +65,24 @@ describe("insertImageFile", () => {
   afterEach(() => {
     editor?.destroy();
     editor = undefined;
+  });
+
+  it("does not use the filename as alt or title", async () => {
+    editor = createEditor();
+    await insertImageFile(editor, createFile("IMG_1234.png"));
+    let attrs: Record<string, unknown> | undefined;
+    editor.state.doc.descendants((node) => { if (node.type.name === "resizableImage") attrs = node.attrs; });
+    expect(attrs?.["alt"]).toBeNull();
+    expect(attrs?.["title"]).toBeNull();
+  });
+
+  it("stores the alt the user supplied, and renders no alt attribute when there is none", async () => {
+    editor = createEditor();
+    await insertImageFile(editor, createFile(), {}, "Sunset over a lake");
+    expect(editor.getHTML()).toContain('alt="Sunset over a lake"');
+    editor.commands.setContent("<p>x</p>");
+    await insertImageFile(editor, createFile());
+    expect(editor.view.dom.querySelector("img")?.hasAttribute("alt")).toBe(false);
   });
 
   // ═══════════════ Validation ═══════════════
@@ -213,6 +231,15 @@ describe("insertImageFile", () => {
     // not to be.
     expect(compressImage).not.toHaveBeenCalled();
     expect(outcome.ok).toBe(true);
+  });
+});
+
+describe("insertImageUrl alt", () => {
+  it("passes decorative alt through", () => {
+    const editor = createEditor();
+    insertImageUrl(editor, "https://example.com/a.png", "");
+    expect(editor.view.dom.querySelector("img")?.getAttribute("alt")).toBe("");
+    editor.destroy();
   });
 });
 

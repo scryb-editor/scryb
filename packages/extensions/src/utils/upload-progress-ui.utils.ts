@@ -17,7 +17,7 @@ export function createUploadProgressHtml(message: string, progress: number): str
     <div class="upload-skeleton">
       <div class="upload-content">
         <div class="upload-icon">
-          <span class="material-symbols-outlined spinning">image</span>
+          <span class="material-symbols-outlined spinning" aria-hidden="true" translate="no">image</span>
         </div>
         <div class="upload-info">
           <div class="upload-message">${escapeHtml(message)}</div>

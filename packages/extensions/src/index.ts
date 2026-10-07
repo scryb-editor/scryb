@@ -39,6 +39,24 @@ export {
 export type { CellAlign, CellVerticalAlign, TableWidthMode } from "./table-layout.extension";
 
 // ============================================================================
+// Keyboard
+// ============================================================================
+
+export {
+  KeyboardReleaseExtension,
+  KEYBOARD_RELEASE_KEY,
+  isKeyboardReleaseArmed,
+} from "./keyboard-release.extension";
+export type { KeyboardReleaseState } from "./keyboard-release.extension";
+export {
+  KeyboardShortcutsExtension,
+  setKeyboardShortcutHandlers,
+  FOCUS_CHROME_SHORTCUT,
+  OPEN_BLOCK_MENU_SHORTCUT,
+} from "./keyboard-shortcuts.extension";
+export type { KeyboardShortcutHandlers, KeyboardShortcutsStorage } from "./keyboard-shortcuts.extension";
+
+// ============================================================================
 // Media Extensions
 // ============================================================================
 
@@ -62,6 +80,7 @@ export { PasteCleanupExtension } from "./paste-cleanup.extension";
 export { DragHandleExtension } from "./drag-handle.extension";
 export type { DragHandleExtensionOptions } from "./drag-handle.extension";
 export { BlockMenuTargetExtension } from "./block-menu-target.extension";
+export { BlockMoveExtension, moveBlockCommand } from "./block-move.extension";
 
 // ============================================================================
 // UI Extensions
@@ -110,6 +129,7 @@ export type {
   AccessibilityIssueLocation,
   AccessibilityIssueSeverity,
   AccessibilityIssueType,
+  AccessibilityMessageId,
   ChainCommandPayload,
   CommandPayload,
   ExtensionEditorContext,

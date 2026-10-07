@@ -26,6 +26,12 @@ import {
   findTextblockPosInBlock,
   getBlockMenuCapabilities,
 } from "./capabilities";
+import {
+  getBlockMoveTarget,
+  moveBlockAtPos,
+  MOVE_BLOCK_UP_SHORTCUT,
+  MOVE_BLOCK_DOWN_SHORTCUT,
+} from "./move";
 
 // Module augmentation: block background commands (provided by BlockBackgroundExtension in extensions)
 declare module "@tiptap/core" {
@@ -52,6 +58,8 @@ export const BLOCK_MENU_ITEM_IDS = {
   turnInto: "turnInto",
   alignment: "alignment",
   fitToWidth: "fitToWidth",
+  moveUp: "moveUp",
+  moveDown: "moveDown",
 } as const;
 
 /**
@@ -185,6 +193,8 @@ export function createBlockMenuItemsForBlock(
     activeAlign: readTableCellAlign(editor, pos),
     activeVerticalAlign: readTableCellVerticalAlign(editor, pos),
     fitToWidth: isTableFitToWidthAtPos(editor, pos),
+    canMoveUp: pos !== null && getBlockMoveTarget(editor, pos, "up") !== null,
+    canMoveDown: pos !== null && getBlockMoveTarget(editor, pos, "down") !== null,
   });
 
   // The title goes on here rather than inside the builder because it is the
@@ -219,6 +229,8 @@ export function createBlockMenuItemsWithActiveColor(
     activeAlign: null,
     activeVerticalAlign: null,
     fitToWidth: true,
+    canMoveUp: false,
+    canMoveDown: false,
   });
 }
 
@@ -232,6 +244,9 @@ interface BlockMenuBuildState {
   /** `"mixed"` when the table's cells disagree, so nothing is marked. */
   readonly activeVerticalAlign: CellVerticalAlign | "mixed" | null;
   readonly fitToWidth: boolean;
+  /** Whether the block has a sibling above / below to swap with. */
+  readonly canMoveUp: boolean;
+  readonly canMoveDown: boolean;
 }
 
 function buildBlockMenuItems(
@@ -291,6 +306,15 @@ function buildBlockMenuItems(
   // separator.
   if (items.length > 0) {
     items.push({ id: "separator:clipboard", label: "", separator: true });
+  }
+
+  // Reordering sits with the clipboard group: it moves the block, it does not
+  // transform it. Dragging was the only way to reorder (WCAG 2.5.7).
+  if (labels.moveUp && state.canMoveUp) {
+    items.push({ id: BLOCK_MENU_ITEM_IDS.moveUp, label: labels.moveUp, icon: "arrow_upward", shortcut: MOVE_BLOCK_UP_SHORTCUT });
+  }
+  if (labels.moveDown && state.canMoveDown) {
+    items.push({ id: BLOCK_MENU_ITEM_IDS.moveDown, label: labels.moveDown, icon: "arrow_downward", shortcut: MOVE_BLOCK_DOWN_SHORTCUT });
   }
 
   items.push(
@@ -915,6 +939,9 @@ export function handleBlockMenuAction(
   if (itemId === BLOCK_MENU_ITEM_IDS.copy) {
     return copyBlockAtPos(editor, pos);
   }
+
+  if (itemId === BLOCK_MENU_ITEM_IDS.moveUp) return moveBlockAtPos(editor, pos, "up");
+  if (itemId === BLOCK_MENU_ITEM_IDS.moveDown) return moveBlockAtPos(editor, pos, "down");
 
   // `BLOCK_MENU_COLOR_VALUES` maps the "default" color item to `null` so
   // `!== undefined` distinguishes "color item, reset to default" from "not a

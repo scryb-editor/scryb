@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { TABLE_GRIP_ANCHOR_OFFSET_PX, TABLE_ROW_GRIP_LANE_PX } from "../table-menu/geometry";
+
 // =============================================================================
 // Theme Tokens Contract
 //
@@ -131,7 +133,7 @@ describe("theme tokens contract — --scryb-surface-elevated", () => {
     // direct declaration on the popup element beat inherited values. If this
     // reappears, dark-mode popups will render with a light background again.
     const popupLightBlock = themes.match(
-      /\.scryb-mention-popup:not\(\.scryb-theme-dark\),[^{]*\{([^}]*)\}/s,
+      /\.scryb-mention-popup:not\(\.scryb-theme-dark\):where\([^{]*\{([^}]*)\}/s,
     );
     expect(popupLightBlock, "popup-scope light selector not found").toBeTruthy();
     // Strip CSS comments before scanning — the block contains a doc comment
@@ -180,5 +182,38 @@ describe("theme tokens contract — floating UI components use surface-elevated"
     expect(block, ".scryb-editor block not found").toBeTruthy();
     expect(block![1]).toMatch(/background:\s*var\(--scryb-editor-bg/);
     expect(block![1]).not.toMatch(/background:\s*var\(--scryb-surface-elevated/);
+  });
+});
+
+describe("theme tokens contract — table grip targets match core's geometry", () => {
+  // WCAG 2.5.8: where the gap around the table has room, the button is a 24px
+  // target and the bar users see is its ::before. Core decides from two
+  // constants whether that room exists, so the CSS must spend exactly them:
+  // edge grips rise TABLE_GRIP_ANCHOR_OFFSET_PX above the table, and a row
+  // grip outside the table takes TABLE_ROW_GRIP_LANE_PX of the gutter.
+  const block = (selector: string): string => {
+    const match = components.match(new RegExp(`(?:^|\\})\\s*${selector.replace(/\./g, "\\.")}\\s*\\{([^}]*)\\}`, "m"));
+    expect(match, `block for ${selector} not found`).toBeTruthy();
+    return match![1]!;
+  };
+  const ROWS_OUTSIDE = ".scryb-table-grips--rows-outside .scryb-table-grip--row";
+
+  it("gives every grip that has room a 24px thin side", () => {
+    expect(block(".scryb-table-grip--column")).toMatch(/height:\s*24px/);
+    expect(block(ROWS_OUTSIDE)).toMatch(/width:\s*24px/);
+    expect(block(".scryb-table-grip--corner")).toMatch(/width:\s*24px/);
+    expect(block(".scryb-table-grip--corner")).toMatch(/height:\s*24px/);
+  });
+
+  it("raises the edge grips exactly core's anchor offset above the table", () => {
+    const corner = block(".scryb-table-grip--corner").match(/translate\(-?\d+px,\s*-(\d+)px\)/);
+    const column = block(".scryb-table-grip--column").match(/translateY\(-(\d+)px\)/);
+    expect(Number(corner![1])).toBe(TABLE_GRIP_ANCHOR_OFFSET_PX);
+    expect(Number(column![1])).toBe(TABLE_GRIP_ANCHOR_OFFSET_PX);
+  });
+
+  it("puts exactly core's lane of the outside row grip beside the table", () => {
+    const shift = block(ROWS_OUTSIDE).match(/translateX\(-(\d+)px\)/);
+    expect(Number(shift![1])).toBe(TABLE_ROW_GRIP_LANE_PX);
   });
 });

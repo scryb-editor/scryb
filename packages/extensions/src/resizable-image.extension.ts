@@ -43,7 +43,8 @@ export type ImageDimension = number | string;
  */
 export interface ResizableImageAttributes {
   src: string;
-  alt?: string;
+  /** `""` marks the image decorative; null/absent means no alt was given */
+  alt?: string | null;
   title?: string;
   width?: ImageDimension | null;
   height?: ImageDimension | null;
@@ -268,10 +269,24 @@ function createNodeView(
 function createImageElement(node: ProseMirrorNode): HTMLImageElement {
   const img = document.createElement("img");
   img.src = node.attrs["src"] as string;
-  img.alt = (node.attrs["alt"] as string) || "";
-  img.title = (node.attrs["title"] as string) || "";
+  applyTextAttributes(node, img);
   img.className = "tiptap-image";
   return img;
+}
+
+/**
+ * Mirrors `alt`/`title` onto the image. A null `alt` removes the attribute
+ * rather than writing `alt=""`, which would wrongly mark the image decorative.
+ * @param node - ProseMirror node
+ * @param img - Image element to update
+ */
+function applyTextAttributes(node: ProseMirrorNode, img: HTMLImageElement): void {
+  const alt = node.attrs["alt"] as string | null | undefined;
+  if (alt === null || alt === undefined) img.removeAttribute("alt");
+  else img.alt = alt;
+  const title = node.attrs["title"] as string | null | undefined;
+  if (title) img.title = title;
+  else img.removeAttribute("title");
 }
 
 /**
@@ -300,8 +315,7 @@ function updateImageNode(
   if (node.type.name !== "resizableImage") return false;
 
   img.src = node.attrs["src"] as string;
-  img.alt = (node.attrs["alt"] as string) || "";
-  img.title = (node.attrs["title"] as string) || "";
+  applyTextAttributes(node, img);
 
   applyNodeDimensions(container, img, node);
 

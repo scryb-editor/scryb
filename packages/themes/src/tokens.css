@@ -63,7 +63,9 @@
     --scryb-color-gray-200: #e2e8f0;
     --scryb-color-gray-300: #d1d5db;
     --scryb-color-gray-400: #a0aec0;
+    --scryb-color-gray-450: #7c8594;
     --scryb-color-gray-500: #718096;
+    --scryb-color-gray-550: #6b7280;
     --scryb-color-gray-600: #4a5568;
     --scryb-color-gray-700: #374151;
     --scryb-color-gray-800: #2d3748;
@@ -79,6 +81,7 @@
     --scryb-color-primary-500: #3b82f6;
     --scryb-color-primary-600: #3182ce;
     --scryb-color-primary-700: #1d4ed8;
+    --scryb-color-primary-800: #1e3a8a;
 
     /* ─────────────────────────────────────────────────────────────────────────
      Accent Palette (dark-theme interactive accents)
@@ -107,8 +110,12 @@
        -light value is for dark surfaces, where #f87171 passes comfortably. */
     --scryb-color-error: #c53030;
     --scryb-color-error-light: #f87171;
+    --scryb-color-success-dark: #047857;
+    --scryb-color-success-light: #34d399;
     --scryb-color-warning: #fef08a;
     --scryb-color-warning-dark: #854d0e;
+    --scryb-color-amber-700: #b45309;
+    --scryb-color-amber-400: #fbbf24;
 
     /* Inline code is not an error, so it gets its own pair rather than
        borrowing the error tokens: retinting error text would otherwise
@@ -133,6 +140,7 @@
     --scryb-color-dark-300: #121215;
     --scryb-color-dark-border: #303036;
     --scryb-color-dark-border-hover: #3f3f46;
+    --scryb-color-dark-border-strong: #74747c;
 
     /* ─────────────────────────────────────────────────────────────────────────
      Shadows
@@ -203,7 +211,21 @@
     --scryb-bubble-gap: var(--scryb-spacing-xs);
     --scryb-bubble-button-size: 36px;
     --scryb-bubble-button-radius: var(--scryb-radius-md);
+}
 
+/* Component tokens: details, TOC, emoji and mention.
+   Declared on the hosts and theme classes, and on a TOC or popup element
+   only when no theme class sits above it. Consumers mount those elements
+   wherever they like — usually inside the editor or a themed page region —
+   and a declaration on the element itself would shadow the dark values its
+   themed ancestor resolved. `:where()` keeps the popup selector at (0,1,0),
+   so the theme blocks in themes.css still win on source order. */
+.scryb-editor,
+.scryb-editor-portal,
+.scryb-theme-light,
+.scryb-theme-dark,
+.scryb-theme-auto,
+:is(.scryb-toc, .scryb-emoji-popup, .scryb-mention-popup):where(:not(:is(.scryb-theme-light, .scryb-theme-dark, .scryb-theme-auto) *)) {
     /* Details / Toggle Block (Phase 68) */
     --scryb-details-summary-hover-bg: rgba(0, 0, 0, 0.04);
     --scryb-details-border: var(--scryb-color-gray-200);
@@ -220,17 +242,17 @@
 
     /* Table of Contents (Phase 68)
        Editorial-minimalism design: borderless container, rail-based.
-       Default item text is muted (gray-500); brightens to active-color on
+       Default item text is `--scryb-text-muted`; brightens to active-color on
        hover/active. The rail is hairline gray-200, replaced by active-color
        on the heading currently in viewport. No background fills anywhere.
        Hover/active "bg" tokens preserved as `transparent` for back-compat. */
     --scryb-toc-bg: transparent;
     --scryb-toc-border: var(--scryb-color-gray-200);
-    --scryb-toc-item-color: var(--scryb-color-gray-500);
+    --scryb-toc-item-color: var(--scryb-text-muted);
     --scryb-toc-item-hover-bg: transparent;
     --scryb-toc-item-active-bg: transparent;
-    --scryb-toc-item-active-color: var(--scryb-color-primary-600);
-    --scryb-toc-title-color: var(--scryb-color-gray-500);
+    --scryb-toc-item-active-color: var(--scryb-color-primary-700);
+    --scryb-toc-title-color: var(--scryb-text-muted);
 
     /* Emoji Popup (Phase 68) */
     --scryb-emoji-popup-bg: var(--scryb-surface-elevated, #ffffff);
@@ -238,7 +260,7 @@
     --scryb-emoji-popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
     --scryb-emoji-item-hover-bg: rgba(0, 0, 0, 0.04);
     --scryb-emoji-item-selected-bg: rgba(0, 0, 0, 0.06);
-    --scryb-emoji-group-header-color: var(--scryb-color-gray-400);
+    --scryb-emoji-group-header-color: var(--scryb-text-muted);
     --scryb-emoji-empty-color: var(--scryb-text-muted);
 
     /* Mention Popup & Pill */
@@ -249,9 +271,9 @@
     --scryb-mention-item-selected-bg: rgba(0, 0, 0, 0.06);
     --scryb-mention-empty-color: var(--scryb-text-muted);
     --scryb-mention-avatar-bg: var(--scryb-color-primary-100);
-    --scryb-mention-avatar-color: var(--scryb-color-primary-600);
+    --scryb-mention-avatar-color: var(--scryb-color-primary-700);
     --scryb-mention-pill-bg: var(--scryb-color-primary-100);
-    --scryb-mention-pill-color: var(--scryb-color-primary-600);
+    --scryb-mention-pill-color: var(--scryb-color-primary-700);
 }
 
 /* =============================================================================
@@ -280,7 +302,7 @@
 .scryb-editor {
     --scryb-sidemenu-bg: transparent;
     --scryb-sidemenu-hover-bg: var(--scryb-color-gray-100);
-    --scryb-sidemenu-icon-color: var(--scryb-color-gray-400);
+    --scryb-sidemenu-icon-color: var(--scryb-text-muted, #5a6472);
     --scryb-sidemenu-border: transparent;
     --scryb-sidemenu-shadow: none;
 }

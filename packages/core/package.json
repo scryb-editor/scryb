@@ -1,6 +1,6 @@
 {
   "name": "@scryb-editor/core",
-  "version": "3.9.0",
+  "version": "3.10.0",
   "description": "Headless core for the Scryb rich text editor: a configured Tiptap factory, formatting commands, i18n and an accessibility checker",
   "keywords": [
     "rich-text-editor",
@@ -142,6 +142,7 @@
     "test": "vitest run",
     "size": "size-limit"
   },
+  "//size-limit": "'the whole barrel' raised 44 -> 52 kB (measured 50.5 + ~3%) for the WCAG 2.2 AA remediation: a11y strings in all five built-in locales plus the accessibility modules. The other budgets are unchanged.",
   "size-limit": [
     {
       "name": "typical import — createScrybEditor",
@@ -180,7 +181,7 @@
       "name": "the whole barrel",
       "path": "dist/index.mjs",
       "import": "*",
-      "limit": "44 kB",
+      "limit": "52 kB",
       "gzip": true,
       "ignore": [
         "@intevation/tiptap-extension-office-paste",
@@ -239,6 +240,8 @@
   "devDependencies": {
     "@size-limit/esbuild": "^13.0.1",
     "@size-limit/file": "^13.0.1",
+    "@tiptap/extension-image": "^3.30.2",
+    "@tiptap/extension-table": "^3.30.2",
     "happy-dom": "^20.11.1",
     "rollup-plugin-visualizer": "^7.0.1",
     "size-limit": "^13.0.1",

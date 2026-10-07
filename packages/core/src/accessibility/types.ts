@@ -1,3 +1,5 @@
+import type { TiptapTranslations } from "../i18n/types";
+
 // =============================================================================
 // Accessibility Types
 // =============================================================================
@@ -24,6 +26,12 @@ export type AccessibilityIssueType =
   | "missingFormLabels";
 
 /**
+ * Key into `accessibilityChecker.issues` for an issue's localised texts.
+ * `imageTooLarge` issues use `imageTooWide` / `imageTooTall`.
+ */
+export type AccessibilityMessageId = keyof NonNullable<TiptapTranslations["accessibilityChecker"]["issues"]>;
+
+/**
  * Location information for an accessibility issue
  */
 export interface AccessibilityIssueLocation {
@@ -45,6 +53,9 @@ export interface AccessibilityIssue {
   readonly id: string;
   /** Type of issue */
   readonly type: AccessibilityIssueType;
+  /** Catalog key for the localised message, description and fix. Optional so
+   * issues built by consumer code stay valid; the checker always sets it. */
+  readonly messageId?: AccessibilityMessageId;
   /** Severity level */
   readonly severity: AccessibilityIssueSeverity;
   /** Human-readable message describing the issue */

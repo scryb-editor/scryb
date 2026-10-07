@@ -302,6 +302,35 @@ export function createBubbleMenuOutsideDismiss(
 
   // ── Keyboard ─────────────────────────────────────────────────────────────
   let pendingEscape: ReturnType<typeof setTimeout> | undefined;
+  let stopMarkingEscape: (() => void) | undefined;
+
+  /**
+   * Marks `event` as used once overlays registered on the document have seen
+   * it, but before it reaches the editor.
+   *
+   * Something always closes on this press — the overlay, or the menu once the
+   * deferred check finds the overlay ignored the key — so the editor's
+   * Esc-then-Tab release must not arm on it. Marking it here, in the window's
+   * capture phase, would be too early: overlay primitives such as Radix's
+   * DismissableLayer listen on the document and skip an Escape that is already
+   * `defaultPrevented`, so the overlay would stay open. A document capture
+   * listener added now runs after theirs, since an event reaching a node runs
+   * the listeners that node holds at that moment, in registration order.
+   */
+  const markEscapeAfterOverlays = (event: KeyboardEvent): void => {
+    stopMarkingEscape?.();
+    const doc = editor.view.dom.ownerDocument;
+    const mark = (seen: Event): void => {
+      if (seen !== event) return;
+      stopMarkingEscape?.();
+      if (!seen.defaultPrevented) seen.preventDefault();
+    };
+    doc.addEventListener("keydown", mark, true);
+    stopMarkingEscape = () => {
+      doc.removeEventListener("keydown", mark, true);
+      stopMarkingEscape = undefined;
+    };
+  };
 
   const handleKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== ESCAPE_KEY) return;
@@ -314,15 +343,25 @@ export function createBubbleMenuOutsideDismiss(
     // swallow the menu's own dismissal — so the verdict waits a tick and reads
     // whether anything actually closed.
     if (hasOpenOverlay(menu)) {
+      markEscapeAfterOverlays(event);
       clearTimeout(pendingEscape);
       pendingEscape = setTimeout(() => {
+        // Normally already gone; covers a propagation stopped before the document.
+        stopMarkingEscape?.();
         const stillOpen = activeMenu();
         if (stillOpen && hasOpenOverlay(stillOpen)) dismiss();
       }, 0);
       return;
     }
 
+    // A keyboard user who reached the menu with Alt+F10 must land back in the
+    // text, not on <body> when the menu disappears under them.
+    const focusWasInMenu = menu.contains(document.activeElement);
+    // The key is spent closing this menu. Marking it stops the editor's
+    // Esc-then-Tab release from also arming on the same press.
+    event.preventDefault();
     dismiss();
+    if (focusWasInMenu) editor.commands.focus();
   };
 
   // ── Focus ────────────────────────────────────────────────────────────────
@@ -343,6 +382,7 @@ export function createBubbleMenuOutsideDismiss(
 
   return () => {
     clearTimeout(pendingEscape);
+    stopMarkingEscape?.();
     window.removeEventListener("mousedown", handleMouseDown, true);
     window.removeEventListener("keydown", handleKeyDown, true);
     window.removeEventListener("focusin", handleFocusIn, true);

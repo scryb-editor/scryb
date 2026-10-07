@@ -150,6 +150,8 @@ export const DEFAULT_BUBBLE_MENU_ITEMS: readonly BubbleMenuItemKey[] = [
 export interface ImageBubbleMenuConfig {
   /** Show change image button */
   changeImage?: boolean;
+  /** Show edit alt text button */
+  editAltText?: boolean;
   /** Show resize to small (25%) */
   resizeSmall?: boolean;
   /** Show resize to medium (50%) */
@@ -170,6 +172,7 @@ export interface ImageBubbleMenuConfig {
  */
 export const DEFAULT_IMAGE_BUBBLE_MENU_CONFIG: ImageBubbleMenuConfig = {
   changeImage: true,
+  editAltText: true,
   resizeSmall: true,
   resizeMedium: true,
   resizeLarge: true,

@@ -105,7 +105,13 @@ export type {
   AccessibilityIssueLocation,
   AccessibilityIssueSeverity,
   AccessibilityIssueType,
+  AccessibilityMessageId,
 } from "./accessibility/types";
+export {
+  accessibilitySeverityLabel,
+  formatAccessibilitySummary,
+  localizeAccessibilityIssue,
+} from "./accessibility/localize";
 export { DEFAULT_ACCESSIBILITY_CHECKER_CONFIG } from "./accessibility/types";
 
 // ─── Image ───────────────────────────────────────────────────────────────────
@@ -144,6 +150,8 @@ export {
 } from "./image/insert";
 export { createImagePasteExtension, IMAGE_PASTE_PLUGIN_KEY } from "./image/paste";
 export type { ImageInsertOutcome } from "./image/insert";
+export { getImageAlt, resolveImageAlt, setImageAlt } from "./image/alt-text";
+export type { ImageAltInput } from "./image/alt-text";
 
 // ─── Editor types ────────────────────────────────────────────────────────────
 export type { EditorCommand, EditorCommandCheck, ScrybTheme } from "./types/editor.types";
@@ -215,6 +223,21 @@ export {
   BLOCK_MENU_EXCLUDED_TYPES,
   canOpenBlockMenuAt,
   executeBlockMove,
+  getCaretBlock,
+  getDomCaretBlock,
+  createCaretMenuItems,
+  getCaretMenuAnchorPos,
+  getCaretMenuBlockPos,
+  getCaretMenuStep,
+  getCaretMenuTarget,
+  remapCaretMenuTarget,
+  runCaretMenuAction,
+  MOVE_BLOCK_UP_SHORTCUT,
+  MOVE_BLOCK_DOWN_SHORTCUT,
+  getBlockMoveTarget,
+  moveBlockAtPos,
+  moveCaretBlock,
+  BlockMoveShortcutsExtension,
 } from "./block-menu";
 export type {
   BlockMenuItem,
@@ -222,6 +245,8 @@ export type {
   BlockMenuLabels,
   BlockMenuCapabilities,
   BlockDetectionResult,
+  BlockMoveDirection,
+  CaretMenuTarget,
 } from "./block-menu";
 
 // ─── Table Grip Menus ─────────────────────────────────────────────────────────
@@ -255,6 +280,12 @@ export {
   TABLE_LINE_MENU_IDS,
   createTableLineMenuItems,
   handleTableLineMenuAction,
+  TABLE_CELL_MENU_IDS,
+  createTableCellMenuItems,
+  getCaretTableCell,
+  handleTableCellMenuAction,
+  mapTablePosThrough,
+  tableGripLabel,
 } from "./table-menu";
 export type {
   SharedCellAttr,
@@ -265,11 +296,46 @@ export type {
   TableLineRef,
   TableCellScope,
   TableLineMenuLabels,
+  TableCellMenuLabels,
+  CaretTableCell,
 } from "./table-menu";
 
 // ─── Editor Factory ───────────────────────────────────────────────────────────
 export { createScrybEditor, buildExtensions, buildViewerExtensions, withContentRootClass, CONTENT_ROOT_CLASS } from "./editor-factory";
 export type { CreateScrybEditorOptions } from "./editor-factory";
+export {
+  characterLimitId,
+  createEditorInstanceId,
+  getKeyboardHintText,
+  keyboardHintId,
+} from "./accessibility/keyboard-hint";
+export {
+  announce,
+  CHARACTER_LIMIT_NEAR_RATIO,
+  characterLimitMessage,
+  characterLimitStatus,
+  watchCharacterLimit,
+} from "./accessibility/announcer";
+export type { CharacterLimitStatus } from "./accessibility/announcer";
+export { EditableSemanticsExtension, editableSemanticsKey } from "./accessibility/editable-semantics";
+export type { TypeaheadComboboxState } from "./accessibility/editable-semantics";
+export {
+  createTypeaheadListboxId,
+  setTypeaheadCombobox,
+  typeaheadComboboxState,
+  typeaheadOptionId,
+} from "./accessibility/typeahead-combobox";
+export { nextTabIndex } from "./accessibility/tabs";
+export {
+  findVisibleBubbleMenu,
+  focusEditorChrome,
+  focusToolbar,
+  installChromeEscape,
+  isActiveElementWithin,
+  isForwardFocusEntry,
+} from "./accessibility/chrome-focus";
+export { getEditableAttributes } from "./accessibility/editable-attributes";
+export type { EditableAttributeOptions } from "./accessibility/editable-attributes";
 
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
 export type { ToolbarItemKey } from "./toolbar/config";
@@ -284,10 +350,11 @@ export {
   MATERIAL_ICONS,
 } from "./toolbar/config";
 export type { ToolbarItemConfig } from "./toolbar/item-config";
-export { TOOLBAR_ITEM_CONFIG } from "./toolbar/item-config";
+export { resolveItemPressed, TOOLBAR_ITEM_CONFIG } from "./toolbar/item-config";
 export { ariaKeyShortcut, formatShortcut, toolbarItemTooltip } from "./toolbar/shortcuts";
+export { currentIndentLevel, INDENT_STEP_PX } from "./toolbar/indent-level";
 export { bubbleMenuItemLabel, toolbarItemLabel } from "./i18n/item-labels";
-export { buildBlockMenuLabels, buildTableLineMenuLabels } from "./i18n/menu-labels";
+export { buildBlockMenuLabels, buildTableCellMenuLabels, buildTableLineMenuLabels } from "./i18n/menu-labels";
 export type {
   ToolbarOverflowRole,
   ToolbarOverflowSections,
@@ -345,6 +412,7 @@ export { isDarkThemeActive, resolveThemeClasses } from "./utils/theme";
 export {
   isScrollInducedBlur,
   installPointerTracking,
+  isForwardTabFocus,
   isFocusWithinEditor,
   watchForFocusLeavingEditor,
 } from "./utils/dom-events";
@@ -353,7 +421,7 @@ export {
 export { getBlockCoordinates, getBlockFirstLineBox } from "./utils/block-coordinates";
 
 // ─── DOM Scroll Utilities ────────────────────────────────────────────────────
-export { getScrollableAncestor } from "./utils/dom-scroll";
+export { getScrollableAncestor, prefersReducedMotion, scrollBehavior } from "./utils/dom-scroll";
 
 // ─── Slash Command Grouping ──────────────────────────────────────────────────
 export { GROUP_ORDER, groupSlashCommands } from "./slash-commands/grouping";
