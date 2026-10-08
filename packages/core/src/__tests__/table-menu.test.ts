@@ -339,6 +339,16 @@ describe("where the row grips go", () => {
     expect(hasLaneForRowGrips(TABLE_ROW_GRIP_LANE_PX, false)).toBe(true);
     expect(hasLaneForRowGrips(TABLE_ROW_GRIP_LANE_PX - 1, false)).toBe(false);
   });
+
+  it("counts the indentation of a nested table as room beside it", () => {
+    // A table inside a list with no gutter reserved: the list's indent is empty
+    // ground beside the rows, and the side menu parks at the content edge, not
+    // in it.
+    expect(hasLaneForRowGrips(0, false, 40)).toBe(true);
+    expect(hasLaneForRowGrips(0, false, TABLE_ROW_GRIP_LANE_PX - 1)).toBe(false);
+    expect(hasLaneForRowGrips(64, true, 16)).toBe(true);
+    expect(hasLaneForRowGrips(64, true, 15)).toBe(false);
+  });
 });
 
 describe("grips anchored to the table's top edge", () => {

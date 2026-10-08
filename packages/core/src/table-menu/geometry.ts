@@ -57,6 +57,13 @@ export interface TableGripGeometry {
    * compares a number against itself.
    */
   readonly scrollClip: TableLineRect;
+  /**
+   * How far right of the editable's content edge the table's scroll box sits,
+   * in pixels: zero for a top-level table, the list or blockquote indentation
+   * for a nested one. That indentation is empty ground beside the rows, so a
+   * row grip can use it as well as the gutter the consumer reserved.
+   */
+  readonly indent: number;
   /** One box per row, top to bottom */
   readonly rows: readonly TableLineRect[];
   /** One box per column, left to right */
@@ -345,6 +352,7 @@ export function getTableGripGeometry(
   const scrollerRect = scroller.getBoundingClientRect();
   const scrollClipRect = findScrollViewportRect(scroller, container);
   const clipRect = intersectRects(scrollerRect, scrollClipRect);
+  const indent = Math.max(0, clipRect.left - getContentEdgeLeft(editor.view.dom));
 
   return {
     tablePos,
@@ -356,6 +364,7 @@ export function getTableGripGeometry(
       width: clipRect.width,
       height: clipRect.height,
     },
+    indent,
     scrollClip: {
       index: 0,
       top: scrollClipRect.top - origin.top,
@@ -422,28 +431,37 @@ export const TABLE_ROW_GRIP_LANE_PX = 20;
 /**
  * Whether the row grips can sit outside the table, beside the rows they name.
  *
- * Read from the gutter the consumer actually reserved. With a side menu the
- * grips get only what the menu yields — see getSideMenuGutterGap — and with no
- * side menu the whole gutter is theirs. When neither leaves room the grips fall
- * back inside the table's left edge, which is cramped but clickable; out in a
- * four-pixel gap they landed under the drag handle instead.
+ * Read from the room the layout actually leaves: the gutter the consumer
+ * reserved plus whatever the table is indented by. With a side menu the grips
+ * get only what the menu yields of the gutter — see getSideMenuGutterGap — and
+ * with no side menu the whole gutter is theirs. The indentation is theirs
+ * either way, since the side menu parks at the content edge whatever the
+ * block's own indent. When neither leaves room the grips fall back inside the
+ * table's left edge, which is cramped but clickable; out in a four-pixel gap
+ * they landed under the drag handle instead.
  *
  * @param editor - The Tiptap editor instance
  * @param sideMenuEnabled - Whether a side menu occupies the gutter
+ * @param geometry - The table's measured geometry, for its indentation
  * @returns True when there is room for the grips outside the table
  *
  * @example
  * ```typescript
- * const outside = hasRoomForOutsideRowGrips(editor, config.sideMenu?.enabled !== false);
+ * const outside = hasRoomForOutsideRowGrips(editor, config.sideMenu?.enabled !== false, geometry);
  * ```
  */
-export function hasRoomForOutsideRowGrips(editor: Editor, sideMenuEnabled: boolean): boolean {
+export function hasRoomForOutsideRowGrips(
+  editor: Editor,
+  sideMenuEnabled: boolean,
+  geometry: TableGripGeometry,
+): boolean {
   const dom = editor?.view?.dom;
   if (!isElement(dom)) return false;
 
   return hasLaneForRowGrips(
     Number.parseFloat(getComputedStyle(dom).paddingLeft) || 0,
     sideMenuEnabled,
+    geometry.indent,
   );
 }
 
@@ -452,11 +470,12 @@ export function hasRoomForOutsideRowGrips(editor: Editor, sideMenuEnabled: boole
  *
  * @param paddingLeft - The editable element's left padding, in pixels
  * @param sideMenuEnabled - Whether a side menu occupies the gutter
- * @returns True when the gutter has a lane the row grips fit in
+ * @param indent - How far the table sits right of the content edge, in pixels
+ * @returns True when the gutter and the indentation together hold a lane the row grips fit in
  */
-export function hasLaneForRowGrips(paddingLeft: number, sideMenuEnabled: boolean): boolean {
-  const lane = sideMenuEnabled ? getSideMenuGutterGap(paddingLeft) : paddingLeft;
-  return lane >= TABLE_ROW_GRIP_LANE_PX;
+export function hasLaneForRowGrips(paddingLeft: number, sideMenuEnabled: boolean, indent = 0): boolean {
+  const gutter = sideMenuEnabled ? getSideMenuGutterGap(paddingLeft) : paddingLeft;
+  return gutter + indent >= TABLE_ROW_GRIP_LANE_PX;
 }
 
 /**
@@ -636,6 +655,16 @@ function findScrollViewportRect(from: HTMLElement, boundary: HTMLElement): Box {
 function spanOf(node: ProseMirrorNode, name: "colspan" | "rowspan"): number {
   const value = node.attrs[name];
   return typeof value === "number" && value > 0 ? value : 1;
+}
+
+/** Viewport x of the editable's content edge: inside its border and left padding. */
+function getContentEdgeLeft(dom: Element): number {
+  const style = getComputedStyle(dom);
+  return (
+    dom.getBoundingClientRect().left +
+    (Number.parseFloat(style.borderLeftWidth) || 0) +
+    (Number.parseFloat(style.paddingLeft) || 0)
+  );
 }
 
 /**

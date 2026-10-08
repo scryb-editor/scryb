@@ -36,7 +36,7 @@
 
 .scryb-scrollable,
 .scryb-dropdown-content,
-.scryb-slash-commands,
+.scryb-slash-commands-list,
 .scryb-block-context-menu-submenu,
 .scryb-accessibility-checker-issues,
 .scryb-emoji-popup-scroll,
@@ -53,7 +53,7 @@
 @supports selector(::-webkit-scrollbar) {
     .scryb-scrollable,
     .scryb-dropdown-content,
-    .scryb-slash-commands,
+    .scryb-slash-commands-list,
     .scryb-block-context-menu-submenu,
     .scryb-accessibility-checker-issues,
     .scryb-emoji-popup-scroll,
@@ -70,7 +70,7 @@
 
     .scryb-scrollable::-webkit-scrollbar,
     .scryb-dropdown-content::-webkit-scrollbar,
-    .scryb-slash-commands::-webkit-scrollbar,
+    .scryb-slash-commands-list::-webkit-scrollbar,
     .scryb-block-context-menu-submenu::-webkit-scrollbar,
     .scryb-accessibility-checker-issues::-webkit-scrollbar,
     .scryb-emoji-popup-scroll::-webkit-scrollbar,
@@ -85,7 +85,7 @@
 
     .scryb-scrollable::-webkit-scrollbar-track,
     .scryb-dropdown-content::-webkit-scrollbar-track,
-    .scryb-slash-commands::-webkit-scrollbar-track,
+    .scryb-slash-commands-list::-webkit-scrollbar-track,
     .scryb-block-context-menu-submenu::-webkit-scrollbar-track,
     .scryb-accessibility-checker-issues::-webkit-scrollbar-track,
     .scryb-emoji-popup-scroll::-webkit-scrollbar-track,
@@ -105,7 +105,7 @@
        radius and paints over the 1px border. */
     .scryb-scrollable::-webkit-scrollbar-thumb,
     .scryb-dropdown-content::-webkit-scrollbar-thumb,
-    .scryb-slash-commands::-webkit-scrollbar-thumb,
+    .scryb-slash-commands-list::-webkit-scrollbar-thumb,
     .scryb-block-context-menu-submenu::-webkit-scrollbar-thumb,
     .scryb-accessibility-checker-issues::-webkit-scrollbar-thumb,
     .scryb-emoji-popup-scroll::-webkit-scrollbar-thumb,
@@ -122,7 +122,7 @@
 
     .scryb-scrollable::-webkit-scrollbar-thumb:hover,
     .scryb-dropdown-content::-webkit-scrollbar-thumb:hover,
-    .scryb-slash-commands::-webkit-scrollbar-thumb:hover,
+    .scryb-slash-commands-list::-webkit-scrollbar-thumb:hover,
     .scryb-block-context-menu-submenu::-webkit-scrollbar-thumb:hover,
     .scryb-accessibility-checker-issues::-webkit-scrollbar-thumb:hover,
     .scryb-emoji-popup-scroll::-webkit-scrollbar-thumb:hover,
@@ -1407,7 +1407,8 @@ scryb-icon {
    Rendered by packages/react/src/components/features/slash-commands.tsx and
    packages/angular/src/lib/components/features/tiptap-slash-commands.component.ts.
    The outer box is the floating panel; the listbox inside it is the scroller,
-   so the scrolling region is the combobox's own popup.
+   so the scrolling region is the combobox's own popup. The scroller carries
+   the padding, as the dropdowns' does, so its bar runs along the panel edge.
    ============================================================================= */
 
 .scryb-slash-commands {
@@ -1416,13 +1417,13 @@ scryb-icon {
     border: 1px solid var(--scryb-popover-border, rgba(0, 0, 0, 0.06));
     border-radius: 10px;
     box-shadow: var(--scryb-popover-shadow, 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04));
-    padding: 6px;
     min-width: 240px;
     outline: none;
     z-index: 1000;
 }
 
 .scryb-slash-commands-list {
+    padding: 6px;
     max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1462,9 +1463,18 @@ scryb-icon {
     background: var(--scryb-menu-item-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
+/* Same cues as the block and dropdown menus: a wash for the highlighted row,
+   plus their focus ring when the row was reached from the keyboard. The
+   options never take focus (the editor keeps it, via aria-activedescendant),
+   so :focus-visible cannot tell the two apart; a pointer over the panel does,
+   since that is when the selection follows the pointer. */
 .scryb-slash-commands-item.is-selected {
-    background: var(--scryb-menu-item-selected-bg, rgba(0, 0, 0, 0.06));
-    box-shadow: inset 2px 0 0 var(--scryb-selected-indicator, #5a6472);
+    background: var(--scryb-menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.scryb-slash-commands:not(:hover) .scryb-slash-commands-item.is-selected {
+    outline: 2px solid var(--scryb-color-primary-600, #3182ce);
+    outline-offset: -2px;
 }
 
 /* Forced colors drop box-shadow, which is the selected/active cue above and in
@@ -3165,6 +3175,57 @@ scryb-icon {
         14px calc(100% - 4px),
         14px calc(100% - 4px);
     background-attachment: local, local, scroll, scroll;
+}
+
+/* Where the browser can tie an animation to the wrapper's own scroll position,
+   the shadows follow it and the covers go. The covers paint the editor
+   background over the shadows, so they only work where that background is
+   opaque: a host that sets `--scryb-editor-bg: transparent` (an editor laid
+   on a card or a coloured block) got both shadows on every table, scrolled or
+   not, showing through wherever a row had no fill of its own. A scroll
+   timeline is inactive while nothing overflows, so the widths stay at their
+   zero initial values and a table that fits draws no shadow at all. */
+@property --scryb-table-shadow-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@property --scryb-table-shadow-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes scryb-table-scroll-shadows {
+    from {
+        --scryb-table-shadow-start: 0px;
+        --scryb-table-shadow-end: 14px;
+    }
+    4% {
+        --scryb-table-shadow-start: 14px;
+    }
+    96% {
+        --scryb-table-shadow-end: 14px;
+    }
+    to {
+        --scryb-table-shadow-start: 14px;
+        --scryb-table-shadow-end: 0px;
+    }
+}
+
+@supports (animation-timeline: scroll()) {
+    .scryb-editor .ProseMirror .tableWrapper {
+        background:
+            radial-gradient(farthest-side at 0 50%, var(--scryb-table-scroll-shadow, rgba(15, 22, 36, 0.14)), transparent) left top,
+            radial-gradient(farthest-side at 100% 50%, var(--scryb-table-scroll-shadow, rgba(15, 22, 36, 0.14)), transparent) right top;
+        background-repeat: no-repeat;
+        background-size:
+            var(--scryb-table-shadow-start) calc(100% - 4px),
+            var(--scryb-table-shadow-end) calc(100% - 4px);
+        animation: scryb-table-scroll-shadows linear both;
+        animation-timeline: scroll(self inline);
+    }
 }
 
 .scryb-editor .ProseMirror .tableWrapper table {
