@@ -1,11 +1,13 @@
 // Geometry
 export {
   TABLE_GRIP_ANCHOR_OFFSET_PX,
+  TABLE_GRIP_BAR_REACH_PX,
   TABLE_GRIP_MIN_VISIBLE_PX,
   TABLE_GRIP_REACH_PX,
   TABLE_ROW_GRIP_LANE_PX,
   clampLineRectToViewport,
   isGripAnchorVisible,
+  getEdgeGripPlacement,
   hasLaneForRowGrips,
   hasRoomForOutsideRowGrips,
   findTableCellFromDOM,
@@ -14,7 +16,13 @@ export {
   getTableGripGeometry,
   isWithinGripReach,
 } from "./geometry";
-export type { TableCellRef, TableGripGeometry, TableLineOrientation, TableLineRect } from "./geometry";
+export type {
+  TableCellRef,
+  TableEdgeGripPlacement,
+  TableGripGeometry,
+  TableLineOrientation,
+  TableLineRect,
+} from "./geometry";
 
 // Selection
 export {

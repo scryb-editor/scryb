@@ -14,11 +14,14 @@ import { isTableGripMenuOpen, setTableGripMenuOpen } from "../table-menu/grip-st
 import {
   clampLineRectToViewport,
   findTablePosAtDocPos,
+  getEdgeGripPlacement,
   hasLaneForRowGrips,
   isGripAnchorVisible,
+  TABLE_GRIP_BAR_REACH_PX,
   TABLE_GRIP_ANCHOR_OFFSET_PX,
   TABLE_ROW_GRIP_LANE_PX,
 } from "../table-menu/geometry";
+import type { TableGripGeometry } from "../table-menu/geometry";
 import { getSideMenuGutterGap, getSideMenuLeftOffset } from "../side-menu/constants";
 import {
   getSelectedTableLine,
@@ -417,6 +420,39 @@ describe("grips anchored to the table's top edge", () => {
 
     expect(clampLineRectToViewport(column, viewport)).not.toBeNull();
     expect(isGripAnchorVisible(column.top, viewport)).toBe(false);
+  });
+});
+
+describe("where the column and corner grips go", () => {
+  const box = { index: 0, top: 0, left: 0, width: 400, height: 300 };
+  const geometry = (tableTop: number, topRoom: number): TableGripGeometry => ({
+    tablePos: 0,
+    table: { index: 0, top: tableTop, left: 0, width: 400, height: 100 },
+    viewport: box,
+    scrollClip: box,
+    indent: 0,
+    leftRoom: 0,
+    topRoom,
+    rows: [],
+    columns: [],
+  });
+
+  it("puts them above the table when the editor and the page leave room there", () => {
+    expect(getEdgeGripPlacement(geometry(40, 40))).toBe("outside");
+    // The bar, not the whole target, is what the host must not clip.
+    expect(getEdgeGripPlacement(geometry(40, TABLE_GRIP_BAR_REACH_PX))).toBe("outside");
+  });
+
+  it("moves them inside the table instead of dropping them when there is no room above", () => {
+    // Flush with the top of the editor's scroll box: above would cover the toolbar.
+    expect(getEdgeGripPlacement(geometry(0, 40))).toBe("inside");
+    // Flush with a host that clips: above would be cut off.
+    expect(getEdgeGripPlacement(geometry(40, TABLE_GRIP_BAR_REACH_PX - 1))).toBe("inside");
+  });
+
+  it("drops them while the table's top edge is scrolled out of the editor", () => {
+    expect(getEdgeGripPlacement(geometry(-1, 40))).toBeNull();
+    expect(getEdgeGripPlacement(geometry(301, 40))).toBeNull();
   });
 });
 

@@ -252,11 +252,13 @@ export type {
 // ─── Table Grip Menus ─────────────────────────────────────────────────────────
 export {
   TABLE_GRIP_ANCHOR_OFFSET_PX,
+  TABLE_GRIP_BAR_REACH_PX,
   TABLE_GRIP_MIN_VISIBLE_PX,
   TABLE_GRIP_REACH_PX,
   TABLE_ROW_GRIP_LANE_PX,
   clampLineRectToViewport,
   isGripAnchorVisible,
+  getEdgeGripPlacement,
   hasLaneForRowGrips,
   hasRoomForOutsideRowGrips,
   findTableCellFromDOM,
@@ -290,6 +292,7 @@ export {
 export type {
   SharedCellAttr,
   TableCellRef,
+  TableEdgeGripPlacement,
   TableGripGeometry,
   TableLineOrientation,
   TableLineRect,

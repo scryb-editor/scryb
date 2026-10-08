@@ -1566,37 +1566,35 @@ scryb-icon {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border-width: 2px;
-    border-style: solid;
+    border: 1px solid var(--scryb-border-strong, #7c8594);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 1;
     font-family: inherit;
     cursor: pointer;
-    transition: box-shadow var(--scryb-transition-fast, 0.15s ease);
+    transition: background-color var(--scryb-transition-fast, 0.15s ease);
     outline: none;
     padding: 0;
-    /* A neutral ring outside the coloured border: Black on the dark panel and
-       Lime on the light one would otherwise have no visible edge (1.4.11). */
-    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594);
+    /* One edge per swatch, and a neutral one: the colour is carried by the
+       letter (the adapters set `color`) and a faint wash of it. A coloured ring
+       cannot be the edge, because Black on the dark panel and Lime on the light
+       one have no visible boundary (1.4.11); stacking a neutral ring outside a
+       coloured one fixed that but drew every swatch as a heavy double circle.
+       A border rather than a box-shadow ring, so forced-colors mode keeps it. */
+    background-color: color-mix(in srgb, currentColor 7%, transparent);
 }
 
 .scryb-color-picker-swatch:hover {
-    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594), 0 2px 8px rgba(0, 0, 0, 0.12);
+    background-color: color-mix(in srgb, currentColor 15%, transparent);
 }
 
-.scryb-color-picker-swatch.is-active {
-    outline: 2px solid var(--scryb-color-primary-600, #3182ce);
-    outline-offset: 1px;
-    box-shadow: 0 0 0 1px var(--scryb-border-strong, #7c8594), 0 0 0 3px rgba(49, 130, 206, 0.3);
-}
-
+.scryb-color-picker-swatch.is-active,
 .scryb-color-picker-swatch:focus-visible {
     outline: 2px solid var(--scryb-color-primary-600, #3182ce);
-    outline-offset: 1px;
+    outline-offset: 2px;
 }
 
 /* Consumers who want a focus ring can set --scryb-editor-border-focus */
@@ -3477,6 +3475,40 @@ tiptap-table-grips {
 .scryb-table-grips:not(.scryb-table-grips--rows-outside):has(> .scryb-table-grip--corner)
     .scryb-table-grip--column.is-at-start::before {
     left: 14px;
+}
+
+/* No room above (the table sits flush with the top of the editor's scroll box,
+   or of a host that clips): the column grips fall back just inside the table's
+   top edge, as the row grips do on the left, rather than not being drawn. The
+   bar sits two pixels in, clear of the table's border, and is its own target. */
+.scryb-table-grips--columns-inside .scryb-table-grip--column {
+    height: 8px;
+    transform: translateY(2px);
+}
+
+.scryb-table-grips--columns-inside .scryb-table-grip--column::before {
+    top: 0;
+}
+
+/* The corner follows them down: level with the top of the table, left of it
+   when the rows have a lane and inside its top-left corner when they do not.
+   Either way it takes the first 14px of the row lane, so the first row's bar
+   begins after it. */
+.scryb-table-grips--columns-inside .scryb-table-grip--corner {
+    height: 14px;
+    transform: translateX(-24px);
+}
+
+.scryb-table-grips--columns-inside .scryb-table-grip--corner::before {
+    top: 2px;
+}
+
+.scryb-table-grips--columns-inside:not(.scryb-table-grips--rows-outside) .scryb-table-grip--corner {
+    transform: none;
+}
+
+.scryb-table-grips--columns-inside:has(> .scryb-table-grip--corner) .scryb-table-grip--row.is-at-start::before {
+    top: 14px;
 }
 
 /* Forced colours paint every background as Canvas, which would erase the bar:

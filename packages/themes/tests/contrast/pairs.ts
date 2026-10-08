@@ -114,7 +114,7 @@ export const PAIRS: ContrastPair[] = [
   // Task 11 — selection (C-F21)
   { id: "content.selection-text", rows: [], mount: "editor", html: content(`<p id="t">Selected</p>`), fg: { selector: T, property: "color" }, bg: { selector: T, pseudo: "::selection" }, min: 4.5 },
   // Task 13 — palette swatch ring (C-F20)
-  { id: "color-picker.swatch-ring", rows: [], mount: "portal", html: `<div class="scryb-color-picker"><div class="scryb-color-picker-grid"><button class="scryb-color-picker-swatch" id="t" style="color:#000000;border-color:#000000;background:var(--scryb-editor-bg, white)">A</button></div></div>`, fg: { selector: T, property: "box-shadow" }, bg: { selector: T, skipSelf: true }, min: 3 },
+  { id: "color-picker.swatch-ring", rows: [], mount: "portal", html: `<div class="scryb-color-picker"><div class="scryb-color-picker-grid"><button class="scryb-color-picker-swatch" id="t" style="color:#000000">A</button></div></div>`, fg: { selector: T, property: "border-top-color" }, bg: { selector: T, skipSelf: true }, min: 3 },
   // Final fix wave F2 — the React alt-text form on its bubble surface
   { id: "alt-form.label", rows: [], mount: "editor", html: altForm(`<label id="t">Alt text</label><input type="text">`), fg: { selector: T, property: "color" }, bg: { selector: T }, min: 4.5 },
   { id: "alt-form.input-text", rows: [], mount: "editor", html: altForm(`<label>Alt text</label><input type="text" id="t" value="A cat">`), fg: { selector: T, property: "color" }, bg: { selector: T }, min: 4.5 },

@@ -72,6 +72,13 @@ export interface TableGripGeometry {
    * and the corner go outside the table or fall back inside it.
    */
   readonly leftRoom: number;
+  /**
+   * Room above the table that is actually on screen, in pixels, measured the
+   * same way as `leftRoom` and kept clear of the editor's own toolbar. Decides,
+   * with the editor's own scroll box, whether the column and corner grips sit
+   * above the table or fall back inside it.
+   */
+  readonly topRoom: number;
   /** One box per row, top to bottom */
   readonly rows: readonly TableLineRect[];
   /** One box per column, left to right */
@@ -361,7 +368,19 @@ export function getTableGripGeometry(
   const scrollClipRect = findScrollViewportRect(scroller, container);
   const clipRect = intersectRects(scrollerRect, scrollClipRect);
   const indent = Math.max(0, clipRect.left - getContentEdgeLeft(editor.view.dom));
-  const leftRoom = Math.max(0, clipRect.left - findClipLeft(container));
+  const clipEdges = findClipEdges(container);
+  const leftRoom = Math.max(0, clipRect.left - clipEdges.left);
+  // Room above the table, measured to the nearest edge that would hide or be
+  // covered by a grip there. A host's clip only has to spare the bar; the
+  // editor's own toolbar has to be spared the whole target, or with no top
+  // padding the column grips would sit over its buttons and take their clicks.
+  const toolbar = container.closest(".scryb-editor")?.querySelector(".scryb-toolbar");
+  const toolbarBottom = toolbar?.getBoundingClientRect().bottom;
+  const toolbarEdge =
+    toolbarBottom !== undefined && toolbarBottom <= tableRect.top
+      ? toolbarBottom + TABLE_GRIP_ANCHOR_OFFSET_PX - TABLE_GRIP_BAR_REACH_PX
+      : -Infinity;
+  const topRoom = Math.max(0, tableRect.top - Math.max(clipEdges.top, toolbarEdge));
 
   return {
     tablePos,
@@ -375,6 +394,7 @@ export function getTableGripGeometry(
     },
     indent,
     leftRoom,
+    topRoom,
     scrollClip: {
       index: 0,
       top: scrollClipRect.top - origin.top,
@@ -604,6 +624,46 @@ export function isGripAnchorVisible(edgeTop: number, viewport: TableLineRect): b
   );
 }
 
+/**
+ * How far above the table's top edge a column grip's visible bar reaches: the
+ * 8px bar sits 4–12px above the edge, inside its 24px target. Kept in step
+ * with `.scryb-table-grip--column::before` in the theme by hand.
+ */
+export const TABLE_GRIP_BAR_REACH_PX = 12;
+
+/** Where the grips anchored to the table's top edge — column and corner — are drawn. */
+export type TableEdgeGripPlacement = "outside" | "inside";
+
+/**
+ * Where the column and corner grips go: above the table, or just inside its
+ * top edge when there is no room above it.
+ *
+ * Above needs the whole target inside the editor's own scroll box, or it would
+ * cover the toolbar (see isGripAnchorVisible), and the bar clear of anything
+ * the host page clips, or it would be cut off. Without both the grips move
+ * inside, the way the row grips do on the left, instead of not being drawn:
+ * a table flush with the top of an editor with no padding, or of a host that
+ * clips, used to lose its column grips and the table menu with them.
+ *
+ * @param geometry - The table's measured geometry
+ * @returns The placement, or null when the table's top edge is scrolled out of the editor
+ *
+ * @example
+ * ```typescript
+ * const placement = getEdgeGripPlacement(geometry);
+ * if (placement) drawColumnGrip(placement);
+ * ```
+ */
+export function getEdgeGripPlacement(geometry: TableGripGeometry): TableEdgeGripPlacement | null {
+  const { table, scrollClip } = geometry;
+  if (scrollClip.height <= 0 || scrollClip.width <= 0) return null;
+  if (table.top < scrollClip.top || table.top > scrollClip.top + scrollClip.height) return null;
+
+  return isGripAnchorVisible(table.top, scrollClip) && geometry.topRoom >= TABLE_GRIP_BAR_REACH_PX
+    ? "outside"
+    : "inside";
+}
+
 // =============================================================================
 // Internals
 // =============================================================================
@@ -650,8 +710,10 @@ function intersectRects(a: Box, b: Box): Box {
  * further up is the host page's business, and clipping grips to it would let a
  * consumer's own layout silently delete parts of the editor's UI.
  *
- * Falls back to the boundary's own box when nothing between them scrolls, which
- * intersects to a no-op.
+ * Falls back to the browser viewport when nothing between them clips. Not to
+ * the boundary's own box: that box does not clip, and a table flush with the
+ * top of an editor with no padding read as scrolled out of it, so its column
+ * and corner grips were never drawn.
  */
 function findScrollViewportRect(from: HTMLElement, boundary: HTMLElement): Box {
   let node: HTMLElement | null = from.parentElement;
@@ -667,24 +729,30 @@ function findScrollViewportRect(from: HTMLElement, boundary: HTMLElement): Box {
     node = node.parentElement;
   }
 
-  return boundary.getBoundingClientRect();
+  const root = boundary.ownerDocument.documentElement;
+  return { top: 0, left: 0, width: root.clientWidth, height: root.clientHeight };
 }
 
 /**
- * Viewport x of the left edge anything inside `from` is clipped at: the inner
- * left edge of the nearest clipping ancestor at or above it, or the viewport's.
+ * Viewport coordinates of the left and top edges anything inside `from` is
+ * clipped at: the inner edges of the nearest clipping ancestors at or above
+ * it, or the viewport's.
  *
  * Unlike findScrollViewportRect this does not stop at the editor. It answers
  * where a grip would still be visible, not what to clip it to, and the host
  * page's own layout is exactly what decides that.
  */
-function findClipLeft(from: HTMLElement): number {
+function findClipEdges(from: HTMLElement): { left: number; top: number } {
   let left = 0;
+  let top = 0;
   for (let node: HTMLElement | null = from; node; node = node.parentElement) {
-    if (getComputedStyle(node).overflowX === "visible") continue;
-    left = Math.max(left, node.getBoundingClientRect().left + node.clientLeft);
+    const style = getComputedStyle(node);
+    if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+    const rect = node.getBoundingClientRect();
+    if (style.overflowX !== "visible") left = Math.max(left, rect.left + node.clientLeft);
+    if (style.overflowY !== "visible") top = Math.max(top, rect.top + node.clientTop);
   }
-  return left;
+  return { left, top };
 }
 
 /** Reads a span attribute, treating anything unusable as 1 rather than as zero width. */

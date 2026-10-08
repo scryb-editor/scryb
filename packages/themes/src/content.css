@@ -292,7 +292,11 @@
 .scryb-content table {
     border-collapse: separate;
     border-spacing: 0;
-    margin: 0;
+    /* The editor's 1em comes from prosemirror-tables' .tableWrapper, which the
+       saved HTML does not have, so read-only output drew tables flush against
+       the paragraphs around them. Inside the editor the wrapper rule in
+       components.css sets this back to 0 and spaces the wrapper instead. */
+    margin: 1em 0;
     table-layout: fixed;
     width: 100%;
     border-radius: 8px;
