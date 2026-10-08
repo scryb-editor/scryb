@@ -326,9 +326,9 @@ export interface TiptapTranslations {
     keyboardHints?: {
       /** How to leave the editor with the keyboard (Esc, then Tab). */
       leaveEditor?: string;
-      /** Alt+F10 moves to the bubble menu or toolbar. */
+      /** Alt+F10 moves to the bubble menu or toolbar; `{keys}` is replaced with the platform's key names. */
       toolbar?: string;
-      /** Shift+F10 opens the current block's (or table cell's) menu. */
+      /** Shift+F10 opens the current block's (or table cell's) menu; `{keys}` is replaced with the platform's key names. */
       blockMenu?: string;
       /** Mod+Shift+Arrow; `{keys}` is replaced with the platform's key names. */
       moveBlock?: string;

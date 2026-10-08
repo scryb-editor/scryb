@@ -1,3 +1,4 @@
+import { FOCUS_CHROME_SHORTCUT, OPEN_BLOCK_MENU_SHORTCUT } from "@scryb-editor/extensions";
 import type { TiptapTranslations } from "../i18n/types";
 import { interpolate } from "../i18n/interpolate";
 import { formatShortcut } from "../toolbar/shortcuts";
@@ -6,8 +7,8 @@ import { MOVE_BLOCK_DOWN_SHORTCUT, MOVE_BLOCK_UP_SHORTCUT } from "../block-menu/
 /** English fallbacks for catalogs that predate a sentence. */
 const ENGLISH = {
   leaveEditor: "Press Escape, then Tab, to leave the editor.",
-  toolbar: "Alt+F10 moves to the formatting menu or the toolbar.",
-  blockMenu: "Shift+F10 opens the actions for the current block.",
+  toolbar: "{keys} moves to the formatting menu or the toolbar.",
+  blockMenu: "{keys} opens the actions for the current block.",
   moveBlock: "{keys} moves the current block.",
 } as const;
 
@@ -36,7 +37,9 @@ export function keyboardHintId(instanceId: string): string {
 
 /**
  * The keyboard help a screen reader announces as the editable's description.
- * The keys it lists are otherwise undiscoverable without a pointer.
+ * The keys it lists are otherwise undiscoverable without a pointer. Each
+ * `{keys}` is the platform's name for the keys ("⌥F10" on Apple devices,
+ * "Alt+F10" elsewhere), so a Mac user hears the key their keyboard labels.
  *
  * @param translations - The active translation catalog
  * @returns The hint sentences joined with spaces
@@ -46,8 +49,8 @@ export function getKeyboardHintText(translations: TiptapTranslations): string {
   const moveKeys = `${formatShortcut(MOVE_BLOCK_UP_SHORTCUT)} / ${formatShortcut(MOVE_BLOCK_DOWN_SHORTCUT)}`;
   return [
     hints?.leaveEditor ?? ENGLISH.leaveEditor,
-    hints?.toolbar ?? ENGLISH.toolbar,
-    hints?.blockMenu ?? ENGLISH.blockMenu,
+    interpolate(hints?.toolbar ?? ENGLISH.toolbar, { keys: formatShortcut(FOCUS_CHROME_SHORTCUT) }),
+    interpolate(hints?.blockMenu ?? ENGLISH.blockMenu, { keys: formatShortcut(OPEN_BLOCK_MENU_SHORTCUT) }),
     interpolate(hints?.moveBlock ?? ENGLISH.moveBlock, { keys: moveKeys }),
   ].join(" ");
 }

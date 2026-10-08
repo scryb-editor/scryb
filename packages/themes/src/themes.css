@@ -247,7 +247,6 @@
     --scryb-popover-border: rgba(0, 0, 0, 0.06);
     --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
     --scryb-menu-item-hover-bg: rgba(0, 0, 0, 0.04);
-    --scryb-menu-item-selected-bg: rgba(0, 0, 0, 0.06);
     --scryb-link-editor-divider: #e5e7eb;
 
     /* ─────────────────────────────────────────────────────────────────────────
@@ -497,7 +496,6 @@
     --scryb-popover-border: rgba(255, 255, 255, 0.06);
     --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     --scryb-menu-item-hover-bg: rgba(255, 255, 255, 0.05);
-    --scryb-menu-item-selected-bg: rgba(255, 255, 255, 0.06);
     --scryb-link-editor-divider: var(--scryb-color-dark-border);
 
     /* Form inputs */
@@ -721,7 +719,6 @@
         --scryb-popover-border: rgba(255, 255, 255, 0.06);
         --scryb-popover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
         --scryb-menu-item-hover-bg: rgba(255, 255, 255, 0.05);
-        --scryb-menu-item-selected-bg: rgba(255, 255, 255, 0.06);
         --scryb-link-editor-divider: var(--scryb-color-dark-border);
 
         /* Form inputs */

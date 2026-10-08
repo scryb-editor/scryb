@@ -494,6 +494,26 @@ describe("createBubbleMenuOutsideDismiss", () => {
     vi.useRealTimers();
   });
 
+  it("stays put when Escape closed a nested overlay and left its parent open", () => {
+    vi.useFakeTimers();
+    const fake = arm();
+    openOverlays(dom);
+    // The colour picker opened from inside the overflow panel.
+    const nested = document.createElement("div");
+    nested.id = "surface-nested";
+    document.body.appendChild(nested);
+    dom.ownedItem.setAttribute("aria-expanded", "true");
+    dom.ownedItem.setAttribute("aria-controls", nested.id);
+
+    pressEscape(dom.editorDom);
+    // Only the picker closes; the overflow panel it sat in is still open.
+    dom.ownedItem.setAttribute("aria-expanded", "false");
+    vi.runAllTimers();
+
+    expect(fake.dispatch).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
   it("ignores keys other than Escape", () => {
     const fake = arm();
 

@@ -247,8 +247,8 @@ export const en: TiptapTranslations = {
     },
     keyboardHints: {
       leaveEditor: "Press Escape, then Tab, to leave the editor.",
-      toolbar: "Alt+F10 moves to the formatting menu or the toolbar.",
-      blockMenu: "Shift+F10 opens the actions for the current block.",
+      toolbar: "{keys} moves to the formatting menu or the toolbar.",
+      blockMenu: "{keys} opens the actions for the current block.",
       moveBlock: "{keys} moves the current block.",
     },
   },

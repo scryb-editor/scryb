@@ -210,15 +210,20 @@ function collectOpenSurfaces(menu: HTMLElement): readonly Element[] {
 }
 
 /**
- * Whether the menu has any overlay open — inline or portaled.
+ * How many overlays the menu has open — inline or portaled, nested included.
  *
  * {@link collectOpenSurfaces} only reports surfaces that live outside the menu,
  * so a dropdown rendered inline would read as "nothing open". The open trigger
- * is the one signal both shapes share, wherever the surface ends up.
+ * is the one signal both shapes share, wherever the surface ends up. A count
+ * rather than a yes/no, because closing the colour picker inside the overflow
+ * panel leaves the panel open: only a drop tells that Escape closed something.
  */
-function hasOpenOverlay(menu: HTMLElement): boolean {
-  if (menu.querySelector(OPEN_TRIGGER_SELECTOR)) return true;
-  return collectOpenSurfaces(menu).some((surface) => surface.querySelector(OPEN_TRIGGER_SELECTOR));
+function countOpenOverlays(menu: HTMLElement): number {
+  const triggers = new Set(menu.querySelectorAll(OPEN_TRIGGER_SELECTOR));
+  for (const surface of collectOpenSurfaces(menu)) {
+    for (const trigger of Array.from(surface.querySelectorAll(OPEN_TRIGGER_SELECTOR))) triggers.add(trigger);
+  }
+  return triggers.size;
 }
 
 // ═══════════════ Factory ═══════════════
@@ -342,14 +347,15 @@ export function createBubbleMenuOutsideDismiss(
     // every overlay handles the key though, and one that ignores it must not
     // swallow the menu's own dismissal — so the verdict waits a tick and reads
     // whether anything actually closed.
-    if (hasOpenOverlay(menu)) {
+    const openBefore = countOpenOverlays(menu);
+    if (openBefore > 0) {
       markEscapeAfterOverlays(event);
       clearTimeout(pendingEscape);
       pendingEscape = setTimeout(() => {
         // Normally already gone; covers a propagation stopped before the document.
         stopMarkingEscape?.();
         const stillOpen = activeMenu();
-        if (stillOpen && hasOpenOverlay(stillOpen)) dismiss();
+        if (stillOpen && countOpenOverlays(stillOpen) >= openBefore) dismiss();
       }, 0);
       return;
     }

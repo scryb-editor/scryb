@@ -254,8 +254,8 @@ export const zh: TiptapTranslations = {
     },
     keyboardHints: {
       leaveEditor: "按 Esc 键，然后按 Tab 键离开编辑器。",
-      toolbar: "按 Alt+F10 移至格式菜单或工具栏。",
-      blockMenu: "按 Shift+F10 打开当前块的操作。",
+      toolbar: "按 {keys} 移至格式菜单或工具栏。",
+      blockMenu: "按 {keys} 打开当前块的操作。",
       moveBlock: "{keys} 可移动当前块。",
     },
   },

@@ -3494,10 +3494,12 @@ tiptap-table-grips {
 /* The corner follows them down: level with the top of the table, left of it
    when the rows have a lane and inside its top-left corner when they do not.
    Either way it takes the first 14px of the row lane, so the first row's bar
-   begins after it. */
+   begins after it. The first row's target still spans that 14px, so the
+   corner stacks above it, or a click on its bar opens the row's menu. */
 .scryb-table-grips--columns-inside .scryb-table-grip--corner {
     height: 14px;
     transform: translateX(-24px);
+    z-index: 1;
 }
 
 .scryb-table-grips--columns-inside .scryb-table-grip--corner::before {

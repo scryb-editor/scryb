@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import type { Editor } from "@tiptap/core";
 import { createScrybEditor, buildExtensions } from "../editor-factory";
 import {
@@ -33,19 +33,53 @@ describe("keyboard hint", () => {
     expect(getKeyboardHintText(en)).toContain("Press Escape, then Tab, to leave the editor.");
   });
 
-  it("lists Alt+F10", () => expect(getKeyboardHintText(en)).toContain("Alt+F10"));
+  describe("shortcut names", () => {
+    /** Loads the hint fresh under `userAgent`; the shortcut module reads the platform once at import. */
+    async function hintFor(userAgent: string, catalog = en): Promise<string> {
+      vi.resetModules();
+      vi.stubGlobal("navigator", { userAgent });
+      const { getKeyboardHintText: fresh } = await import("../accessibility/keyboard-hint");
+      return fresh(catalog);
+    }
 
-  it("lists Shift+F10 after Alt+F10, before the move keys", () => {
-    const text = getKeyboardHintText(en);
-    expect(text).toContain("Shift+F10 opens the actions for the current block.");
-    expect(text.indexOf("Alt+F10")).toBeLessThan(text.indexOf("Shift+F10"));
-    expect(text.indexOf("Shift+F10")).toBeLessThan(text.indexOf("moves the current block"));
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("names the keys the way a Mac keyboard labels them", async () => {
+      const text = await hintFor("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)");
+      expect(text).toContain("⌥F10 moves to the formatting menu or the toolbar.");
+      expect(text).toContain("⇧F10 opens the actions for the current block.");
+      expect(text).not.toContain("Alt+F10");
+    });
+
+    it("names Alt and Shift elsewhere", async () => {
+      const text = await hintFor("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+      expect(text).toContain("Alt+F10 moves to the formatting menu or the toolbar.");
+      expect(text).toContain("Shift+F10 opens the actions for the current block.");
+    });
+
+    it("keeps a consumer's sentence that spells the keys out itself", async () => {
+      const catalog = {
+        ...en,
+        editor: { ...en.editor, keyboardHints: { ...en.editor.keyboardHints, toolbar: "Option+F10 reaches the menus." } },
+      };
+      expect(await hintFor("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", catalog)).toContain(
+        "Option+F10 reaches the menus.",
+      );
+    });
   });
 
-  it("falls back to the English Shift+F10 sentence", () => {
+  it("lists the menu keys before the move keys", () => {
+    const text = getKeyboardHintText(en);
+    expect(text.indexOf("formatting menu")).toBeLessThan(text.indexOf("actions for the current block"));
+    expect(text.indexOf("actions for the current block")).toBeLessThan(text.indexOf("moves the current block"));
+  });
+
+  it("falls back to the English block-menu sentence", () => {
     const { blockMenu: _omitted, ...rest } = en.editor.keyboardHints!;
     const catalog = { ...en, editor: { ...en.editor, keyboardHints: rest } };
-    expect(getKeyboardHintText(catalog)).toContain("Shift+F10 opens the actions for the current block.");
+    expect(getKeyboardHintText(catalog)).toContain("F10 opens the actions for the current block.");
   });
 
   it.each([
@@ -54,9 +88,12 @@ describe("keyboard hint", () => {
     ["fr", fr],
     ["pt", pt],
     ["zh", zh],
-  ])("ships the leave-editor and block-menu hints in %s", (_code, catalog) => {
-    expect(catalog.editor.keyboardHints?.leaveEditor).toBeTruthy();
-    expect(catalog.editor.keyboardHints?.blockMenu).toContain("F10");
+  ])("leaves the key names to the platform in %s", (_code, catalog) => {
+    const hints = catalog.editor.keyboardHints;
+    expect(hints?.leaveEditor).toBeTruthy();
+    expect(hints?.toolbar).toContain("{keys}");
+    expect(hints?.blockMenu).toContain("{keys}");
+    expect(getKeyboardHintText(catalog)).not.toContain("{keys}");
   });
 
   it("points the editable's aria-describedby at the hint", () => {

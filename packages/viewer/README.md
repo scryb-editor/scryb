@@ -59,6 +59,8 @@ markup and the viewer stylesheet knows how to read it.
 - **Tables** — width mode, cell alignment and cell colour arrive as classes and an inline
   background, and a table nobody resized fits the container it lands in rather than keeping the
   editor's column floor. Column widths someone dragged live in `<colgroup><col style="width:…">`.
+  Each table arrives inside a `<div class="tableWrapper">`, which scrolls when the table is wider
+  than its container. The viewer renders from JSON, so documents saved before 3.11 get it too.
 - **Images** — the width the author resized to: a `width` attribute when it is a pixel count, an
   inline style when it is a percentage.
 - **Dark output** — pass `theme: "dark"`, or put `.scryb-theme-dark` on an ancestor yourself. The

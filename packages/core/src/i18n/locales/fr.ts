@@ -247,8 +247,8 @@ export const fr: TiptapTranslations = {
     },
     keyboardHints: {
       leaveEditor: "Appuyez sur Échap, puis sur Tab, pour quitter l'éditeur.",
-      toolbar: "Alt+F10 place le focus sur le menu de mise en forme ou la barre d'outils.",
-      blockMenu: "Maj+F10 ouvre les actions du bloc actuel.",
+      toolbar: "{keys} place le focus sur le menu de mise en forme ou la barre d'outils.",
+      blockMenu: "{keys} ouvre les actions du bloc actuel.",
       moveBlock: "{keys} déplace le bloc actuel.",
     },
   },

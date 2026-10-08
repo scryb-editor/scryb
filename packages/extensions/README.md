@@ -60,6 +60,12 @@ content, the default fills the column) and its cells an alignment and a backgrou
 rendered as classes so read-only output keeps them. It ships inside the bundle rather than
 opt-in, so the viewer's extension set gets it too and a table saved centred renders centred.
 
+Saved HTML puts each table in a `<div class="tableWrapper">` (`TABLE_WRAPPER_CLASS`), the same
+scroll container the editor draws, so a table wider than the page scrolls instead of overflowing
+it. HTML saved before 3.11 has bare tables; `ensureTableWrappers(html)` adds the wrapper before you
+render it and leaves already wrapped tables alone. It needs a DOM: on the server it returns the HTML
+unchanged.
+
 **Images** — `ResizableImageExtension` adds drag handles and aspect-ratio-preserving resize.
 `ImagePlaceholderExtension` holds the spot while an upload runs — a decoration, not a node, so
 an in-flight upload never reaches `getHTML()`, an autosave, or your database as a half-finished
