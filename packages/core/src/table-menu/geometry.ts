@@ -64,6 +64,14 @@ export interface TableGripGeometry {
    * row grip can use it as well as the gutter the consumer reserved.
    */
   readonly indent: number;
+  /**
+   * Room left of the table's scroll box that is actually on screen, in pixels:
+   * up to the nearest ancestor of the grip layer that clips, or the viewport's
+   * left edge. Where the host page clips the editor flush with the table, a
+   * grip placed outside would be cut off, so this decides whether the grips
+   * and the corner go outside the table or fall back inside it.
+   */
+  readonly leftRoom: number;
   /** One box per row, top to bottom */
   readonly rows: readonly TableLineRect[];
   /** One box per column, left to right */
@@ -353,6 +361,7 @@ export function getTableGripGeometry(
   const scrollClipRect = findScrollViewportRect(scroller, container);
   const clipRect = intersectRects(scrollerRect, scrollClipRect);
   const indent = Math.max(0, clipRect.left - getContentEdgeLeft(editor.view.dom));
+  const leftRoom = Math.max(0, clipRect.left - findClipLeft(container));
 
   return {
     tablePos,
@@ -365,6 +374,7 @@ export function getTableGripGeometry(
       height: clipRect.height,
     },
     indent,
+    leftRoom,
     scrollClip: {
       index: 0,
       top: scrollClipRect.top - origin.top,
@@ -429,20 +439,22 @@ export function isWithinGripReach(
 export const TABLE_ROW_GRIP_LANE_PX = 20;
 
 /**
- * Whether the row grips can sit outside the table, beside the rows they name.
+ * Whether the row grips — and, with no side menu, the corner grip — can sit
+ * outside the table, beside the rows they name.
  *
- * Read from the room the layout actually leaves: the gutter the consumer
- * reserved plus whatever the table is indented by. With a side menu the grips
- * get only what the menu yields of the gutter — see getSideMenuGutterGap — and
- * with no side menu the whole gutter is theirs. The indentation is theirs
- * either way, since the side menu parks at the content edge whatever the
- * block's own indent. When neither leaves room the grips fall back inside the
- * table's left edge, which is cramped but clickable; out in a four-pixel gap
- * they landed under the drag handle instead.
+ * Read from the room the layout actually leaves. With no side menu that is all
+ * the visible ground left of the table: the gutter the consumer reserved, the
+ * table's own indentation, and any margin around the editor the host page does
+ * not clip. With a side menu the grips get only what the menu yields of the
+ * gutter — see getSideMenuGutterGap — plus the indentation, since the menu
+ * parks at the content edge whatever the block's own indent. When there is no
+ * lane the grips fall back inside the table's left edge, which is cramped but
+ * clickable; out in a four-pixel gap they landed under the drag handle, and
+ * past a clipping edge they were not drawn at all.
  *
  * @param editor - The Tiptap editor instance
  * @param sideMenuEnabled - Whether a side menu occupies the gutter
- * @param geometry - The table's measured geometry, for its indentation
+ * @param geometry - The table's measured geometry, for its indentation and visible room
  * @returns True when there is room for the grips outside the table
  *
  * @example
@@ -462,6 +474,7 @@ export function hasRoomForOutsideRowGrips(
     Number.parseFloat(getComputedStyle(dom).paddingLeft) || 0,
     sideMenuEnabled,
     geometry.indent,
+    geometry.leftRoom,
   );
 }
 
@@ -471,11 +484,17 @@ export function hasRoomForOutsideRowGrips(
  * @param paddingLeft - The editable element's left padding, in pixels
  * @param sideMenuEnabled - Whether a side menu occupies the gutter
  * @param indent - How far the table sits right of the content edge, in pixels
- * @returns True when the gutter and the indentation together hold a lane the row grips fit in
+ * @param leftRoom - Visible room left of the table, in pixels; defaults to the padding and indentation alone
+ * @returns True when the room left free holds a lane the row grips fit in
  */
-export function hasLaneForRowGrips(paddingLeft: number, sideMenuEnabled: boolean, indent = 0): boolean {
-  const gutter = sideMenuEnabled ? getSideMenuGutterGap(paddingLeft) : paddingLeft;
-  return gutter + indent >= TABLE_ROW_GRIP_LANE_PX;
+export function hasLaneForRowGrips(
+  paddingLeft: number,
+  sideMenuEnabled: boolean,
+  indent = 0,
+  leftRoom = paddingLeft + indent,
+): boolean {
+  const free = sideMenuEnabled ? Math.min(getSideMenuGutterGap(paddingLeft) + indent, leftRoom) : leftRoom;
+  return free >= TABLE_ROW_GRIP_LANE_PX;
 }
 
 /**
@@ -649,6 +668,23 @@ function findScrollViewportRect(from: HTMLElement, boundary: HTMLElement): Box {
   }
 
   return boundary.getBoundingClientRect();
+}
+
+/**
+ * Viewport x of the left edge anything inside `from` is clipped at: the inner
+ * left edge of the nearest clipping ancestor at or above it, or the viewport's.
+ *
+ * Unlike findScrollViewportRect this does not stop at the editor. It answers
+ * where a grip would still be visible, not what to clip it to, and the host
+ * page's own layout is exactly what decides that.
+ */
+function findClipLeft(from: HTMLElement): number {
+  let left = 0;
+  for (let node: HTMLElement | null = from; node; node = node.parentElement) {
+    if (getComputedStyle(node).overflowX === "visible") continue;
+    left = Math.max(left, node.getBoundingClientRect().left + node.clientLeft);
+  }
+  return left;
 }
 
 /** Reads a span attribute, treating anything unusable as 1 rather than as zero width. */

@@ -1324,9 +1324,15 @@ scryb-icon {
     outline-offset: -2px;
 }
 
+/* A <kbd>, so a host page's global kbd style (Bootstrap's dark key cap) would
+   otherwise paint it: every box property the hint does not set is reset. */
 .scryb-block-context-menu-shortcut {
     margin-left: auto;
-    padding-left: 12px;
+    padding: 0 0 0 12px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
     font: inherit;
     font-size: 12px;
     color: var(--scryb-text-muted, #5a6472);
@@ -3451,6 +3457,26 @@ tiptap-table-grips {
     width: 8px;
     height: 8px;
     border-radius: 2px;
+}
+
+/* No lane to the left (the host clips flush with the table, or reserved no
+   room): the corner moves into the band above the table that the column grips
+   use, over the table's own left edge and in line with the inside row bar, and
+   the bar of the column starting there begins after it. Left outside, it was
+   cut off and the table menu had no way in. */
+.scryb-table-grips:not(.scryb-table-grips--rows-outside) .scryb-table-grip--corner {
+    width: 14px;
+    transform: translateY(-24px);
+    z-index: 1;
+}
+
+.scryb-table-grips:not(.scryb-table-grips--rows-outside) .scryb-table-grip--corner::before {
+    left: 2px;
+}
+
+.scryb-table-grips:not(.scryb-table-grips--rows-outside):has(> .scryb-table-grip--corner)
+    .scryb-table-grip--column.is-at-start::before {
+    left: 14px;
 }
 
 /* Forced colours paint every background as Canvas, which would erase the bar:

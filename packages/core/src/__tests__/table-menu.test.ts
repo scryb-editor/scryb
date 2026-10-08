@@ -349,6 +349,15 @@ describe("where the row grips go", () => {
     expect(hasLaneForRowGrips(64, true, 16)).toBe(true);
     expect(hasLaneForRowGrips(64, true, 15)).toBe(false);
   });
+
+  it("takes the room the page leaves beside the editor when nothing clips it", () => {
+    // No gutter, no indent, but 30px of unclipped margin around the editor.
+    expect(hasLaneForRowGrips(0, false, 0, 30)).toBe(true);
+    // The host clips flush with the table: a grip outside would be cut off.
+    expect(hasLaneForRowGrips(80, false, 0, 0)).toBe(false);
+    // With a side menu, the visible room still caps what the menu yields.
+    expect(hasLaneForRowGrips(80, true, 0, 10)).toBe(false);
+  });
 });
 
 describe("grips anchored to the table's top edge", () => {
