@@ -1,6 +1,6 @@
 {
   "name": "@scryb-editor/themes",
-  "version": "3.10.4",
+  "version": "3.11.0",
   "description": "CSS design tokens, light and dark themes, and content styles for the Scryb rich text editor, with a viewer-only stylesheet for read-only pages",
   "keywords": [
     "css",

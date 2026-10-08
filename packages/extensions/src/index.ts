@@ -26,7 +26,7 @@ export {
 // ============================================================================
 
 export { IndentExtension } from "./indent.extension";
-export { TableBundle } from "./table-bundle.extension";
+export { TableBundle, TABLE_WRAPPER_CLASS, ensureTableWrappers } from "./table-bundle.extension";
 export {
   TableLayoutExtension,
   TABLE_WIDTH_AUTO_CLASS,

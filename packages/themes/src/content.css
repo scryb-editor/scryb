@@ -292,15 +292,71 @@
 .scryb-content table {
     border-collapse: separate;
     border-spacing: 0;
-    /* The editor's 1em comes from prosemirror-tables' .tableWrapper, which the
-       saved HTML does not have, so read-only output drew tables flush against
-       the paragraphs around them. Inside the editor the wrapper rule in
-       components.css sets this back to 0 and spaces the wrapper instead. */
+    /* The editor spaces tables through prosemirror-tables' .tableWrapper. Saved
+       HTML carries that wrapper only since TableBundle started writing it, so a
+       bare table from older content keeps its own 1em here; a wrapped one hands
+       it to the wrapper below, as the editor does in components.css. */
     margin: 1em 0;
     table-layout: fixed;
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
+}
+
+/* The scroll container saved around each table
+   -----------------------------------------------------------------------------
+   TableBundle saves every table inside the `div.tableWrapper` the editor draws
+   it in, so read-only output scrolls a table wider than its column the way the
+   editor does, instead of letting it bleed out of the page or be cut off by it.
+   Content saved before that has bare tables: `ensureTableWrappers()` from
+   @scryb-editor/extensions wraps them at render time.
+
+   The editor's rules for this wrapper live in components.css; these are for
+   read-only output only, hence `:not(.ProseMirror)`, and repeat the editor's:
+   the 4px under the table keeps the scrollbar off its bottom border, and the
+   contained overscroll keeps a fast horizontal flick from reaching the browser's
+   back gesture. The scrollbar is the designed one, kept in step with the
+   scrollbar block at the top of components.css. */
+.scryb-content:not(.ProseMirror) .tableWrapper {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    margin: 1em 0;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scryb-scrollbar-thumb, #718096)
+        var(--scryb-scrollbar-track, transparent);
+}
+
+.scryb-content:not(.ProseMirror) .tableWrapper > table {
+    margin: 0;
+}
+
+@supports selector(::-webkit-scrollbar) {
+    .scryb-content:not(.ProseMirror) .tableWrapper {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+    }
+
+    .scryb-content:not(.ProseMirror) .tableWrapper::-webkit-scrollbar {
+        width: var(--scryb-scrollbar-size, 10px);
+        height: var(--scryb-scrollbar-size, 10px);
+    }
+
+    .scryb-content:not(.ProseMirror) .tableWrapper::-webkit-scrollbar-track,
+    .scryb-content:not(.ProseMirror) .tableWrapper::-webkit-scrollbar-corner {
+        background: var(--scryb-scrollbar-track, transparent);
+    }
+
+    .scryb-content:not(.ProseMirror) .tableWrapper::-webkit-scrollbar-thumb {
+        background-color: var(--scryb-scrollbar-thumb, #718096);
+        border: var(--scryb-scrollbar-inset, 3px) solid transparent;
+        background-clip: padding-box;
+        border-radius: var(--scryb-scrollbar-size, 10px);
+    }
+
+    .scryb-content:not(.ProseMirror) .tableWrapper::-webkit-scrollbar-thumb:hover {
+        background-color: var(--scryb-scrollbar-thumb-hover, #4a5568);
+    }
 }
 
 /* Table width mode

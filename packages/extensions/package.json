@@ -1,6 +1,6 @@
 {
   "name": "@scryb-editor/extensions",
-  "version": "3.10.4",
+  "version": "3.11.0",
   "description": "Tiptap extensions for rich text editing: font size and family, line height, indentation, resizable images, tables, drag handle, paste cleanup and an accessibility checker",
   "keywords": [
     "tiptap",
