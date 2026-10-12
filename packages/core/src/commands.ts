@@ -375,7 +375,7 @@ export class EditorCommands {
   }
 
   setEditable(editor: Editor, editable: boolean): void {
-    editor.setEditable(editable);
+    setEditable(editor, editable);
   }
 
   focus(editor: Editor): void {
@@ -774,8 +774,15 @@ export function setContent(editor: Editor, content: string, emitUpdate = true): 
   editor.chain().focus().setContent(content, { emitUpdate }).run();
 }
 
-/** Sets the editor's editable state. */
+/**
+ * Sets the editor's editable state. A no-op when it already has that state:
+ * Tiptap's `setEditable` emits `update` on every call, and a redundant call
+ * (an effect re-running on mount) would wake every `update` listener for
+ * nothing. A real switch still emits it, which is how listeners such as the
+ * table grips learn about the change.
+ */
 export function setEditable(editor: Editor, editable: boolean): void {
+  if (editor.isEditable === editable) return;
   editor.setEditable(editable);
 }
 

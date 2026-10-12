@@ -465,9 +465,10 @@ describe("EditorCommands class", () => {
       expect(runFn).toHaveBeenCalled();
     });
 
-    it("setEditable calls editor.setEditable", () => {
-      commands.setEditable(editor, false);
-      expect(editor.setEditable).toHaveBeenCalledWith(false);
+    it("setEditable leaves an editor already in that state alone, so no update is emitted", () => {
+      const { editor: readOnly } = createMockEditor({ isEditable: false });
+      commands.setEditable(readOnly, false);
+      expect(readOnly.setEditable).not.toHaveBeenCalled();
     });
 
     it("focus calls the correct chain", () => {
@@ -769,9 +770,10 @@ describe("standalone functional API", () => {
       expect(runFn).toHaveBeenCalled();
     });
 
-    it("setEditable delegates to editor.setEditable", () => {
-      setEditable(editor, true);
-      expect(editor.setEditable).toHaveBeenCalledWith(true);
+    it("setEditable switches an editor in the other state", () => {
+      const { editor: readOnly } = createMockEditor({ isEditable: false });
+      setEditable(readOnly, true);
+      expect(readOnly.setEditable).toHaveBeenCalledWith(true);
     });
 
     it("focusEditor calls chain", () => {
